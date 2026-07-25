@@ -1,7 +1,7 @@
 // ============================================================
 // تنظیمات اولیه
 // ============================================================
-const API_BASE_URL = 'https://ays-tqxj.onrender.com/api'; // در تولید، آدرس سرور واقعی قرار می‌گیرد
+const API_BASE_URL = 'https://ays-server.onrender.com/api'; // در تولید، آدرس سرور واقعی قرار می‌گیرد
 let currentUserId = localStorage.getItem('ays_user_id');
 let currentUserData = null;
 
