@@ -1,7 +1,7 @@
 // ============================================================
 // تنظیمات اولیه
 // ============================================================
-const API_BASE_URL = 'https://ays-tqxj.onrender.com';
+const API_BASE_URL = 'https://ays-tqxj.onrender.com/api';
 let currentUserId = localStorage.getItem('ays_user_id');
 let currentUserData = null;
 
