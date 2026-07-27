@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد</title>
-    <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است. ایده خود را ثبت کنید و آینده‌ساز باشید." />
+    <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است." />
     <meta name="keywords" content="ایده, ثبت ایده, فروش ایده, موسسه آیس, AYS" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,8 +15,8 @@
 </head>
 <body>
 
-    <!-- ===== هدر (فقط در صفحات داخلی) ===== -->
-    <header id="mainHeader" class="hidden">
+    <!-- ===== هدر (فقط در صفحه اصلی و صفحات داخلی) ===== -->
+    <header id="mainHeader">
         <div class="header-container">
             <span class="logo-dujit">AYS</span>
         </div>
@@ -134,9 +134,7 @@
                     <i class="fas fa-info-circle"></i>
                     اگر ایده شما مورد قبول موسسه و شرکت بود، از طریق شماره تلفن به شما اطلاع‌رسانی خواهد شد.
                 </div>
-                <div id="ideasList" class="ideas-list">
-                    <!-- توسط جاوااسکریپت پر می‌شود -->
-                </div>
+                <div id="ideasList" class="ideas-list"></div>
             </div>
         </section>
 
@@ -145,16 +143,9 @@
             <div class="about-wrapper">
                 <div class="about-card">
                     <h2 class="about-title">درباره <span class="highlight">موسسه آیس</span></h2>
-                    <p class="about-text">
-                        موسسه آیس (AYS) با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است.
-                        ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد. به همین دلیل، بستری فراهم کرده‌ایم تا هر فردی بتواند ایده‌های خود را بدون دغدغه با ما در میان بگذارد.
-                    </p>
-                    <p class="about-text">
-                        همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی، این امکان را فراهم می‌کند که ایده‌های ارزشمند، به سرعت به مرحله اجرا برسند و سرمایه‌گذاران مناسب را پیدا کنند.
-                    </p>
-                    <p class="about-text highlight-text">
-                        ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن، به اشتراک گذاشته نمی‌شود.
-                    </p>
+                    <p class="about-text">موسسه آیس (AYS) با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است. ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد.</p>
+                    <p class="about-text">همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی، این امکان را فراهم می‌کند که ایده‌های ارزشمند، به سرعت به مرحله اجرا برسند.</p>
+                    <p class="about-text highlight-text">ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن، به اشتراک گذاشته نمی‌شود.</p>
                     <div class="about-stats">
                         <div class="stat"><span class="num">+۵۰۰</span><span class="label">ایده ثبت شده</span></div>
                         <div class="stat"><span class="num">+۱۲۰</span><span class="label">همکاری موفق</span></div>
@@ -169,9 +160,7 @@
             <div class="account-wrapper">
                 <div class="account-card">
                     <h2><i class="fas fa-user-circle"></i> اکانت من</h2>
-                    <div id="accountInfo" class="account-info">
-                        <!-- توسط جاوااسکریپت پر می‌شود -->
-                    </div>
+                    <div id="accountInfo" class="account-info"></div>
                     <button id="logoutBtn" class="btn-primary btn-logout">خروج از حساب <i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </div>
@@ -180,7 +169,7 @@
     </main>
 
     <!-- ===== ناوبری پایین (فقط در صفحات داخلی) ===== -->
-    <nav id="bottomNav" class="hidden">
+    <nav id="bottomNav">
         <div class="nav-item active" data-page="dashboardPage">
             <i class="fas fa-home"></i>
             <span>خانه</span>
