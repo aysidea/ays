@@ -1,174 +1,195 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { sendVerificationEmail } = require('./utils/email');
+const path = require('path');
 const { sendToTelegram } = require('./utils/telegram');
+const { sendVerificationEmail } = require('./utils/email');
 require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(cors());
 app.use(express.json());
 
-// ===== دیتابیس =====
-const db = new sqlite3.Database('./database/ays.db', (err) => {
-  if (err) console.error('DB error:', err);
-  else console.log('✅ Connected to SQLite');
+const dbPath = path.join(__dirname, 'database', 'ays.db');
+const db = new sqlite3.Database(dbPath);
+
+db.serialize(() => {
+    db.run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            phone TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS verifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            code TEXT NOT NULL,
+            expires_at DATETIME NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS ideas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `);
 });
 
-db.run(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    phone TEXT NOT NULL,
-    password TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
-db.run(`
-  CREATE TABLE IF NOT EXISTS verification_codes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL,
-    code TEXT NOT NULL,
-    expires_at DATETIME NOT NULL,
-    used INTEGER DEFAULT 0
-  )
-`);
-db.run(`
-  CREATE TABLE IF NOT EXISTS ideas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    content TEXT NOT NULL,
-    status TEXT DEFAULT 'pending',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )
-`);
-
-// ===== توابع کمکی =====
-const generateToken = (user) => {
-  return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-};
-
-const verifyToken = (req, res, next) => {
-  const auth = req.headers.authorization;
-  if (!auth) return res.status(401).json({ message: 'توکن ارائه نشده' });
-  const token = auth.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.id;
-    next();
-  } catch {
-    res.status(401).json({ message: 'توکن نامعتبر' });
-  }
-};
-
-// ===== API =====
-
-// 1. درخواست کد تایید
-app.post('/api/request-verification', async (req, res) => {
-  const { email } = req.body;
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ message: 'ایمیل نامعتبر' });
-  }
-  // بررسی وجود ایمیل تکراری
-  db.get('SELECT id FROM users WHERE email = ?', [email], async (err, user) => {
-    if (user) return res.status(400).json({ message: 'این ایمیل قبلاً ثبت شده' });
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expires = new Date(Date.now() + 5 * 60000).toISOString();
-    db.run('INSERT INTO verification_codes (email, code, expires_at) VALUES (?, ?, ?)', [email, code, expires]);
-    try {
-      await sendVerificationEmail(email, code);
-      res.json({ success: true });
-    } catch {
-      res.status(500).json({ message: 'خطا در ارسال ایمیل' });
-    }
-  });
-});
-
-// 2. ثبت‌نام کامل
 app.post('/api/register', (req, res) => {
-  const { name, email, phone, password, code } = req.body;
-  if (!name || !email || !phone || !password || !code) {
-    return res.status(400).json({ message: 'همه فیلدها الزامی است' });
-  }
-  if (password.length < 6) return res.status(400).json({ message: 'رمز حداقل ۶ کاراکتر' });
+    const { phone, name, email, password } = req.body;
 
-  // بررسی کد
-  db.get(
-    'SELECT * FROM verification_codes WHERE email = ? AND code = ? AND used = 0 AND expires_at > datetime("now")',
-    [email, code],
-    async (err, record) => {
-      if (!record) return res.status(400).json({ message: 'کد نامعتبر یا منقضی' });
-      // هش رمز
-      const hashed = await bcrypt.hash(password, 10);
-      db.run(
-        'INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)',
-        [name, email, phone, hashed],
-        function(err) {
-          if (err) {
-            if (err.message.includes('UNIQUE')) return res.status(400).json({ message: 'ایمیل تکراری' });
-            return res.status(500).json({ message: 'خطای سرور' });
-          }
-          // علامت استفاده کد
-          db.run('UPDATE verification_codes SET used = 1 WHERE id = ?', [record.id]);
-          const token = generateToken({ id: this.lastID, email });
-          res.json({ token, user: { id: this.lastID, name, email, phone } });
+    if (!phone || !name || !email || !password) {
+        return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
+    }
+
+    db.get('SELECT id FROM users WHERE phone = ? OR email = ?', [phone, email], (err, existing) => {
+        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
+        if (existing) return res.status(400).json({ error: 'این شماره یا ایمیل قبلاً ثبت شده است.' });
+
+        db.run(
+            'INSERT INTO users (phone, name, email, password, status) VALUES (?, ?, ?, ?, ?)',
+            [phone, name, email, password, 'pending'],
+            function(err) {
+                if (err) return res.status(500).json({ error: 'خطا در ثبت‌نام' });
+                res.status(201).json({
+                    id: this.lastID,
+                    phone,
+                    name,
+                    email,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                });
+            }
+        );
+    });
+});
+
+app.post('/api/send-verification', async (req, res) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'شناسه کاربر الزامی است.' });
+    }
+
+    db.get('SELECT email, name FROM users WHERE id = ? AND status = "pending"', [userId], async (err, user) => {
+        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
+        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد یا قبلاً تأیید شده است.' });
+
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 5 * 60000).toISOString();
+
+        db.run(
+            'INSERT INTO verifications (user_id, code, expires_at) VALUES (?, ?, ?)',
+            [userId, code, expiresAt],
+            async function(err) {
+                if (err) return res.status(500).json({ error: 'خطا در ذخیره کد' });
+
+                try {
+                    await sendVerificationEmail(user.email, user.name, code);
+                    res.json({ message: 'کد تأیید به ایمیل ارسال شد.' });
+                } catch (emailErr) {
+                    console.error('خطا در ارسال ایمیل:', emailErr);
+                    res.status(500).json({ error: 'خطا در ارسال ایمیل. دوباره تلاش کنید.' });
+                }
+            }
+        );
+    });
+});
+
+app.post('/api/verify-code', (req, res) => {
+    const { userId, code } = req.body;
+
+    if (!userId || !code) {
+        return res.status(400).json({ error: 'شناسه کاربر و کد الزامی هستند.' });
+    }
+
+    db.get(
+        'SELECT * FROM verifications WHERE user_id = ? AND code = ? AND expires_at > datetime("now") ORDER BY created_at DESC LIMIT 1',
+        [userId, code],
+        (err, verification) => {
+            if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
+            if (!verification) {
+                return res.status(400).json({ error: 'کد اشتباه یا منقضی شده است.' });
+            }
+
+            db.run('UPDATE users SET status = "active" WHERE id = ?', [userId], function(err) {
+                if (err) return res.status(500).json({ error: 'خطا در فعال‌سازی حساب' });
+
+                db.get('SELECT id, phone, name, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
+                    if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
+                    res.json({ message: 'حساب کاربری فعال شد.', user });
+                });
+            });
         }
-      );
+    );
+});
+
+app.get('/api/user/:id', (req, res) => {
+    const userId = req.params.id;
+    db.get('SELECT id, phone, name, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
+        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
+        res.json(user);
+    });
+});
+
+app.post('/api/ideas', (req, res) => {
+    const { userId, content } = req.body;
+
+    if (!userId || !content || content.trim().length < 5) {
+        return res.status(400).json({ error: 'متن ایده باید حداقل ۵ کاراکتر باشد.' });
     }
-  );
+
+    db.get('SELECT name, phone FROM users WHERE id = ? AND status = "active"', [userId], (err, user) => {
+        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
+        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد یا حساب فعال نیست.' });
+
+        db.run('INSERT INTO ideas (user_id, content) VALUES (?, ?)', [userId, content.trim()], function(err) {
+            if (err) return res.status(500).json({ error: 'خطا در ذخیره ایده' });
+
+            sendToTelegram(user.name, user.phone, content.trim());
+
+            res.status(201).json({
+                id: this.lastID,
+                user_id: userId,
+                content: content.trim(),
+                status: 'pending',
+                created_at: new Date().toISOString()
+            });
+        });
+    });
 });
 
-// 3. تأیید توکن
-app.get('/api/verify', verifyToken, (req, res) => {
-  res.json({ valid: true });
+app.get('/api/ideas', (req, res) => {
+    const userId = req.query.userId;
+    if (!userId) return res.status(400).json({ error: 'شناسه کاربر الزامی است.' });
+
+    db.all(
+        'SELECT id, content, status, created_at FROM ideas WHERE user_id = ? ORDER BY created_at DESC',
+        [userId],
+        (err, ideas) => {
+            if (err) return res.status(500).json({ error: 'خطا در دریافت ایده‌ها' });
+            res.json(ideas);
+        }
+    );
 });
 
-// 4. دریافت اطلاعات کاربر
-app.get('/api/me', verifyToken, (req, res) => {
-  db.get('SELECT id, name, email, phone, created_at FROM users WHERE id = ?', [req.userId], (err, user) => {
-    if (!user) return res.status(404).json({ message: 'کاربر یافت نشد' });
-    res.json(user);
-  });
-});
-
-// 5. ثبت ایده
-app.post('/api/ideas', verifyToken, (req, res) => {
-  const { content } = req.body;
-  if (!content || content.length < 5) {
-    return res.status(400).json({ message: 'ایده حداقل ۵ کاراکتر' });
-  }
-  db.run(
-    'INSERT INTO ideas (user_id, content) VALUES (?, ?)',
-    [req.userId, content],
-    function(err) {
-      if (err) return res.status(500).json({ message: 'خطا در ذخیره ایده' });
-      // ارسال به تلگرام
-      db.get('SELECT name, phone FROM users WHERE id = ?', [req.userId], (err2, user) => {
-        if (user) sendToTelegram(user.name, user.phone, content);
-      });
-      res.status(201).json({ id: this.lastID, content, status: 'pending' });
-    }
-  );
-});
-
-// 6. دریافت ایده‌های کاربر
-app.get('/api/ideas', verifyToken, (req, res) => {
-  db.all('SELECT id, content, status, created_at FROM ideas WHERE user_id = ? ORDER BY created_at DESC', [req.userId], (err, rows) => {
-    res.json(rows || []);
-  });
-});
-
-// 7. سلامت
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK' });
-});
-
-// ===== شروع =====
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`سرور AYS روی پورت ${PORT} در حال اجرا است.`);
 });
