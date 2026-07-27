@@ -2,7 +2,6 @@ const API_BASE_URL = 'https://ays-server.onrender.com/api';
 let currentUserId = localStorage.getItem('ays_user_id');
 let pendingUserId = null;
 
-// تشخیص صفحه فعلی
 const currentPage = window.location.pathname.split('/').pop();
 
 // ===== توابع کمکی =====
@@ -32,11 +31,11 @@ function showFeedback(message, type = 'success') {
 }
 
 // ===== مدیریت احراز هویت =====
-async function registerUser(phone, name, email, password) {
+async function registerUser(name, email, password) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, name, email, password })
+        body: JSON.stringify({ name, email, password })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'خطا در ثبت‌نام');
@@ -144,7 +143,6 @@ if (currentPage === 'register.html') {
 
         const name = document.getElementById('fullname').value.trim();
         const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
         const password = document.getElementById('password').value;
         const confirm = document.getElementById('confirmPassword').value;
 
@@ -154,10 +152,6 @@ if (currentPage === 'register.html') {
         }
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             setError('emailError', 'ایمیل معتبر نیست.');
-            isValid = false;
-        }
-        if (!phone || phone.length < 10) {
-            setError('phoneError', 'شماره تلفن معتبر نیست.');
             isValid = false;
         }
         if (!password || password.length < 6) {
@@ -178,11 +172,10 @@ if (currentPage === 'register.html') {
 
         const name = document.getElementById('fullname').value.trim();
         const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
         const password = document.getElementById('password').value;
 
         try {
-            const user = await registerUser(phone, name, email, password);
+            const user = await registerUser(name, email, password);
             pendingUserId = user.id;
             await sendVerificationRequest(pendingUserId);
             registerForm.style.display = 'none';
@@ -235,7 +228,6 @@ if (currentPage === 'dashboard.html') {
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', function() {
             const page = this.dataset.page;
-            // فعلاً فقط صفحه اصلی فعال است
             if (page !== 'dashboard') {
                 alert('این صفحه در حال توسعه است.');
                 return;
