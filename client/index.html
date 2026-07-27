@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد</title>
     <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است." />
-    <meta name="keywords" content="ایده, ثبت ایده, فروش ایده, موسسه آیس, AYS" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;700;900&display=swap" rel="stylesheet" />
@@ -15,17 +14,15 @@
 </head>
 <body>
 
-    <!-- ===== هدر (فقط در صفحات داخلی) ===== -->
     <header id="mainHeader">
         <div class="header-container">
             <span class="logo-dujit">AYS</span>
         </div>
     </header>
 
-    <!-- ===== کانتینر صفحات با قابلیت کشویی ===== -->
     <div class="pages-container" id="pagesContainer">
 
-        <!-- صفحه ۱: خوش‌آمدگویی (لندینگ) -->
+        <!-- صفحه ۱: خوش‌آمدگویی -->
         <section id="landingPage" class="page active">
             <div class="landing-wrapper">
                 <div class="landing-card">
@@ -44,11 +41,6 @@
                         شروع کنید <i class="fas fa-arrow-left"></i>
                     </button>
                 </div>
-                <div class="landing-decoration">
-                    <div class="circle circle-1"></div>
-                    <div class="circle circle-2"></div>
-                    <div class="circle circle-3"></div>
-                </div>
             </div>
         </section>
 
@@ -60,7 +52,6 @@
                     <h2 class="register-title">ثبت‌نام در آیس</h2>
                     <p class="register-sub">برای شروع، اطلاعات زیر را وارد کنید.</p>
 
-                    <!-- مرحله ۱: فرم ثبت‌نام -->
                     <form id="registerForm" class="register-form">
                         <div class="form-group">
                             <label><i class="fas fa-user"></i> نام کامل</label>
@@ -101,31 +92,13 @@
                         </button>
                         <div id="registerError" class="global-error"></div>
                     </form>
-
-                    <!-- مرحله ۲: تأیید کد (پنهان در ابتدا) -->
-                    <div id="verifySection" style="display: none;">
-                        <div class="divider"><span>یا</span></div>
-                        <p class="verify-text">کد تأیید به ایمیل شما ارسال شد. لطفاً آن را وارد کنید.</p>
-                        <div class="form-group">
-                            <label><i class="fas fa-key"></i> کد تأیید</label>
-                            <input type="text" id="verifyCode" placeholder="مثلاً ۱۲۳۴۵۶" maxlength="6" />
-                            <span class="error" id="verifyError"></span>
-                        </div>
-                        <button id="verifyBtn" class="btn-primary btn-verify">
-                            تأیید کد <i class="fas fa-check"></i>
-                        </button>
-                        <button id="resendBtn" class="btn-resend">ارسال مجدد کد</button>
-                        <div id="verifyMessage" class="global-error"></div>
-                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- صفحه ۳: اصلی (داشبورد) -->
+        <!-- صفحه ۳: اصلی -->
         <section id="dashboardPage" class="page">
             <div class="dashboard-wrapper">
-
-                <!-- بخش ارسال ایده -->
                 <div class="idea-card">
                     <h2><i class="fas fa-lightbulb"></i> ایده خود را ثبت کنید</h2>
                     <div class="idea-input-area">
@@ -137,7 +110,6 @@
                     <div id="ideaFeedback" class="feedback"></div>
                 </div>
 
-                <!-- کلاژ -->
                 <div class="collage-grid">
                     <div class="collage-item large">
                         <div class="collage-img" style="background-image: url('https://via.placeholder.com/600x350/8B5CF6/FFFFFF?text=AYS+IDEAS');"></div>
@@ -160,7 +132,6 @@
                         <div class="collage-text">رشد و پیشرفت</div>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -180,16 +151,9 @@
             <div class="about-wrapper">
                 <div class="about-card">
                     <h2 class="about-title">درباره <span class="highlight">موسسه آیس</span></h2>
-                    <p class="about-text">
-                        موسسه آیس (AYS) با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است.
-                        ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد.
-                    </p>
-                    <p class="about-text">
-                        همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی، این امکان را فراهم می‌کند که ایده‌های ارزشمند، به سرعت به مرحله اجرا برسند.
-                    </p>
-                    <p class="about-text highlight-text">
-                        ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن، به اشتراک گذاشته نمی‌شود.
-                    </p>
+                    <p class="about-text">موسسه آیس (AYS) با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است.</p>
+                    <p class="about-text">همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی، این امکان را فراهم می‌کند که ایده‌های ارزشمند، به سرعت به مرحله اجرا برسند.</p>
+                    <p class="about-text highlight-text">ما به حریم خصوصی کاربران احترام می‌گذاریم.</p>
                     <div class="about-stats">
                         <div class="stat"><span class="num">+۵۰۰</span><span class="label">ایده ثبت شده</span></div>
                         <div class="stat"><span class="num">+۱۲۰</span><span class="label">همکاری موفق</span></div>
@@ -214,7 +178,6 @@
 
     </div>
 
-    <!-- ===== ناوبری پایین (فقط در صفحات داخلی) ===== -->
     <nav id="bottomNav">
         <div class="nav-item active" data-page="dashboardPage">
             <i class="fas fa-home"></i>
