@@ -1,7 +1,7 @@
 {
   "name": "ays-server",
   "version": "2.0.0",
-  "description": "سرور پلتفرم AYS با دیتابیس، احراز هویت و ارسال ",
+  "description": "سرور پلتفرم AYS با احراز هویت ایمیل و ارسال به تلگرام",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,7 +12,8 @@
     "sqlite3": "^5.1.6",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "nodemailer": "^6.9.7"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
