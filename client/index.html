@@ -5,133 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد</title>
     <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است. ایده خود را ثبت کنید و آینده‌ساز باشید." />
-    <meta name="keywords" content="ایده, ثبت ایده, فروش ایده, موسسه آیس, AYS, پلتفرم ایده ,درآمد" />
-    <meta property="og:title" content="AYS | پلتفرمی که ایده‌های شما را می‌خرد" />
-    <meta property="og:description" content="ایده خود را به موسسه آیس بسپارید تا به بزرگترین شرکت‌ها معرفی شود." />
-    <meta property="og:type" content="website" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://ays-client.onrender.com" />
-
-    <!-- فونت‌ها -->
+    <meta name="keywords" content="ایده, ثبت ایده, فروش ایده, موسسه آیس, AYS" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Shrikhand&family=Permanent+Marker&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;700;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.cdnfonts.com/css/dujitsufont" rel="stylesheet" />
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    
-    <!-- استایل اصلی -->
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-    <!-- ====== هدر (فقط در صفحه اصلی و صفحات داخلی) ====== -->
-    <header id="mainHeader" class="hidden-header">
+    <!-- ===== هدر (فقط در صفحات داخلی) ===== -->
+    <header id="mainHeader" class="hidden">
         <div class="header-container">
             <span class="logo-dujit">AYS</span>
         </div>
     </header>
 
-    <!-- ====== محتوای اصلی ====== -->
+    <!-- ===== صفحات ===== -->
     <main id="mainContent">
 
-        <!-- ===== صفحه ۱: خوش‌آمدگویی (لندینگ) ===== -->
+        <!-- صفحه ۱: خوش‌آمدگویی (لندینگ) -->
         <section id="landingPage" class="page active">
             <div class="landing-wrapper">
-                <div class="landing-glass-card">
-                    <h1 class="landing-title">به <span class="highlight-text">آیس</span> خوش آمدید</h1>
+                <div class="landing-card">
+                    <h1 class="landing-title">به <span class="highlight">آیس</span> خوش آمدید</h1>
                     <p class="landing-desc">اینجا جایی است که ایده‌های ناب شما به چشم‌های بینای صنعت می‌رسد.</p>
                     <p class="landing-desc">ما پلی هستیم میان خلاقیت شما و بزرگترین شرکت‌های کشور.</p>
                     <p class="landing-desc">اگر ایده‌تان ارزش سرمایه‌گذاری داشته باشد، از طریق شماره تماس با شما ارتباط می‌گیریم و آن را به بهترین شکل به بازار معرفی می‌کنیم.</p>
                     <p class="landing-highlight">همین حالا شروع کنید و آینده‌ساز باشید.</p>
-                    <button id="startBtn" class="btn-glass">شروع کنید <i class="fas fa-arrow-left"></i></button>
+                    <button id="startBtn" class="btn-primary">شروع کنید <i class="fas fa-arrow-left"></i></button>
                 </div>
             </div>
         </section>
 
-        <!-- ===== صفحه ۲: ثبت‌نام ===== -->
+        <!-- صفحه ۲: ثبت‌نام -->
         <section id="registerPage" class="page">
             <div class="register-wrapper">
-                <div class="register-neon-card">
-                    <div class="register-logo-animated">AYS</div>
+                <div class="register-card">
+                    <div class="register-logo">AYS</div>
                     <form id="registerForm" class="register-form">
-                        <div class="form-group-modern">
-                            <label for="fullname"><i class="fas fa-user"></i> نام کامل</label>
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> نام کامل</label>
                             <input type="text" id="fullname" placeholder="مثلاً امیرمهدی حسینی" required />
-                            <span class="input-error" id="nameError"></span>
+                            <span class="error" id="nameError"></span>
                         </div>
 
-                        <div class="form-group-modern phone-group">
-                            <label for="phone"><i class="fas fa-phone"></i> شماره تلفن</label>
-                            <div class="phone-input-wrapper">
+                        <div class="form-group phone-group">
+                            <label><i class="fas fa-phone"></i> شماره تلفن</label>
+                            <div class="phone-input">
                                 <span class="country-code">+98</span>
                                 <input type="tel" id="phone" placeholder="912 345 6789" required />
                             </div>
-                            <span class="input-error" id="phoneError"></span>
+                            <span class="error" id="phoneError"></span>
                         </div>
 
-                        <div class="form-group-modern">
-                            <label for="email"><i class="fas fa-envelope"></i> ایمیل (اختیاری)</label>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> ایمیل (اختیاری)</label>
                             <input type="email" id="email" placeholder="example@gmail.com" />
-                            <span class="input-error" id="emailError"></span>
+                            <span class="error" id="emailError"></span>
                         </div>
 
-                        <div class="form-row-modern">
-                            <div class="form-group-modern half">
-                                <label for="password"><i class="fas fa-lock"></i> رمز عبور</label>
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label><i class="fas fa-lock"></i> رمز عبور</label>
                                 <input type="password" id="password" placeholder="حداقل ۶ کاراکتر" required />
-                                <span class="input-error" id="passError"></span>
+                                <span class="error" id="passError"></span>
                             </div>
-                            <div class="form-group-modern half">
-                                <label for="confirmPassword"><i class="fas fa-check-circle"></i> تکرار رمز</label>
+                            <div class="form-group half">
+                                <label><i class="fas fa-check-circle"></i> تکرار رمز</label>
                                 <input type="password" id="confirmPassword" placeholder="تکرار رمز" required />
-                                <span class="input-error" id="confirmError"></span>
+                                <span class="error" id="confirmError"></span>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-glass btn-register">ثبت‌نام <i class="fas fa-user-plus"></i></button>
+                        <button type="submit" class="btn-primary btn-register">ثبت‌نام <i class="fas fa-user-plus"></i></button>
                         <div id="registerError" class="global-error"></div>
                     </form>
                 </div>
             </div>
         </section>
 
-        <!-- ===== صفحه ۳: اصلی (داشبورد) ===== -->
+        <!-- صفحه ۳: اصلی (داشبورد) -->
         <section id="dashboardPage" class="page">
             <div class="dashboard-wrapper">
 
-                <!-- بخش ارسال ایده (بالا) -->
-                <div class="idea-submit-glass">
+                <!-- بخش ارسال ایده -->
+                <div class="idea-card">
                     <h2><i class="fas fa-lightbulb"></i> ایده خود را ثبت کنید</h2>
-                    <div class="idea-input-wrapper">
-                        <textarea id="ideaInput" placeholder="ایده خود را به طور کامل و دقیق توضیح دهید..."></textarea>
-                        <button id="submitIdeaBtn" class="btn-glass btn-idea">ارسال ایده <i class="fas fa-paper-plane"></i></button>
+                    <div class="idea-input-area">
+                        <textarea id="ideaInput" placeholder="ایده خود را به طور کامل توضیح دهید..."></textarea>
+                        <button id="submitIdeaBtn" class="btn-primary btn-idea">ارسال ایده <i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <div id="ideaFeedback" class="feedback-message"></div>
+                    <div id="ideaFeedback" class="feedback"></div>
                 </div>
 
-                <!-- کلاژهای قاطی و زیبا -->
-                <div class="collage-mosaic">
+                <!-- کلاژ -->
+                <div class="collage-grid">
                     <div class="collage-item large">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/600x400/1a1a2e/FF6B00?text=AYS+IDEAS');"></div>
+                        <div class="collage-img" style="background-image: url('https://via.placeholder.com/600x350/8B5CF6/FFFFFF?text=AYS+IDEAS');"></div>
                         <div class="collage-text">ایده‌های خود را به ما بسپارید</div>
                     </div>
                     <div class="collage-item small">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/300x200/16213e/FF6B00?text=INNOVATION');"></div>
+                        <div class="collage-img" style="background-image: url('https://via.placeholder.com/300x180/EC4899/FFFFFF?text=INNOVATION');"></div>
                         <div class="collage-text">نوآوری در اولویت</div>
                     </div>
                     <div class="collage-item small">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/300x200/0f3460/FF6B00?text=FUTURE');"></div>
+                        <div class="collage-img" style="background-image: url('https://via.placeholder.com/300x180/3B82F6/FFFFFF?text=FUTURE');"></div>
                         <div class="collage-text">آینده‌سازی با آیس</div>
                     </div>
                     <div class="collage-item medium">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/450x250/533483/FF6B00?text=PARTNERS');"></div>
+                        <div class="collage-img" style="background-image: url('https://via.placeholder.com/450x230/F59E0B/FFFFFF?text=PARTNERS');"></div>
                         <div class="collage-text">همکاری با شرکت‌های بزرگ</div>
                     </div>
                     <div class="collage-item medium">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/450x250/e94560/FFFFFF?text=GROWTH');"></div>
+                        <div class="collage-img" style="background-image: url('https://via.placeholder.com/450x230/10B981/FFFFFF?text=GROWTH');"></div>
                         <div class="collage-text">رشد و پیشرفت</div>
                     </div>
                 </div>
@@ -139,24 +127,24 @@
             </div>
         </section>
 
-        <!-- ===== صفحه ۴: ایده‌های من ===== -->
+        <!-- صفحه ۴: ایده‌های من -->
         <section id="myIdeasPage" class="page">
             <div class="my-ideas-wrapper">
-                <div class="info-banner-glass">
+                <div class="info-banner">
                     <i class="fas fa-info-circle"></i>
                     اگر ایده شما مورد قبول موسسه و شرکت بود، از طریق شماره تلفن به شما اطلاع‌رسانی خواهد شد.
                 </div>
-                <div id="ideasList" class="ideas-grid">
+                <div id="ideasList" class="ideas-list">
                     <!-- توسط جاوااسکریپت پر می‌شود -->
                 </div>
             </div>
         </section>
 
-        <!-- ===== صفحه ۵: درباره ما ===== -->
+        <!-- صفحه ۵: درباره ما -->
         <section id="aboutPage" class="page">
             <div class="about-wrapper">
-                <div class="about-glass-card">
-                    <h2 class="about-title">درباره <span class="highlight-text">موسسه آیس</span></h2>
+                <div class="about-card">
+                    <h2 class="about-title">درباره <span class="highlight">موسسه آیس</span></h2>
                     <p class="about-text">
                         موسسه آیس (AYS) با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است.
                         ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد. به همین دلیل، بستری فراهم کرده‌ایم تا هر فردی بتواند ایده‌های خود را بدون دغدغه با ما در میان بگذارد.
@@ -168,42 +156,31 @@
                         ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن، به اشتراک گذاشته نمی‌شود.
                     </p>
                     <div class="about-stats">
-                        <div class="stat-item">
-                            <span class="stat-number">+۵۰۰</span>
-                            <span class="stat-label">ایده ثبت شده</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">+۱۲۰</span>
-                            <span class="stat-label">همکاری موفق</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">+۴۰</span>
-                            <span class="stat-label">شرکت همکار</span>
-                        </div>
+                        <div class="stat"><span class="num">+۵۰۰</span><span class="label">ایده ثبت شده</span></div>
+                        <div class="stat"><span class="num">+۱۲۰</span><span class="label">همکاری موفق</span></div>
+                        <div class="stat"><span class="num">+۴۰</span><span class="label">شرکت همکار</span></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ===== صفحه ۶: اکانت ===== -->
+        <!-- صفحه ۶: اکانت -->
         <section id="accountPage" class="page">
             <div class="account-wrapper">
-                <div class="account-glass-card">
+                <div class="account-card">
                     <h2><i class="fas fa-user-circle"></i> اکانت من</h2>
-                    <div id="accountInfo" class="account-info-grid">
+                    <div id="accountInfo" class="account-info">
                         <!-- توسط جاوااسکریپت پر می‌شود -->
                     </div>
-                    <div class="account-actions">
-                        <button id="logoutBtn" class="btn-glass btn-logout">خروج از حساب <i class="fas fa-sign-out-alt"></i></button>
-                    </div>
+                    <button id="logoutBtn" class="btn-primary btn-logout">خروج از حساب <i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- ====== ناوبری پایین (فقط در صفحات داخلی) ====== -->
-    <nav id="bottomNav" class="hidden-nav">
+    <!-- ===== ناوبری پایین (فقط در صفحات داخلی) ===== -->
+    <nav id="bottomNav" class="hidden">
         <div class="nav-item active" data-page="dashboardPage">
             <i class="fas fa-home"></i>
             <span>خانه</span>
