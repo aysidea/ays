@@ -1,144 +1,115 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AYS: پلتفرمی که ایده‌های شما را می‌خرد</title>
-    <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است. ایده خود را ثبت کنید و آینده‌ساز باشید.">
-    <meta name="keywords" content="ایده, ثبت ایده, فروش ایده, موسسه آیس, AYS">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/dujitsufont" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-    <!-- هدر ثابت -->
     <header id="mainHeader">
-        <div class="header-content">
-            <span class="logo">AYS</span>
+        <div class="header-container">
+            <span class="logo-dujit">AYS</span>
         </div>
     </header>
 
-    <!-- محتوای اصلی -->
-    <main id="mainContent">
-        <!-- صفحه لندینگ -->
-        <section id="landingPage" class="page active">
-            <div class="landing-container">
-                <div class="intro-text">
-                    <h1>به آی‌ای‌اس (AYS) خوش آمدید.</h1>
-                    <p>اینجا جایی است که ایده‌های ناب شما، به دیده‌بانان صنعت می‌رسد.</p>
-                    <p>ما پل ارتباطی بین خلاقیت شما و بزرگترین شرکت‌های کشور هستیم.</p>
-                    <p>کافی است ایده خود را با ما در میان بگذارید؛ اگر ارزش سرمایه‌گذاری داشته باشد، از طریق شماره تماس با شما ارتباط خواهیم گرفت و آن را به بهترین شکل ممکن به بازار معرفی می‌کنیم.</p>
-                    <p class="highlight">همین حالا شروع کنید و آینده‌ساز باشید.</p>
-                    <button id="startBtn" class="btn-primary">شروع کنید</button>
-                </div>
-                <div class="landing-image">
-                    <!-- می‌توانید یک تصویر شاخص در اینجا قرار دهید -->
-                </div>
+    <!-- ===== صفحات ===== -->
+    <section id="landingPage" class="page active">
+        <div class="landing-card">
+            <div class="landing-badge">✨ موسسه آیس</div>
+            <h1 class="landing-title">ایده‌هایت را <br /><span class="highlight">به پرواز</span> درآور</h1>
+            <p class="landing-desc">
+                پلی میان خلاقیت تو و بزرگترین شرکت‌های کشور.
+                ایده‌ات را ثبت کن، ما به چشم‌های بینای صنعت می‌رسانیمش.
+            </p>
+            <div class="landing-features">
+                <span><i class="fas fa-check-circle"></i> ثبت رایگان</span>
+                <span><i class="fas fa-check-circle"></i> بررسی تخصصی</span>
+                <span><i class="fas fa-check-circle"></i> معرفی به شرکت‌ها</span>
             </div>
-        </section>
+            <button id="startBtn" class="btn-primary btn-pulse">
+                شروع کنید <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+    </section>
 
-        <!-- صفحه ثبت‌نام -->
-        <section id="registerPage" class="page">
-            <div class="register-container">
+    <section id="registerPage" class="page">
+        <div class="register-wrapper">
+            <div class="register-card">
                 <div class="register-logo">AYS</div>
-                <form id="registerForm">
+                <h2 class="register-title">ثبت‌نام در آیس</h2>
+                <p class="register-sub">برای شروع، اطلاعات زیر را وارد کنید.</p>
+                <form id="registerForm" class="register-form">
                     <div class="form-group">
-                        <label for="phone">شماره تلفن</label>
-                        <input type="tel" id="phone" placeholder="مثلاً 09123456789" required>
+                        <label><i class="fas fa-user"></i> نام کامل</label>
+                        <input type="text" id="fullname" placeholder="مثلاً امیرمهدی حسینی" />
                     </div>
                     <div class="form-group">
-                        <label for="fullname">نام کامل</label>
-                        <input type="text" id="fullname" placeholder="نام و نام خانوادگی" required>
+                        <label><i class="fas fa-envelope"></i> ایمیل</label>
+                        <input type="email" id="email" placeholder="example@gmail.com" />
                     </div>
                     <div class="form-group">
-                        <label for="language">زبان</label>
-                        <select id="language">
-                            <option value="fa">فارسی</option>
-                            <option value="en">English</option>
-                        </select>
+                        <label><i class="fas fa-phone"></i> شماره تلفن</label>
+                        <input type="tel" id="phone" placeholder="912 345 6789" />
                     </div>
-                    <button type="submit" class="btn-primary">ثبت‌نام</button>
-                    <div id="registerError" class="error-message"></div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label><i class="fas fa-lock"></i> رمز عبور</label>
+                            <input type="password" id="password" placeholder="حداقل ۶ کاراکتر" />
+                        </div>
+                        <div class="form-group half">
+                            <label><i class="fas fa-check-circle"></i> تکرار رمز</label>
+                            <input type="password" id="confirmPassword" placeholder="تکرار رمز" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary btn-register">
+                        ثبت‌نام <i class="fas fa-user-plus"></i>
+                    </button>
                 </form>
+                <div id="registerMessage" class="register-message"></div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- صفحه اصلی (داشبورد) -->
-        <section id="dashboardPage" class="page">
-            <div class="dashboard-container">
-                <!-- کادرهای کلاژ -->
-                <div class="collage">
-                    <div class="collage-item">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/300x200/FF6B00/FFFFFF?text=AYS');"></div>
-                        <div class="collage-text">ایده‌های خود را به ما بسپارید</div>
-                    </div>
-                    <div class="collage-item">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/300x200/FF6B00/FFFFFF?text=AYS');"></div>
-                        <div class="collage-text">ما به شرکت‌های بزرگ معرفی می‌کنیم</div>
-                    </div>
-                    <div class="collage-item">
-                        <div class="collage-image" style="background-image: url('https://via.placeholder.com/300x200/FF6B00/FFFFFF?text=AYS');"></div>
-                        <div class="collage-text">آینده خود را بسازید</div>
-                    </div>
-                </div>
+    <section id="dashboardPage" class="page">
+        <div class="dashboard-welcome">
+            به <span>آیس</span> خوش آمدی 👋
+        </div>
+        <p class="dashboard-sub">
+            اینجا می‌تونی ایده‌های خودت رو ثبت کنی و آینده‌ات رو بسازی.
+        </p>
+    </section>
 
-                <!-- بخش ارسال ایده -->
-                <div class="idea-submit">
-                    <h2>ایده خود را ثبت کنید</h2>
-                    <textarea id="ideaInput" placeholder="ایده خود را به طور کامل توضیح دهید..."></textarea>
-                    <button id="submitIdeaBtn" class="btn-primary">ارسال ایده</button>
-                    <div id="ideaFeedback" class="feedback-message"></div>
-                </div>
-            </div>
-        </section>
+    <section id="myIdeasPage" class="page">
+        <div class="placeholder-page">
+            <i class="fas fa-lightbulb"></i>
+            <h2>ایده‌های من</h2>
+            <p>به زودی...</p>
+        </div>
+    </section>
 
-        <!-- صفحه ایده‌های من -->
-        <section id="myIdeasPage" class="page">
-            <div class="my-ideas-container">
-                <div class="info-banner">
-                    اگر ایده شما مورد قبول موسسه و شرکت بود، از طریق شماره تلفن به شما اطلاع‌رسانی خواهد شد.
-                </div>
-                <div id="ideasList">
-                    <!-- لیست ایده‌ها توسط جاوااسکریپت پر می‌شود -->
-                </div>
-            </div>
-        </section>
+    <section id="aboutPage" class="page">
+        <div class="placeholder-page">
+            <i class="fas fa-info-circle"></i>
+            <h2>درباره ما</h2>
+            <p>به زودی...</p>
+        </div>
+    </section>
 
-        <!-- صفحه درباره ما -->
-        <section id="aboutPage" class="page">
-            <div class="about-container">
-                <h2>درباره موسسه آیس (AYS)</h2>
-                <p>
-                    موسسه آیس با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است.
-                    ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد. به همین دلیل، بستری فراهم کرده‌ایم تا هر فردی بتواند ایده‌های خود را بدون دغدغه با ما در میان بگذارد.
-                </p>
-                <p>
-                    همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی، این امکان را فراهم می‌کند که ایده‌های ارزشمند، به سرعت به مرحله اجرا برسند و سرمایه‌گذاران مناسب را پیدا کنند.
-                </p>
-                <p>
-                    ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن، به اشتراک گذاشته نمی‌شود.
-                </p>
-            </div>
-        </section>
+    <section id="accountPage" class="page">
+        <div class="placeholder-page">
+            <i class="fas fa-user-circle"></i>
+            <h2>اکانت من</h2>
+            <p>به زودی...</p>
+        </div>
+    </section>
 
-        <!-- صفحه اکانت -->
-        <section id="accountPage" class="page">
-            <div class="account-container">
-                <h2>اکانت من</h2>
-                <div id="accountInfo">
-                    <!-- اطلاعات کاربر توسط جاوااسکریپت پر می‌شود -->
-                </div>
-                <div class="account-actions">
-                    <button id="logoutBtn" class="btn-secondary">خروج از حساب</button>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ناوبری پایین -->
     <nav id="bottomNav">
         <div class="nav-item active" data-page="dashboardPage">
             <i class="fas fa-home"></i>
@@ -148,13 +119,13 @@
             <i class="fas fa-lightbulb"></i>
             <span>ایده‌های من</span>
         </div>
-        <div class="nav-item" data-page="aboutPage">
-            <i class="fas fa-info-circle"></i>
-            <span>درباره ما</span>
-        </div>
         <div class="nav-item" data-page="accountPage">
             <i class="fas fa-user"></i>
             <span>اکانت</span>
+        </div>
+        <div class="nav-item" data-page="aboutPage">
+            <i class="fas fa-info-circle"></i>
+            <span>درباره ما</span>
         </div>
     </nav>
 
