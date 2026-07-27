@@ -1,13 +1,7 @@
-// ============================================================
-// تنظیمات اولیه
-// ============================================================
 const API_BASE_URL = 'https://ays-server.onrender.com/api';
 let currentUserId = localStorage.getItem('ays_user_id');
 let currentUserData = null;
 
-// ============================================================
-// المان‌های DOM
-// ============================================================
 const pages = {
     landing: document.getElementById('landingPage'),
     register: document.getElementById('registerPage'),
@@ -28,9 +22,6 @@ const ideasList = document.getElementById('ideasList');
 const accountInfo = document.getElementById('accountInfo');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// ============================================================
-// توابع کمکی
-// ============================================================
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -57,9 +48,7 @@ function showPage(pageId) {
 function showFeedback(message, type = 'success') {
     ideaFeedback.textContent = message;
     ideaFeedback.className = 'feedback show ' + type;
-    setTimeout(() => {
-        ideaFeedback.className = 'feedback';
-    }, 4000);
+    setTimeout(() => { ideaFeedback.className = 'feedback'; }, 4000);
 }
 
 function setError(elementId, message) {
@@ -72,9 +61,6 @@ function clearErrors() {
     document.getElementById('registerError').textContent = '';
 }
 
-// ============================================================
-// مدیریت احراز هویت
-// ============================================================
 async function registerUser(phone, name, email, password) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -103,9 +89,6 @@ async function checkUserSession() {
     }
 }
 
-// ============================================================
-// مدیریت ایده‌ها
-// ============================================================
 async function submitIdea(content) {
     if (!currentUserId) {
         showFeedback('لطفاً ابتدا ثبت‌نام کنید.', 'error');
@@ -165,9 +148,6 @@ async function loadMyIdeas() {
     }
 }
 
-// ============================================================
-// نمایش اطلاعات اکانت
-// ============================================================
 async function loadAccountInfo() {
     if (!currentUserId) return;
     try {
@@ -186,9 +166,6 @@ async function loadAccountInfo() {
     }
 }
 
-// ============================================================
-// اعتبارسنجی فرم ثبت‌نام
-// ============================================================
 function validateRegisterForm() {
     clearErrors();
     let isValid = true;
@@ -223,10 +200,7 @@ function validateRegisterForm() {
     return isValid;
 }
 
-// ============================================================
-// رویدادها
-// ============================================================
-
+// ===== رویدادها =====
 startBtn.addEventListener('click', () => showPage('registerPage'));
 
 registerForm.addEventListener('submit', async (e) => {
@@ -258,7 +232,7 @@ submitIdeaBtn.addEventListener('click', async () => {
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
-        if (!currentUserId && pageId !== 'landingPage' && pageId !== 'registerPage') {
+        if (!currentUserId) {
             showPage('landingPage');
             return;
         }
@@ -273,7 +247,5 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-// ============================================================
-// مقداردهی اولیه
-// ============================================================
+// ===== مقداردهی اولیه =====
 checkUserSession();
