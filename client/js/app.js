@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://ays-server.onrender.com/api';
+const API_BASE_URL = '';
 let currentUserId = localStorage.getItem('ays_user_id');
 let pendingUserId = null;
 
