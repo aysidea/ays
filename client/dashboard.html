@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>داشبورد | AYS</title>
+    <meta name="description" content="پنل کاربری موسسه آیس - ثبت و مدیریت ایده‌ها." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/dujitsufont" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <header id="mainHeader">
+        <div class="header-container">
+            <span class="logo-dujit">AYS</span>
+        </div>
+    </header>
+
+    <div class="dashboard-page">
+        <div class="dashboard-wrapper">
+
+            <div class="idea-glass-card">
+                <h2><i class="fas fa-lightbulb"></i> ایده خود را ثبت کنید</h2>
+                <div class="idea-input-area">
+                    <textarea id="ideaInput" placeholder="ایده خود را به طور کامل و دقیق توضیح دهید..."></textarea>
+                    <button id="submitIdeaBtn" class="btn-primary btn-idea">
+                        ارسال ایده <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div id="ideaFeedback" class="feedback"></div>
+            </div>
+
+            <div class="collage-grid">
+                <div class="collage-item large">
+                    <div class="collage-img" style="background-image: url('https://via.placeholder.com/600x350/A78BFA/FFFFFF?text=AYS+IDEAS');"></div>
+                    <div class="collage-text">ایده‌های خود را به ما بسپارید</div>
+                </div>
+                <div class="collage-item small">
+                    <div class="collage-img" style="background-image: url('https://via.placeholder.com/300x180/FCA5A5/FFFFFF?text=INNOVATION');"></div>
+                    <div class="collage-text">نوآوری در اولویت</div>
+                </div>
+                <div class="collage-item small">
+                    <div class="collage-img" style="background-image: url('https://via.placeholder.com/300x180/93C5FD/FFFFFF?text=FUTURE');"></div>
+                    <div class="collage-text">آینده‌سازی با آیس</div>
+                </div>
+                <div class="collage-item medium">
+                    <div class="collage-img" style="background-image: url('https://via.placeholder.com/450x230/FCD34D/FFFFFF?text=PARTNERS');"></div>
+                    <div class="collage-text">همکاری با شرکت‌های بزرگ</div>
+                </div>
+                <div class="collage-item medium">
+                    <div class="collage-img" style="background-image: url('https://via.placeholder.com/450x230/6EE7B7/FFFFFF?text=GROWTH');"></div>
+                    <div class="collage-text">رشد و پیشرفت</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <nav id="bottomNav">
+        <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>خانه</span>
+        </div>
+        <div class="nav-item" data-page="my-ideas">
+            <i class="fas fa-lightbulb"></i>
+            <span>ایده‌های من</span>
+        </div>
+        <div class="nav-item" data-page="account">
+            <i class="fas fa-user"></i>
+            <span>اکانت</span>
+        </div>
+        <div class="nav-item" data-page="about">
+            <i class="fas fa-info-circle"></i>
+            <span>درباره ما</span>
+        </div>
+    </nav>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
