@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ثبت‌نام | AYS</title>
+    <meta name="description" content="ثبت‌نام در موسسه آیس و شروع ثبت ایده‌های خود." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/dujitsufont" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="register-page">
+        <div class="register-container">
+            <div class="register-card">
+                <div class="register-logo">AYS</div>
+                <h2 class="register-title">ثبت‌نام در آیس</h2>
+                <p class="register-sub">برای شروع، اطلاعات زیر را وارد کنید.</p>
+
+                <form id="registerForm" class="register-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> نام کامل</label>
+                        <input type="text" id="fullname" placeholder="مثلاً امیرمهدی حسینی" required />
+                        <span class="error" id="nameError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> ایمیل</label>
+                        <input type="email" id="email" placeholder="example@gmail.com" required />
+                        <span class="error" id="emailError"></span>
+                    </div>
+
+                    <div class="form-group phone-group">
+                        <label><i class="fas fa-phone"></i> شماره تلفن</label>
+                        <div class="phone-input-wrapper">
+                            <span class="country-code">+98</span>
+                            <input type="tel" id="phone" placeholder="912 345 6789" required />
+                        </div>
+                        <span class="error" id="phoneError"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label><i class="fas fa-lock"></i> رمز عبور</label>
+                            <input type="password" id="password" placeholder="حداقل ۶ کاراکتر" required />
+                            <span class="error" id="passError"></span>
+                        </div>
+                        <div class="form-group half">
+                            <label><i class="fas fa-check-circle"></i> تکرار رمز</label>
+                            <input type="password" id="confirmPassword" placeholder="تکرار رمز" required />
+                            <span class="error" id="confirmError"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-register">
+                        ثبت‌نام <i class="fas fa-user-plus"></i>
+                    </button>
+                    <div id="registerError" class="global-error"></div>
+                </form>
+
+                <div id="verifySection" style="display: none;">
+                    <div class="divider"><span>یا</span></div>
+                    <p class="verify-text">کد تأیید به ایمیل شما ارسال شد. لطفاً آن را وارد کنید.</p>
+                    <div class="form-group">
+                        <label><i class="fas fa-key"></i> کد تأیید</label>
+                        <input type="text" id="verifyCode" placeholder="مثلاً ۱۲۳۴۵۶" maxlength="6" />
+                        <span class="error" id="verifyError"></span>
+                    </div>
+                    <button id="verifyBtn" class="btn-primary btn-verify">
+                        تأیید کد <i class="fas fa-check"></i>
+                    </button>
+                    <button id="resendBtn" class="btn-resend">ارسال مجدد کد</button>
+                    <div id="verifyMessage" class="global-error"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
