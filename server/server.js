@@ -20,8 +20,7 @@ db.serialize(() => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             phone TEXT UNIQUE NOT NULL,
             name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
+            language TEXT DEFAULT 'fa',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     `);
@@ -39,26 +38,32 @@ db.serialize(() => {
 });
 
 app.post('/api/register', (req, res) => {
-    const { phone, name, email, password } = req.body;
+    const { phone, name, language } = req.body;
 
-    if (!phone || !name || !email || !password) {
-        return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
+    if (!phone || !name) {
+        return res.status(400).json({ error: 'شماره تلفن و نام الزامی هستند.' });
     }
 
-    db.get('SELECT id FROM users WHERE phone = ? OR email = ?', [phone, email], (err, existing) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-        if (existing) return res.status(400).json({ error: 'این شماره یا ایمیل قبلاً ثبت شده است.' });
+    db.get('SELECT id FROM users WHERE phone = ?', [phone], (err, existing) => {
+        if (err) {
+            return res.status(500).json({ error: 'خطای داخلی سرور' });
+        }
+        if (existing) {
+            return res.status(400).json({ error: 'این شماره تلفن قبلاً ثبت شده است.' });
+        }
 
         db.run(
-            'INSERT INTO users (phone, name, email, password) VALUES (?, ?, ?, ?)',
-            [phone, name, email, password],
+            'INSERT INTO users (phone, name, language) VALUES (?, ?, ?)',
+            [phone, name, language || 'fa'],
             function(err) {
-                if (err) return res.status(500).json({ error: 'خطا در ثبت‌نام' });
+                if (err) {
+                    return res.status(500).json({ error: 'خطا در ثبت‌نام' });
+                }
                 res.status(201).json({
                     id: this.lastID,
                     phone,
                     name,
-                    email,
+                    language: language || 'fa',
                     created_at: new Date().toISOString()
                 });
             }
@@ -68,9 +73,13 @@ app.post('/api/register', (req, res) => {
 
 app.get('/api/user/:id', (req, res) => {
     const userId = req.params.id;
-    db.get('SELECT id, phone, name, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
+    db.get('SELECT id, phone, name, language, created_at FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: 'خطای داخلی سرور' });
+        }
+        if (!user) {
+            return res.status(404).json({ error: 'کاربر یافت نشد' });
+        }
         res.json(user);
     });
 });
@@ -83,37 +92,55 @@ app.post('/api/ideas', (req, res) => {
     }
 
     db.get('SELECT name, phone FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
+        if (err) {
+            return res.status(500).json({ error: 'خطای داخلی سرور' });
+        }
+        if (!user) {
+            return res.status(404).json({ error: 'کاربر یافت نشد' });
+        }
 
-        db.run('INSERT INTO ideas (user_id, content) VALUES (?, ?)', [userId, content.trim()], function(err) {
-            if (err) return res.status(500).json({ error: 'خطا در ذخیره ایده' });
+        db.run(
+            'INSERT INTO ideas (user_id, content) VALUES (?, ?)',
+            [userId, content.trim()],
+            function(err) {
+                if (err) {
+                    return res.status(500).json({ error: 'خطا در ذخیره ایده' });
+                }
 
-            sendToTelegram(user.name, user.phone, content.trim());
+                sendToTelegram(user.name, user.phone, content.trim());
 
-            res.status(201).json({
-                id: this.lastID,
-                user_id: userId,
-                content: content.trim(),
-                status: 'pending',
-                created_at: new Date().toISOString()
-            });
-        });
+                res.status(201).json({
+                    id: this.lastID,
+                    user_id: userId,
+                    content: content.trim(),
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                });
+            }
+        );
     });
 });
 
 app.get('/api/ideas', (req, res) => {
     const userId = req.query.userId;
-    if (!userId) return res.status(400).json({ error: 'شناسه کاربر الزامی است.' });
+    if (!userId) {
+        return res.status(400).json({ error: 'شناسه کاربر الزامی است.' });
+    }
 
     db.all(
         'SELECT id, content, status, created_at FROM ideas WHERE user_id = ? ORDER BY created_at DESC',
         [userId],
         (err, ideas) => {
-            if (err) return res.status(500).json({ error: 'خطا در دریافت ایده‌ها' });
+            if (err) {
+                return res.status(500).json({ error: 'خطا در دریافت ایده‌ها' });
+            }
             res.json(ideas);
         }
     );
+});
+
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {
