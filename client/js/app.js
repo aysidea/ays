@@ -41,7 +41,6 @@ function showPage(pageId) {
         if (item.dataset.page === pageId) item.classList.add('active');
     });
 
-    // نمایش/مخفی کردن هدر و منو
     const internalPages = ['dashboardPage', 'myIdeasPage', 'aboutPage', 'accountPage'];
     if (internalPages.includes(pageId)) {
         header.classList.add('visible');
@@ -57,9 +56,9 @@ function showPage(pageId) {
 
 function showFeedback(message, type = 'success') {
     ideaFeedback.textContent = message;
-    ideaFeedback.className = 'feedback-message show ' + type;
+    ideaFeedback.className = 'feedback show ' + type;
     setTimeout(() => {
-        ideaFeedback.className = 'feedback-message';
+        ideaFeedback.className = 'feedback';
     }, 4000);
 }
 
@@ -69,7 +68,7 @@ function setError(elementId, message) {
 }
 
 function clearErrors() {
-    document.querySelectorAll('.input-error').forEach(el => el.textContent = '');
+    document.querySelectorAll('.error').forEach(el => el.textContent = '');
     document.getElementById('registerError').textContent = '';
 }
 
@@ -84,17 +83,6 @@ async function registerUser(phone, name, email, password) {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'خطا در ثبت‌نام');
-    return data;
-}
-
-async function loginUser(phone, password) {
-    const response = await fetch(`${API_BASE_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'خطا در ورود');
     return data;
 }
 
@@ -154,7 +142,7 @@ async function loadMyIdeas() {
         const ideas = await response.json();
 
         if (ideas.length === 0) {
-            ideasList.innerHTML = `<div class="idea-item-glass" style="text-align:center;color:var(--text-muted);border-right-color:transparent;">
+            ideasList.innerHTML = `<div class="idea-item" style="text-align:center;color:var(--text-muted);border-right-color:transparent;">
                 <i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:10px;color:var(--primary);"></i>
                 هنوز ایده‌ای ثبت نکرده‌اید.
             </div>`;
@@ -162,16 +150,16 @@ async function loadMyIdeas() {
         }
 
         ideasList.innerHTML = ideas.map(idea => `
-            <div class="idea-item-glass">
-                <div class="idea-content">${idea.content}</div>
-                <div class="idea-meta">
+            <div class="idea-item">
+                <div class="content">${idea.content}</div>
+                <div class="meta">
                     <span>${idea.status === 'pending' ? '⏳ در انتظار بررسی' : idea.status === 'approved' ? '✅ تأیید شده' : '❌ رد شده'}</span>
                     <span>${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
                 </div>
             </div>
         `).join('');
     } catch (error) {
-        ideasList.innerHTML = `<div class="idea-item-glass" style="text-align:center;color:#ff4757;border-right-color:#ff4757;">
+        ideasList.innerHTML = `<div class="idea-item" style="text-align:center;color:#EF4444;border-right-color:#EF4444;">
             خطا در دریافت ایده‌ها. دوباره تلاش کنید.
         </div>`;
     }
@@ -194,7 +182,7 @@ async function loadAccountInfo() {
             <div class="info-item"><span class="label">تاریخ ثبت‌نام</span><span class="value">${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></div>
         `;
     } catch (error) {
-        accountInfo.innerHTML = `<div class="info-item" style="color:#ff4757;">خطا در دریافت اطلاعات.</div>`;
+        accountInfo.innerHTML = `<div class="info-item" style="color:#EF4444;">خطا در دریافت اطلاعات.</div>`;
     }
 }
 
@@ -212,11 +200,11 @@ function validateRegisterForm() {
     const confirm = document.getElementById('confirmPassword').value;
 
     if (!name || name.length < 3) {
-        setError('nameError', 'نام باید حداقل ۳ کاراکتر باشد.');
+        setError('nameError', 'نام حداقل ۳ کاراکتر باشد.');
         isValid = false;
     }
     if (!phone || phone.length < 10) {
-        setError('phoneError', 'شماره تلفن را به درستی وارد کنید.');
+        setError('phoneError', 'شماره تلفن معتبر نیست.');
         isValid = false;
     }
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -228,7 +216,7 @@ function validateRegisterForm() {
         isValid = false;
     }
     if (password !== confirm) {
-        setError('confirmError', 'رمز عبور و تکرار آن مطابقت ندارند.');
+        setError('confirmError', 'رمزها مطابقت ندارند.');
         isValid = false;
     }
 
@@ -239,12 +227,8 @@ function validateRegisterForm() {
 // رویدادها
 // ============================================================
 
-// شروع فرآیند ثبت‌نام
-startBtn.addEventListener('click', () => {
-    showPage('registerPage');
-});
+startBtn.addEventListener('click', () => showPage('registerPage'));
 
-// ثبت‌نام
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!validateRegisterForm()) return;
@@ -267,16 +251,14 @@ registerForm.addEventListener('submit', async (e) => {
     }
 });
 
-// ارسال ایده
 submitIdeaBtn.addEventListener('click', async () => {
     await submitIdea(ideaInput.value);
 });
 
-// ناوبری پایین
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
-        if (!currentUserId && pageId !== 'landingPage' && pageId !== 'registerPage' && pageId !== 'aboutPage') {
+        if (!currentUserId && pageId !== 'landingPage' && pageId !== 'registerPage') {
             showPage('landingPage');
             return;
         }
@@ -284,7 +266,6 @@ navItems.forEach(item => {
     });
 });
 
-// خروج
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('ays_user_id');
     currentUserId = null;
