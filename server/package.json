@@ -1,7 +1,7 @@
 {
   "name": "ays-server",
-  "version": "2.0.0",
-  "description": "سرور پلتفرم AYS",
+  "version": "1.0.0",
+  "description": "سرور پلتفرم AYS برای دریافت ایده‌ها و ارسال به تلگرام",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
