@@ -1,32 +1,37 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT),
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
 });
 
-async function sendVerificationEmail(to, code) {
-  await transporter.sendMail({
-    from: `"AYS" <${process.env.EMAIL_USER}>`,
-    to,
-    subject: 'کد تایید ثبت‌نام در AYS',
-    html: `
-      <div style="font-family: 'Segoe UI', sans-serif; direction: rtl; text-align: right; padding: 24px; background: #f5f0eb; border-radius: 16px;">
-        <h2 style="color: #b8957a;">🎯 کد تایید شما</h2>
-        <p style="font-size: 1.1rem;">کد زیر را در سایت وارد کنید:</p>
-        <div style="background: #fff; padding: 16px; border-radius: 12px; font-size: 2rem; font-weight: bold; letter-spacing: 8px; text-align: center; margin: 16px 0; color: #3d3a36;">${code}</div>
-        <p style="color: #6b6560;">این کد تا ۵ دقیقه اعتبار دارد.</p>
-        <hr style="border: none; border-top: 1px solid #e2dbd4;" />
-        <p style="font-size: 0.8rem; color: #6b6560;">اگر درخواست نکردی، این ایمیل را نادیده بگیر.</p>
-      </div>
-    `
-  });
+async function sendVerificationEmail(toEmail, userName, code) {
+    const htmlContent = `
+        <div style="direction:rtl; font-family: Vazir, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px 20px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
+            <h2 style="text-align:center; color:#8B5CF6;">موسسه آیس</h2>
+            <p style="font-size:16px; color:#1e293b;">سلام ${userName}،</p>
+            <p style="font-size:16px; color:#1e293b;">کد تأیید شما برای ثبت‌نام در <strong>آیس</strong>:</p>
+            <div style="background: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; border: 2px dashed #8B5CF6;">
+                <span style="font-size: 32px; font-weight: 900; color: #8B5CF6; letter-spacing: 8px;">${code}</span>
+            </div>
+            <p style="font-size:14px; color:#64748b;">این کد تا ۵ دقیقه اعتبار دارد.</p>
+            <p style="font-size:14px; color:#64748b;">اگر درخواست ثبت‌نام نداده‌اید، این پیام را نادیده بگیرید.</p>
+            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+            <p style="font-size:12px; color:#94a3b8; text-align:center;">موسسه آیس | AYS</p>
+        </div>
+    `;
+
+    await transporter.sendMail({
+        from: `"موسسه آیس" <${process.env.EMAIL_USER}>`,
+        to: toEmail,
+        subject: 'کد تأیید ثبت‌نام در آیس',
+        html: htmlContent
+    });
 }
 
 module.exports = { sendVerificationEmail };
