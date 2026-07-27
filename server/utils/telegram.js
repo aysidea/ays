@@ -1,37 +1,16 @@
 const axios = require('axios');
+require('dotenv').config();
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHAT_ID = process.env.CHAT_ID;
-
-async function sendToTelegram(userName, phone, ideaContent) {
-    if (!BOT_TOKEN || !CHAT_ID) {
-        console.error(' در محیط تعریف نشده است.');
-        return false;
-    }
-
-    const message = `
-🆕 ایده جدید ثبت شد!
-
-👤 نام: ${userName}
-📱 شماره تماس: ${phone}
-💡 متن ایده:
-${ideaContent}
-
-📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
-    `;
-
-    try {
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-        await axios.post(url, {
-            chat_id: CHAT_ID,
-            text: message,
-            parse_mode: 'HTML'
-        });
-        return true;
-    } catch (error) {
-        console.error('خطا در ارسال :', error.message);
-        return false;
-    }
+async function sendToTelegram(name, phone, idea) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+  const text = `📣 ایده جدید\n\n👤 ${name}\n📞 ${phone}\n💡 ${idea}`;
+  await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
+    chat_id: chatId,
+    text,
+    parse_mode: 'HTML'
+  });
 }
 
 module.exports = { sendToTelegram };
