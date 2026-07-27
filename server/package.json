@@ -1,7 +1,7 @@
 {
   "name": "ays-server",
-  "version": "1.0.0",
-  "description": "سرور پلتفرم AYS برای دریافت ایده‌ها و ارسال",
+  "version": "2.0.0",
+  "description": "سرور پلتفرم AYS با دیتابیس، احراز هویت و ارسال ",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
