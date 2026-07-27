@@ -1,58 +1,11 @@
 const API_BASE_URL = 'https://ays-server.onrender.com/api';
 let currentUserId = localStorage.getItem('ays_user_id');
-let currentUserData = null;
 let pendingUserId = null;
 
-const pages = document.querySelectorAll('.page');
-const header = document.getElementById('mainHeader');
-const bottomNav = document.getElementById('bottomNav');
-const navItems = document.querySelectorAll('.nav-item');
+// تشخیص صفحه فعلی
+const currentPage = window.location.pathname.split('/').pop();
 
-const startBtn = document.getElementById('startBtn');
-const registerForm = document.getElementById('registerForm');
-const verifySection = document.getElementById('verifySection');
-const verifyBtn = document.getElementById('verifyBtn');
-const resendBtn = document.getElementById('resendBtn');
-const verifyCodeInput = document.getElementById('verifyCode');
-
-const submitIdeaBtn = document.getElementById('submitIdeaBtn');
-const ideaInput = document.getElementById('ideaInput');
-const ideaFeedback = document.getElementById('ideaFeedback');
-const ideasList = document.getElementById('ideasList');
-const accountInfo = document.getElementById('accountInfo');
-const logoutBtn = document.getElementById('logoutBtn');
-
-function showPage(pageId) {
-    pages.forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) target.classList.add('active');
-
-    navItems.forEach(item => {
-        item.classList.remove('active');
-        if (item.dataset.page === pageId) item.classList.add('active');
-    });
-
-    const internalPages = ['dashboardPage', 'myIdeasPage', 'aboutPage', 'accountPage'];
-    if (internalPages.includes(pageId)) {
-        header.classList.add('visible');
-        bottomNav.classList.add('visible');
-    } else {
-        header.classList.remove('visible');
-        bottomNav.classList.remove('visible');
-    }
-
-    if (pageId === 'myIdeasPage' && currentUserId) loadMyIdeas();
-    if (pageId === 'accountPage' && currentUserId) loadAccountInfo();
-}
-
-function showFeedback(message, type = 'success') {
-    ideaFeedback.textContent = message;
-    ideaFeedback.className = 'feedback show ' + type;
-    setTimeout(() => {
-        ideaFeedback.className = 'feedback';
-    }, 4000);
-}
-
+// ===== توابع کمکی =====
 function setError(elementId, message) {
     const el = document.getElementById(elementId);
     if (el) el.textContent = message;
@@ -60,11 +13,25 @@ function setError(elementId, message) {
 
 function clearErrors() {
     document.querySelectorAll('.error').forEach(el => el.textContent = '');
-    document.getElementById('registerError').textContent = '';
-    document.getElementById('verifyError').textContent = '';
-    document.getElementById('verifyMessage').textContent = '';
+    const registerError = document.getElementById('registerError');
+    if (registerError) registerError.textContent = '';
+    const verifyError = document.getElementById('verifyError');
+    if (verifyError) verifyError.textContent = '';
+    const verifyMessage = document.getElementById('verifyMessage');
+    if (verifyMessage) verifyMessage.textContent = '';
 }
 
+function showFeedback(message, type = 'success') {
+    const el = document.getElementById('ideaFeedback');
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'feedback show ' + type;
+    setTimeout(() => {
+        el.className = 'feedback';
+    }, 4000);
+}
+
+// ===== مدیریت احراز هویت =====
 async function registerUser(phone, name, email, password) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -98,30 +65,44 @@ async function verifyCode(userId, code) {
     return data;
 }
 
-async function checkUserSession() {
-    if (!currentUserId) {
-        showPage('landingPage');
-        return;
-    }
-    try {
-        const response = await fetch(`${API_BASE_URL}/user/${currentUserId}`);
-        if (!response.ok) throw new Error('کاربر یافت نشد');
-        const user = await response.json();
-        if (user.status === 'pending') {
-            localStorage.removeItem('ays_user_id');
-            currentUserId = null;
-            showPage('landingPage');
-            return;
-        }
-        currentUserData = user;
-        showPage('dashboardPage');
-    } catch (error) {
-        localStorage.removeItem('ays_user_id');
-        currentUserId = null;
-        showPage('landingPage');
-    }
+async function getUserData(userId) {
+    const response = await fetch(`${API_BASE_URL}/user/${userId}`);
+    if (!response.ok) throw new Error('کاربر یافت نشد');
+    return response.json();
 }
 
+function checkUserSession() {
+    if (!currentUserId) {
+        if (currentPage !== 'index.html' && currentPage !== 'register.html') {
+            window.location.href = 'index.html';
+        }
+        return;
+    }
+
+    getUserData(currentUserId)
+        .then(user => {
+            if (user.status === 'pending') {
+                localStorage.removeItem('ays_user_id');
+                currentUserId = null;
+                if (currentPage !== 'index.html' && currentPage !== 'register.html') {
+                    window.location.href = 'index.html';
+                }
+                return;
+            }
+            if (currentPage === 'index.html' || currentPage === 'register.html') {
+                window.location.href = 'dashboard.html';
+            }
+        })
+        .catch(() => {
+            localStorage.removeItem('ays_user_id');
+            currentUserId = null;
+            if (currentPage !== 'index.html' && currentPage !== 'register.html') {
+                window.location.href = 'index.html';
+            }
+        });
+}
+
+// ===== مدیریت ایده‌ها =====
 async function submitIdea(content) {
     if (!currentUserId) {
         showFeedback('لطفاً ابتدا وارد شوید.', 'error');
@@ -141,8 +122,7 @@ async function submitIdea(content) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'خطا در ارسال ایده');
         showFeedback('ایده شما ثبت شد', 'success');
-        ideaInput.value = '';
-        loadMyIdeas();
+        document.getElementById('ideaInput').value = '';
         return true;
     } catch (error) {
         showFeedback(error.message, 'error');
@@ -150,170 +130,121 @@ async function submitIdea(content) {
     }
 }
 
-async function loadMyIdeas() {
-    if (!currentUserId) return;
-    try {
-        const response = await fetch(`${API_BASE_URL}/ideas?userId=${currentUserId}`);
-        if (!response.ok) throw new Error('خطا در دریافت ایده‌ها');
-        const ideas = await response.json();
+// ===== رویدادهای صفحه ثبت‌نام =====
+if (currentPage === 'register.html') {
+    const registerForm = document.getElementById('registerForm');
+    const verifySection = document.getElementById('verifySection');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const verifyCodeInput = document.getElementById('verifyCode');
 
-        if (ideas.length === 0) {
-            ideasList.innerHTML = `<div class="idea-item-glass" style="text-align:center;color:var(--text-muted);border-right-color:transparent;">
-                <i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:10px;color:var(--primary-dark);"></i>
-                هنوز ایده‌ای ثبت نکرده‌اید.
-            </div>`;
-            return;
-        }
-
-        ideasList.innerHTML = ideas.map(idea => `
-            <div class="idea-item-glass">
-                <div class="idea-content">${idea.content}</div>
-                <div class="idea-meta">
-                    <span>${idea.status === 'pending' ? '⏳ در انتظار بررسی' : idea.status === 'approved' ? '✅ تأیید شده' : '❌ رد شده'}</span>
-                    <span>${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
-                </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        ideasList.innerHTML = `<div class="idea-item-glass" style="text-align:center;color:#F87171;border-right-color:#F87171;">
-            خطا در دریافت ایده‌ها. دوباره تلاش کنید.
-        </div>`;
-    }
-}
-
-async function loadAccountInfo() {
-    if (!currentUserId) return;
-    try {
-        const response = await fetch(`${API_BASE_URL}/user/${currentUserId}`);
-        if (!response.ok) throw new Error('کاربر یافت نشد');
-        const user = await response.json();
-        currentUserData = user;
-        accountInfo.innerHTML = `
-            <div class="info-item"><span class="label">نام</span><span class="value">${user.name}</span></div>
-            <div class="info-item"><span class="label">ایمیل</span><span class="value">${user.email}</span></div>
-            <div class="info-item"><span class="label">شماره تلفن</span><span class="value">${user.phone}</span></div>
-            <div class="info-item"><span class="label">تاریخ ثبت‌نام</span><span class="value">${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></div>
-        `;
-    } catch (error) {
-        accountInfo.innerHTML = `<div class="info-item" style="color:#F87171;">خطا در دریافت اطلاعات.</div>`;
-    }
-}
-
-function validateRegisterForm() {
-    clearErrors();
-    let isValid = true;
-
-    const name = document.getElementById('fullname').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const password = document.getElementById('password').value;
-    const confirm = document.getElementById('confirmPassword').value;
-
-    if (!name || name.length < 3) {
-        setError('nameError', 'نام حداقل ۳ کاراکتر باشد.');
-        isValid = false;
-    }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setError('emailError', 'ایمیل معتبر نیست.');
-        isValid = false;
-    }
-    if (!phone || phone.length < 10) {
-        setError('phoneError', 'شماره تلفن معتبر نیست.');
-        isValid = false;
-    }
-    if (!password || password.length < 6) {
-        setError('passError', 'رمز عبور حداقل ۶ کاراکتر باشد.');
-        isValid = false;
-    }
-    if (password !== confirm) {
-        setError('confirmError', 'رمزها مطابقت ندارند.');
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-startBtn.addEventListener('click', () => {
-    showPage('registerPage');
-});
-
-registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!validateRegisterForm()) return;
-
-    const name = document.getElementById('fullname').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const password = document.getElementById('password').value;
-
-    try {
-        const user = await registerUser(phone, name, email, password);
-        pendingUserId = user.id;
-        await sendVerificationRequest(pendingUserId);
-        registerForm.style.display = 'none';
-        verifySection.style.display = 'block';
-        document.getElementById('verifyMessage').textContent = '';
-        document.getElementById('verifyError').textContent = '';
-    } catch (error) {
-        document.getElementById('registerError').textContent = error.message;
-    }
-});
-
-verifyBtn.addEventListener('click', async () => {
-    const code = verifyCodeInput.value.trim();
-    if (!code || code.length !== 6) {
-        document.getElementById('verifyError').textContent = 'کد باید ۶ رقم باشد.';
-        return;
-    }
-
-    try {
-        const result = await verifyCode(pendingUserId, code);
-        currentUserId = pendingUserId;
-        currentUserData = result.user;
-        localStorage.setItem('ays_user_id', currentUserId);
-        showPage('dashboardPage');
-        registerForm.reset();
-        verifyCodeInput.value = '';
-        verifySection.style.display = 'none';
-        registerForm.style.display = 'flex';
+    function validateRegisterForm() {
         clearErrors();
-    } catch (error) {
-        document.getElementById('verifyMessage').textContent = error.message;
+        let isValid = true;
+
+        const name = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirmPassword').value;
+
+        if (!name || name.length < 3) {
+            setError('nameError', 'نام حداقل ۳ کاراکتر باشد.');
+            isValid = false;
+        }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError('emailError', 'ایمیل معتبر نیست.');
+            isValid = false;
+        }
+        if (!phone || phone.length < 10) {
+            setError('phoneError', 'شماره تلفن معتبر نیست.');
+            isValid = false;
+        }
+        if (!password || password.length < 6) {
+            setError('passError', 'رمز عبور حداقل ۶ کاراکتر باشد.');
+            isValid = false;
+        }
+        if (password !== confirm) {
+            setError('confirmError', 'رمزها مطابقت ندارند.');
+            isValid = false;
+        }
+
+        return isValid;
     }
-});
 
-resendBtn.addEventListener('click', async () => {
-    try {
-        await sendVerificationRequest(pendingUserId);
-        document.getElementById('verifyMessage').textContent = 'کد جدید به ایمیل شما ارسال شد.';
-        document.getElementById('verifyMessage').style.color = '#34D399';
-    } catch (error) {
-        document.getElementById('verifyMessage').textContent = error.message;
-        document.getElementById('verifyMessage').style.color = '#F87171';
-    }
-});
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!validateRegisterForm()) return;
 
-submitIdeaBtn.addEventListener('click', async () => {
-    await submitIdea(ideaInput.value);
-});
+        const name = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const password = document.getElementById('password').value;
 
-navItems.forEach(item => {
-    item.addEventListener('click', function() {
-        const pageId = this.dataset.page;
-        if (!currentUserId) {
-            showPage('landingPage');
+        try {
+            const user = await registerUser(phone, name, email, password);
+            pendingUserId = user.id;
+            await sendVerificationRequest(pendingUserId);
+            registerForm.style.display = 'none';
+            verifySection.style.display = 'block';
+            document.getElementById('verifyMessage').textContent = '';
+            document.getElementById('verifyError').textContent = '';
+        } catch (error) {
+            document.getElementById('registerError').textContent = error.message;
+        }
+    });
+
+    verifyBtn.addEventListener('click', async () => {
+        const code = verifyCodeInput.value.trim();
+        if (!code || code.length !== 6) {
+            document.getElementById('verifyError').textContent = 'کد باید ۶ رقم باشد.';
             return;
         }
-        showPage(pageId);
+
+        try {
+            const result = await verifyCode(pendingUserId, code);
+            localStorage.setItem('ays_user_id', pendingUserId);
+            window.location.href = 'dashboard.html';
+        } catch (error) {
+            document.getElementById('verifyMessage').textContent = error.message;
+        }
     });
-});
 
-logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('ays_user_id');
-    currentUserId = null;
-    currentUserData = null;
-    pendingUserId = null;
-    showPage('landingPage');
-});
+    resendBtn.addEventListener('click', async () => {
+        try {
+            await sendVerificationRequest(pendingUserId);
+            document.getElementById('verifyMessage').textContent = 'کد جدید به ایمیل شما ارسال شد.';
+            document.getElementById('verifyMessage').style.color = '#34D399';
+        } catch (error) {
+            document.getElementById('verifyMessage').textContent = error.message;
+            document.getElementById('verifyMessage').style.color = '#F87171';
+        }
+    });
+}
 
+// ===== رویدادهای صفحه اصلی (داشبورد) =====
+if (currentPage === 'dashboard.html') {
+    const submitIdeaBtn = document.getElementById('submitIdeaBtn');
+    const ideaInput = document.getElementById('ideaInput');
+
+    submitIdeaBtn.addEventListener('click', async () => {
+        await submitIdea(ideaInput.value);
+    });
+
+    // ناوبری منو
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const page = this.dataset.page;
+            // فعلاً فقط صفحه اصلی فعال است
+            if (page !== 'dashboard') {
+                alert('این صفحه در حال توسعه است.');
+                return;
+            }
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+}
+
+// ===== بررسی نشست کاربر =====
 checkUserSession();
