@@ -19,7 +19,6 @@ db.serialize(() => {
     db.run(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            phone TEXT UNIQUE NOT NULL,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
@@ -52,24 +51,23 @@ db.serialize(() => {
 });
 
 app.post('/api/register', (req, res) => {
-    const { phone, name, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!phone || !name || !email || !password) {
+    if (!name || !email || !password) {
         return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
     }
 
-    db.get('SELECT id FROM users WHERE phone = ? OR email = ?', [phone, email], (err, existing) => {
+    db.get('SELECT id FROM users WHERE email = ?', [email], (err, existing) => {
         if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-        if (existing) return res.status(400).json({ error: 'این شماره یا ایمیل قبلاً ثبت شده است.' });
+        if (existing) return res.status(400).json({ error: 'این ایمیل قبلاً ثبت شده است.' });
 
         db.run(
-            'INSERT INTO users (phone, name, email, password, status) VALUES (?, ?, ?, ?, ?)',
-            [phone, name, email, password, 'pending'],
+            'INSERT INTO users (name, email, password, status) VALUES (?, ?, ?, ?)',
+            [name, email, password, 'pending'],
             function(err) {
                 if (err) return res.status(500).json({ error: 'خطا در ثبت‌نام' });
                 res.status(201).json({
                     id: this.lastID,
-                    phone,
                     name,
                     email,
                     status: 'pending',
@@ -131,7 +129,7 @@ app.post('/api/verify-code', (req, res) => {
             db.run('UPDATE users SET status = "active" WHERE id = ?', [userId], function(err) {
                 if (err) return res.status(500).json({ error: 'خطا در فعال‌سازی حساب' });
 
-                db.get('SELECT id, phone, name, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
+                db.get('SELECT id, name, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
                     if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
                     res.json({ message: 'حساب کاربری فعال شد.', user });
                 });
@@ -142,7 +140,7 @@ app.post('/api/verify-code', (req, res) => {
 
 app.get('/api/user/:id', (req, res) => {
     const userId = req.params.id;
-    db.get('SELECT id, phone, name, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
+    db.get('SELECT id, name, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
         if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
         if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
         res.json(user);
@@ -156,14 +154,14 @@ app.post('/api/ideas', (req, res) => {
         return res.status(400).json({ error: 'متن ایده باید حداقل ۵ کاراکتر باشد.' });
     }
 
-    db.get('SELECT name, phone FROM users WHERE id = ? AND status = "active"', [userId], (err, user) => {
+    db.get('SELECT name, email FROM users WHERE id = ? AND status = "active"', [userId], (err, user) => {
         if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
         if (!user) return res.status(404).json({ error: 'کاربر یافت نشد یا حساب فعال نیست.' });
 
         db.run('INSERT INTO ideas (user_id, content) VALUES (?, ?)', [userId, content.trim()], function(err) {
             if (err) return res.status(500).json({ error: 'خطا در ذخیره ایده' });
 
-            sendToTelegram(user.name, user.phone, content.trim());
+            sendToTelegram(user.name, user.email, content.trim());
 
             res.status(201).json({
                 id: this.lastID,
