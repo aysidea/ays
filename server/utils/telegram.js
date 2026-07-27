@@ -3,7 +3,7 @@ const axios = require('axios');
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CHAT_ID = process.env.CHAT_ID;
 
-async function sendToTelegram(userName, email, ideaContent) {
+async function sendToTelegram(userName, phone, ideaContent) {
     if (!BOT_TOKEN || !CHAT_ID) {
         console.error('BOT_TOKEN یا CHAT_ID در محیط تعریف نشده است.');
         return false;
@@ -13,7 +13,7 @@ async function sendToTelegram(userName, email, ideaContent) {
 🆕 ایده جدید ثبت شد!
 
 👤 نام: ${userName}
-📧 ایمیل: ${email}
+📱 شماره تماس: ${phone}
 💡 متن ایده:
 ${ideaContent}
 
