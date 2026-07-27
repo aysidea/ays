@@ -71,34 +71,39 @@ async function getUserData(userId) {
 }
 
 function checkUserSession() {
-    if (!currentUserId) {
-        if (currentPage !== 'index.html' && currentPage !== 'register.html') {
-            window.location.href = 'index.html';
-        }
+    // اگر کاربر شناسه دارد، بررسی کن
+    if (currentUserId) {
+        getUserData(currentUserId)
+            .then(user => {
+                if (user.status === 'pending') {
+                    // کاربر هنوز تأیید نشده، پس به صفحه ثبت‌نام برگرد
+                    localStorage.removeItem('ays_user_id');
+                    currentUserId = null;
+                    if (currentPage !== 'register.html') {
+                        window.location.href = 'register.html';
+                    }
+                    return;
+                }
+                // کاربر فعال است
+                if (currentPage === 'index.html' || currentPage === 'register.html') {
+                    window.location.href = 'dashboard.html';
+                }
+            })
+            .catch(() => {
+                // خطا در دریافت اطلاعات، به صفحه خوش‌آمدگویی برگرد
+                localStorage.removeItem('ays_user_id');
+                currentUserId = null;
+                if (currentPage !== 'index.html') {
+                    window.location.href = 'index.html';
+                }
+            });
         return;
     }
 
-    getUserData(currentUserId)
-        .then(user => {
-            if (user.status === 'pending') {
-                localStorage.removeItem('ays_user_id');
-                currentUserId = null;
-                if (currentPage !== 'index.html' && currentPage !== 'register.html') {
-                    window.location.href = 'index.html';
-                }
-                return;
-            }
-            if (currentPage === 'index.html' || currentPage === 'register.html') {
-                window.location.href = 'dashboard.html';
-            }
-        })
-        .catch(() => {
-            localStorage.removeItem('ays_user_id');
-            currentUserId = null;
-            if (currentPage !== 'index.html' && currentPage !== 'register.html') {
-                window.location.href = 'index.html';
-            }
-        });
+    // کاربر شناسه ندارد
+    if (currentPage !== 'index.html' && currentPage !== 'register.html') {
+        window.location.href = 'index.html';
+    }
 }
 
 // ===== مدیریت ایده‌ها =====
@@ -220,9 +225,11 @@ if (currentPage === 'dashboard.html') {
     const submitIdeaBtn = document.getElementById('submitIdeaBtn');
     const ideaInput = document.getElementById('ideaInput');
 
-    submitIdeaBtn.addEventListener('click', async () => {
-        await submitIdea(ideaInput.value);
-    });
+    if (submitIdeaBtn) {
+        submitIdeaBtn.addEventListener('click', async () => {
+            await submitIdea(ideaInput.value);
+        });
+    }
 
     // ناوبری منو
     document.querySelectorAll('.nav-item').forEach(item => {
