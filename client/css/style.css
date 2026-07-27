@@ -936,3 +936,17 @@ body {
     }
 
     .landing-title {
+        font-size: 1.8rem;
+    }
+    .register-logo {
+        font-size: 2.2rem;
+    }
+    .phone-group .phone-input {
+        flex-wrap: wrap;
+    }
+    .country-code {
+        width: 100%;
+        border-left: none;
+        border-bottom: 2px solid #E2E8F0;
+    }
+}
