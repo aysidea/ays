@@ -1,0 +1,24 @@
+{
+    "name": "AYS | پلتفرمی که ایده‌های شما را می‌خرد",
+    "short_name": "AYS",
+    "description": "پلتفرم آیس (Ays) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#F5F0EB",
+    "theme_color": "#E67E22",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "assets/images/ays-icon1.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/ays-icon1.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
