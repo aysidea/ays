@@ -234,4 +234,73 @@ registerForm.addEventListener('submit', async (e) => {
             registerForm.reset();
         }, 1200);
     } catch {
-        errorEl.textContent = 'خطا
+        errorEl.textContent = 'خطا در ارتباط با سرور.';
+        showLoading(false);
+    }
+});
+
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = '';
+
+    if (!email || !password) {
+        errorEl.textContent = 'همه فیلدها را پر کنید.';
+        return;
+    }
+
+    try {
+        const result = await loginUser(email, password);
+        if (result.error) {
+            errorEl.textContent = result.error;
+            return;
+        }
+        currentUserId = result.id;
+        currentUserData = result;
+        localStorage.setItem('ays_user_id', currentUserId);
+        showPage('dashboardPage');
+        loginForm.reset();
+    } catch {
+        errorEl.textContent = 'خطا در ارتباط با سرور.';
+    }
+});
+
+document.getElementById('showLoginForm').addEventListener('click', (e) => {
+    e.preventDefault();
+    registerForm.style.display = 'none';
+    loginForm.style.display = 'block';
+});
+document.getElementById('showRegisterForm').addEventListener('click', (e) => {
+    e.preventDefault();
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'block';
+});
+
+submitIdeaBtn.addEventListener('click', async () => {
+    await submitIdea(ideaInput.value);
+});
+
+navItems.forEach(item => {
+    item.addEventListener('click', function() {
+        const pageId = this.dataset.page;
+        if (!currentUserId && pageId !== 'landingPage' && pageId !== 'registerPage' && pageId !== 'aboutPage') {
+            showPage('landingPage');
+            return;
+        }
+        showPage(pageId);
+    });
+});
+
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('ays_user_id');
+    currentUserId = null;
+    currentUserData = null;
+    showPage('landingPage');
+});
+
+// ===== مقداردهی اولیه =====
+document.addEventListener('DOMContentLoaded', function() {
+    checkSession();
+});
