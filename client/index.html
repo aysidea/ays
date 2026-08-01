@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد</title>
     <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است." />
     <meta name="keywords" content="ایده, ثبت ایده, فروش ایده, موسسه آیس, AYS" />
@@ -12,22 +12,31 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://ays-client.onrender.com" />
 
-    <!-- Font Awesome (CDN) -->
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#E67E22" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AYS" />
+    <link rel="apple-touch-icon" href="assets/images/ays-icon1.png" />
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-    <!-- هدر (فقط در صفحات داخلی) -->
+    <!-- هدر -->
     <header id="mainHeader" class="hidden-header">
         <div class="header-content">
             <span class="logo-header">AYS</span>
         </div>
     </header>
 
+    <!-- محتوای اصلی -->
     <main id="mainContent">
-        <!-- صفحه لندینگ (بدون اسکرول) -->
+        <!-- صفحه لندینگ -->
         <section id="landingPage" class="page active no-scroll">
             <div class="landing-wrapper">
                 <div class="landing-card">
@@ -40,12 +49,17 @@
                         <p>از طریق ایمیل با شما ارتباط خواهیم گرفت و آن را به بهترین شکل معرفی می‌کنیم.</p>
                         <p class="highlight-text">همین حالا شروع کنید و آینده‌ساز باشید.</p>
                     </div>
-                    <button id="startBtn" class="btn-primary btn-start">شروع کنید</button>
+                    <button id="startBtn" class="btn-primary btn-start">
+                        <span id="startBtnText">شروع کنید</span>
+                        <span id="startLoader" style="display:none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- صفحه ثبت‌نام (بدون اسکرول) -->
+        <!-- صفحه ثبت‌نام -->
         <section id="registerPage" class="page no-scroll">
             <div class="register-wrapper">
                 <div class="register-card">
@@ -94,7 +108,7 @@
             </div>
         </section>
 
-        <!-- صفحه اصلی (داشبورد) -->
+        <!-- صفحه اصلی -->
         <section id="dashboardPage" class="page">
             <div class="dashboard-wrapper">
                 <div class="idea-submit-modern">
@@ -107,7 +121,7 @@
 
                 <div class="collage-modern">
                     <div class="collage-item-large">
-                        <div class="collage-image" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=400&fit=crop&auto=format');">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-1.jpg');">
                             <div class="collage-overlay">
                                 <span>ایده‌های شما</span>
                                 <span>آینده را می‌سازند</span>
@@ -115,21 +129,21 @@
                         </div>
                     </div>
                     <div class="collage-item-small">
-                        <div class="collage-image" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=300&h=300&fit=crop&auto=format');">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-2.jpg');">
                             <div class="collage-overlay">
                                 <span>ارتباط با صنعت</span>
                             </div>
                         </div>
                     </div>
                     <div class="collage-item-small">
-                        <div class="collage-image" style="background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=300&h=300&fit=crop&auto=format');">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-3.jpg');">
                             <div class="collage-overlay">
                                 <span>تحقق ایده‌ها</span>
                             </div>
                         </div>
                     </div>
                     <div class="collage-item-medium">
-                        <div class="collage-image" style="background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=300&fit=crop&auto=format');">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-4.jpg');">
                             <div class="collage-overlay">
                                 <span>همکاری با شرکت‌های بزرگ</span>
                             </div>
