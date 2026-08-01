@@ -1,40 +1,34 @@
-// ============================================================
-// تنظیمات اولیه
-// ============================================================
 const API_BASE_URL = 'https://ays-server.onrender.com/api';
 let currentUserId = localStorage.getItem('ays_user_id');
 let currentUserData = null;
 
-// ============================================================
-// المان‌های DOM
-// ============================================================
 const pages = {
     landing: document.getElementById('landingPage'),
     register: document.getElementById('registerPage'),
     dashboard: document.getElementById('dashboardPage'),
     myIdeas: document.getElementById('myIdeasPage'),
-    about: document.getElementById('aboutPage'),
     account: document.getElementById('accountPage'),
+    about: document.getElementById('aboutPage'),
 };
+
 const navItems = document.querySelectorAll('.nav-item');
 const startBtn = document.getElementById('startBtn');
 const registerForm = document.getElementById('registerForm');
+const loginForm = document.getElementById('loginForm');
 const submitIdeaBtn = document.getElementById('submitIdeaBtn');
 const ideaInput = document.getElementById('ideaInput');
 const ideaFeedback = document.getElementById('ideaFeedback');
 const ideasList = document.getElementById('ideasList');
 const accountInfo = document.getElementById('accountInfo');
 const logoutBtn = document.getElementById('logoutBtn');
+const header = document.getElementById('mainHeader');
+const bottomNav = document.getElementById('bottomNav');
 
-// ============================================================
-// توابع کمکی
-// ============================================================
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
     if (target) target.classList.add('active');
 
-    // به‌روزرسانی ناوبری پایین
     navItems.forEach(item => {
         item.classList.remove('active');
         if (item.dataset.page === pageId) {
@@ -42,88 +36,84 @@ function showPage(pageId) {
         }
     });
 
-    // بارگذاری داده‌های خاص هر صفحه
-    if (pageId === 'myIdeasPage' && currentUserId) {
-        loadMyIdeas();
+    if (pageId === 'landingPage' || pageId === 'registerPage') {
+        header.classList.add('hidden-header');
+        bottomNav.classList.add('hidden-nav');
+    } else {
+        header.classList.remove('hidden-header');
+        bottomNav.classList.remove('hidden-nav');
     }
-    if (pageId === 'accountPage' && currentUserId) {
-        loadAccountInfo();
-    }
+
+    if (pageId === 'myIdeasPage' && currentUserId) loadMyIdeas();
+    if (pageId === 'accountPage' && currentUserId) loadAccountInfo();
 }
 
 function showFeedback(message, isSuccess = true) {
     ideaFeedback.textContent = message;
-    ideaFeedback.style.color = isSuccess ? '#28a745' : '#dc3545';
+    ideaFeedback.style.color = isSuccess ? '#00D084' : '#FF4444';
     ideaFeedback.classList.add('show');
-    setTimeout(() => {
-        ideaFeedback.classList.remove('show');
-    }, 3000);
+    setTimeout(() => ideaFeedback.classList.remove('show'), 3000);
 }
 
-// ============================================================
-// مدیریت احراز هویت
-// ============================================================
-async function registerUser(phone, name, language) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, name, language })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'خطا در ثبت‌نام');
-        }
-        return data;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+// ===== احراز هویت =====
+async function registerUser(name, email, password) {
+    const res = await fetch(`${API_BASE_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+    });
+    return res.json();
 }
 
-async function checkUserSession() {
+async function loginUser(email, password) {
+    const res = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+    return res.json();
+}
+
+async function getUserData(userId) {
+    const res = await fetch(`${API_BASE_URL}/user/${userId}`);
+    return res.json();
+}
+
+async function checkSession() {
     if (!currentUserId) {
         showPage('landingPage');
         return;
     }
     try {
-        const response = await fetch(`${API_BASE_URL}/user/${currentUserId}`);
-        if (!response.ok) throw new Error('کاربر یافت نشد');
-        const user = await response.json();
+        const user = await getUserData(currentUserId);
+        if (user.error) throw new Error('کاربر یافت نشد');
         currentUserData = user;
         showPage('dashboardPage');
-    } catch (error) {
+    } catch {
         localStorage.removeItem('ays_user_id');
         currentUserId = null;
         showPage('landingPage');
     }
 }
 
-// ============================================================
-// مدیریت ایده‌ها
-// ============================================================
+// ===== مدیریت ایده‌ها =====
 async function submitIdea(content) {
     if (!currentUserId) {
-        showFeedback('لطفاً ابتدا ثبت‌نام کنید.', false);
+        showFeedback('لطفاً ابتدا وارد شوید.', false);
         return false;
     }
     if (!content || content.trim().length < 5) {
         showFeedback('لطفاً متن ایده را با جزئیات بیشتر وارد کنید.', false);
         return false;
     }
-
     try {
-        const response = await fetch(`${API_BASE_URL}/ideas`, {
+        const res = await fetch(`${API_BASE_URL}/ideas`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: currentUserId,
-                content: content.trim()
-            })
+            body: JSON.stringify({ userId: currentUserId, content: content.trim() })
         });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'خطا در ارسال ایده');
-        }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'خطا در ارسال ایده');
         showFeedback('ایده شما ثبت شد', true);
         ideaInput.value = '';
         return true;
@@ -136,93 +126,132 @@ async function submitIdea(content) {
 async function loadMyIdeas() {
     if (!currentUserId) return;
     try {
-        const response = await fetch(`${API_BASE_URL}/ideas?userId=${currentUserId}`);
-        if (!response.ok) throw new Error('خطا در دریافت ایده‌ها');
-        const ideas = await response.json();
-
+        const res = await fetch(`${API_BASE_URL}/ideas?userId=${currentUserId}`);
+        if (!res.ok) throw new Error('خطا در دریافت ایده‌ها');
+        const ideas = await res.json();
         if (ideas.length === 0) {
-            ideasList.innerHTML = '<p style="color: #6C757D; text-align: center;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
+            ideasList.innerHTML = '<p style="color:#666;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
             return;
         }
-
         ideasList.innerHTML = ideas.map(idea => `
-            <div class="idea-item">
+            <div class="idea-card-modern">
                 <div class="idea-content">${idea.content}</div>
                 <div class="idea-meta">
-                    <span>وضعیت: ${idea.status === 'pending' ? 'در انتظار بررسی' : idea.status === 'approved' ? 'تأیید شده' : 'رد شده'}</span>
+                    <span class="idea-status-badge ${idea.status}">${idea.status === 'pending' ? 'در انتظار بررسی' : idea.status === 'approved' ? 'تأیید شده' : 'رد شده'}</span>
                     <span>${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
                 </div>
             </div>
         `).join('');
-    } catch (error) {
-        ideasList.innerHTML = '<p style="color: #dc3545;">خطا در دریافت ایده‌ها. دوباره تلاش کنید.</p>';
+    } catch {
+        ideasList.innerHTML = '<p style="color:#FF4444;text-align:center;">خطا در دریافت ایده‌ها. دوباره تلاش کنید.</p>';
     }
 }
 
-// ============================================================
-// نمایش اطلاعات اکانت
-// ============================================================
+// ===== اطلاعات اکانت =====
 async function loadAccountInfo() {
     if (!currentUserId) return;
     try {
-        const response = await fetch(`${API_BASE_URL}/user/${currentUserId}`);
-        if (!response.ok) throw new Error('کاربر یافت نشد');
-        const user = await response.json();
+        const user = await getUserData(currentUserId);
+        if (user.error) throw new Error('کاربر یافت نشد');
         currentUserData = user;
         accountInfo.innerHTML = `
-            <p><strong>نام:</strong> ${user.name}</p>
-            <p><strong>شماره تلفن:</strong> ${user.phone}</p>
-            <p><strong>زبان:</strong> ${user.language === 'fa' ? 'فارسی' : 'انگلیسی'}</p>
-            <p><strong>تاریخ ثبت‌نام:</strong> ${new Date(user.created_at).toLocaleDateString('fa-IR')}</p>
+            <p><strong>نام:</strong> <span>${user.name}</span></p>
+            <p><strong>ایمیل:</strong> <span>${user.email}</span></p>
+            <p><strong>تاریخ ثبت‌نام:</strong> <span>${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></p>
         `;
-    } catch (error) {
-        accountInfo.innerHTML = '<p style="color: #dc3545;">خطا در دریافت اطلاعات.</p>';
+    } catch {
+        accountInfo.innerHTML = '<p style="color:#FF4444;">خطا در دریافت اطلاعات.</p>';
     }
 }
 
-// ============================================================
-// رویدادها
-// ============================================================
+// ===== رویدادها =====
+startBtn.addEventListener('click', () => showPage('registerPage'));
 
-// شروع فرآیند ثبت‌نام
-startBtn.addEventListener('click', () => {
-    showPage('registerPage');
-});
-
-// ثبت‌نام
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const phone = document.getElementById('phone').value.trim();
     const name = document.getElementById('fullname').value.trim();
-    const language = document.getElementById('language').value;
-
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirmPassword').value;
     const errorEl = document.getElementById('registerError');
     errorEl.textContent = '';
 
-    if (!phone || !name) {
+    if (!name || !email || !password || !confirm) {
+        errorEl.textContent = 'همه فیلدها را پر کنید.';
+        return;
+    }
+    if (!email.includes('@') || !email.includes('.')) {
+        errorEl.textContent = 'ایمیل معتبر وارد کنید.';
+        return;
+    }
+    if (password.length < 6) {
+        errorEl.textContent = 'رمز عبور حداقل ۶ کاراکتر باشد.';
+        return;
+    }
+    if (password !== confirm) {
+        errorEl.textContent = 'رمز عبور و تکرار آن مطابقت ندارند.';
+        return;
+    }
+
+    try {
+        const result = await registerUser(name, email, password);
+        if (result.error) {
+            errorEl.textContent = result.error;
+            return;
+        }
+        currentUserId = result.id;
+        currentUserData = result;
+        localStorage.setItem('ays_user_id', currentUserId);
+        showPage('dashboardPage');
+        registerForm.reset();
+    } catch {
+        errorEl.textContent = 'خطا در ارتباط با سرور.';
+    }
+});
+
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = '';
+
+    if (!email || !password) {
         errorEl.textContent = 'همه فیلدها را پر کنید.';
         return;
     }
 
     try {
-        const user = await registerUser(phone, name, language);
-        currentUserId = user.id;
-        currentUserData = user;
+        const result = await loginUser(email, password);
+        if (result.error) {
+            errorEl.textContent = result.error;
+            return;
+        }
+        currentUserId = result.id;
+        currentUserData = result;
         localStorage.setItem('ays_user_id', currentUserId);
         showPage('dashboardPage');
-        registerForm.reset();
-    } catch (error) {
-        errorEl.textContent = error.message;
+        loginForm.reset();
+    } catch {
+        errorEl.textContent = 'خطا در ارتباط با سرور.';
     }
 });
 
-// ارسال ایده
-submitIdeaBtn.addEventListener('click', async () => {
-    const content = ideaInput.value;
-    await submitIdea(content);
+document.getElementById('showLoginForm').addEventListener('click', (e) => {
+    e.preventDefault();
+    registerForm.style.display = 'none';
+    loginForm.style.display = 'block';
+});
+document.getElementById('showRegisterForm').addEventListener('click', (e) => {
+    e.preventDefault();
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'block';
 });
 
-// ناوبری پایین
+submitIdeaBtn.addEventListener('click', async () => {
+    await submitIdea(ideaInput.value);
+});
+
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
@@ -234,7 +263,6 @@ navItems.forEach(item => {
     });
 });
 
-// خروج از حساب
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('ays_user_id');
     currentUserId = null;
@@ -242,7 +270,5 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-// ============================================================
-// مقداردهی اولیه
-// ============================================================
-checkUserSession();
+// ===== مقداردهی اولیه =====
+checkSession();
