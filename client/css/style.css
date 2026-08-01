@@ -5,10 +5,18 @@
     box-sizing: border-box;
 }
 
-/* ===== فونت‌های داخلی (TTF و OTF) ===== */
+/* ===== فونت‌های داخلی ===== */
 @font-face {
     font-family: 'Shoklat';
     src: url('../fonts/شکلات.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Afsoon';
+    src: url('../fonts/Afsoon_MRT.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -30,7 +38,7 @@
     font-display: swap;
 }
 
-/* ===== تم جدید (خاکستری-کرم، نه سفید و نه سیاه) ===== */
+/* ===== تم جدید (خاکستری-کرم) ===== */
 :root {
     --primary: #E67E22;
     --primary-dark: #D35400;
@@ -47,7 +55,7 @@
 }
 
 body {
-    font-family: 'Shoklat', 'Vazir', 'Tahoma', sans-serif;
+    font-family: 'Shoklat', 'Tahoma', sans-serif;
     background: var(--bg-body);
     color: var(--text-dark);
     min-height: 100vh;
@@ -70,6 +78,9 @@ body {
 .page.no-scroll .register-wrapper {
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ===== اسکرول بار ===== */
@@ -190,12 +201,15 @@ body {
     }
 }
 
-/* ===== صفحه لندینگ ===== */
+/* ============================================================
+   صفحه لندینگ (خوش‌آمدگویی) - وسط‌چین شده
+   ============================================================ */
 .landing-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    width: 100%;
     padding: 20px;
     background: var(--bg-body);
 }
@@ -209,8 +223,10 @@ body {
     box-shadow: var(--shadow);
     border: 1px solid var(--border-light);
     text-align: center;
+    margin: 0 auto;
 }
 
+/* لوگو */
 .landing-logo {
     font-family: 'ElectroGarden', 'Arial', sans-serif;
     font-size: 55px;
@@ -219,6 +235,7 @@ body {
     letter-spacing: 4px;
 }
 
+/* تیتر با فونت شکلات */
 .landing-title {
     font-family: 'Shoklat', sans-serif;
     font-size: 1.9rem;
@@ -226,8 +243,9 @@ body {
     margin-bottom: 20px;
 }
 
+/* متن توضیحی با فونت Afsoon */
 .landing-text p {
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'Afsoon', 'Tahoma', sans-serif;
     font-size: 1rem;
     line-height: 2.2;
     color: var(--text-gray);
@@ -235,12 +253,14 @@ body {
 }
 
 .landing-text .highlight-text {
+    font-family: 'Afsoon', 'Tahoma', sans-serif;
     color: var(--primary);
     font-weight: 700;
     font-size: 1.1rem;
     margin-top: 8px;
 }
 
+/* دکمه‌ها با فونت شکلات */
 .btn-start {
     margin-top: 25px;
     padding: 14px 50px;
@@ -250,6 +270,9 @@ body {
     box-shadow: 0 8px 25px rgba(230, 126, 34, 0.2);
     transition: var(--transition);
     font-family: 'Shoklat', sans-serif;
+    color: #fff;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-start:hover {
@@ -257,12 +280,15 @@ body {
     box-shadow: 0 12px 35px rgba(230, 126, 34, 0.3);
 }
 
-/* ===== صفحه ثبت‌نام ===== */
+/* ============================================================
+   صفحه ثبت‌نام
+   ============================================================ */
 .register-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    width: 100%;
     padding: 20px;
     background: var(--bg-body);
 }
@@ -275,6 +301,7 @@ body {
     width: 100%;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-light);
+    margin: 0 auto;
 }
 
 .register-logo {
@@ -307,6 +334,7 @@ body {
     font-family: 'Shoklat', sans-serif;
 }
 
+/* ===== داخل کادرهای ثبت‌نام با فونت عادی (Shoklat) ===== */
 .register-form input {
     width: 100%;
     padding: 12px 14px;
@@ -315,7 +343,7 @@ body {
     border-radius: 12px;
     font-size: 0.95rem;
     color: var(--text-dark);
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'Shoklat', 'Tahoma', sans-serif;
     transition: var(--transition);
 }
 
@@ -329,6 +357,7 @@ body {
     color: #B0A8A0;
 }
 
+/* دکمه ثبت‌نام با فونت شکلات */
 .btn-register {
     width: 100%;
     padding: 14px;
@@ -343,6 +372,9 @@ body {
     justify-content: center;
     gap: 10px;
     font-family: 'Shoklat', sans-serif;
+    color: #fff;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-register:hover {
@@ -360,6 +392,7 @@ body {
     text-align: center;
     margin-top: 10px;
     min-height: 22px;
+    font-family: 'Shoklat', sans-serif;
 }
 
 .login-link {
@@ -367,6 +400,7 @@ body {
     margin-top: 12px;
     font-size: 0.85rem;
     color: var(--text-gray);
+    font-family: 'Shoklat', sans-serif;
 }
 
 .login-link a {
@@ -379,7 +413,9 @@ body {
     text-decoration: underline;
 }
 
-/* ===== داشبورد ===== */
+/* ============================================================
+   صفحه اصلی (داشبورد)
+   ============================================================ */
 .dashboard-wrapper {
     max-width: 1100px;
     margin: 0 auto;
@@ -402,12 +438,15 @@ body {
     font-family: 'Shoklat', sans-serif;
 }
 
+/* متن "هر ایده‌ای حتی کوچک..." با فونت Afsoon */
 .idea-submit-modern .sub-text {
     color: var(--text-gray);
     margin-bottom: 18px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-family: 'Afsoon', 'Tahoma', sans-serif;
 }
 
+/* داخل کادر ایده با فونت عادی (Shoklat) */
 .idea-submit-modern textarea {
     width: 100%;
     padding: 16px;
@@ -416,7 +455,7 @@ body {
     border-radius: 16px;
     font-size: 0.95rem;
     color: var(--text-dark);
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'Shoklat', 'Tahoma', sans-serif;
     min-height: 120px;
     resize: vertical;
     transition: var(--transition);
@@ -428,6 +467,7 @@ body {
     box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.06);
 }
 
+/* دکمه ارسال ایده با فونت شکلات */
 .btn-submit {
     margin-top: 14px;
     padding: 12px 35px;
@@ -435,6 +475,10 @@ body {
     background: var(--primary);
     box-shadow: 0 6px 20px rgba(230, 126, 34, 0.15);
     font-family: 'Shoklat', sans-serif;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
 }
 
 .btn-submit:hover {
@@ -472,7 +516,9 @@ body {
     }
 }
 
-/* ===== کلاژ ===== */
+/* ============================================================
+   کلاژ
+   ============================================================ */
 .collage-modern {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -536,7 +582,9 @@ body {
     opacity: 0.9;
 }
 
-/* ===== ایده‌های من ===== */
+/* ============================================================
+   ایده‌های من
+   ============================================================ */
 .my-ideas-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -554,6 +602,7 @@ body {
     gap: 12px;
     color: var(--text-gray);
     font-size: 0.9rem;
+    font-family: 'Shoklat', sans-serif;
 }
 
 .info-banner-modern i {
@@ -581,11 +630,12 @@ body {
     transform: translateX(-4px);
 }
 
+/* محتوای ایده با فونت عادی */
 .idea-card-modern .idea-content {
     font-size: 0.95rem;
     line-height: 1.9;
     color: var(--text-dark);
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'Shoklat', 'Tahoma', sans-serif;
 }
 
 .idea-card-modern .idea-meta {
@@ -596,6 +646,7 @@ body {
     color: var(--text-gray);
     border-top: 1px solid var(--border-light);
     padding-top: 10px;
+    font-family: 'Shoklat', sans-serif;
 }
 
 .idea-status-badge {
@@ -618,7 +669,9 @@ body {
     color: #922B21;
 }
 
-/* ===== اکانت ===== */
+/* ============================================================
+   اکانت
+   ============================================================ */
 .account-wrapper {
     max-width: 650px;
     margin: 0 auto;
@@ -640,13 +693,14 @@ body {
     border: 1px solid var(--border-light);
 }
 
+/* کادرهای اطلاعات اکانت با فونت عادی */
 .account-cards p {
     display: flex;
     justify-content: space-between;
     padding: 12px 0;
     border-bottom: 1px solid var(--border-light);
     font-size: 0.95rem;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'Shoklat', 'Tahoma', sans-serif;
 }
 
 .account-cards p:last-child {
@@ -669,6 +723,7 @@ body {
     gap: 12px;
 }
 
+/* دکمه خروج با فونت شکلات */
 .btn-secondary {
     background: var(--bg-input);
     color: var(--text-dark);
@@ -687,7 +742,9 @@ body {
     transform: translateY(-2px);
 }
 
-/* ===== درباره ما ===== */
+/* ============================================================
+   درباره ما
+   ============================================================ */
 .about-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -702,6 +759,7 @@ body {
     border: 1px solid var(--border-light);
 }
 
+/* تیتر با فونت شکلات */
 .about-title {
     font-family: 'Shoklat', sans-serif;
     font-size: 2rem;
@@ -710,8 +768,9 @@ body {
     text-align: center;
 }
 
+/* متن‌های درباره ما با فونت Afsoon */
 .about-text {
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'Afsoon', 'Tahoma', sans-serif;
     font-size: 1rem;
     line-height: 2.2;
     color: var(--text-gray);
@@ -751,7 +810,9 @@ body {
     font-family: 'Shoklat', sans-serif;
 }
 
-/* ===== واکنش‌گرایی ===== */
+/* ============================================================
+   واکنش‌گرایی
+   ============================================================ */
 @media (max-width: 992px) {
     .collage-modern {
         grid-template-columns: 1fr 1fr;
