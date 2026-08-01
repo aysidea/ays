@@ -23,6 +23,9 @@ const accountInfo = document.getElementById('accountInfo');
 const logoutBtn = document.getElementById('logoutBtn');
 const header = document.getElementById('mainHeader');
 const bottomNav = document.getElementById('bottomNav');
+const registerBtn = document.getElementById('registerBtn');
+const registerBtnText = document.getElementById('registerBtnText');
+const registerLoader = document.getElementById('registerLoader');
 
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
@@ -50,9 +53,23 @@ function showPage(pageId) {
 
 function showFeedback(message, isSuccess = true) {
     ideaFeedback.textContent = message;
-    ideaFeedback.style.color = isSuccess ? '#00D084' : '#FF4444';
+    ideaFeedback.style.color = isSuccess ? '#28A745' : '#DC3545';
     ideaFeedback.classList.add('show');
     setTimeout(() => ideaFeedback.classList.remove('show'), 3000);
+}
+
+function showLoading(show) {
+    if (show) {
+        registerBtnText.style.display = 'none';
+        registerLoader.style.display = 'inline-block';
+        registerBtn.disabled = true;
+        registerBtn.style.opacity = '0.7';
+    } else {
+        registerBtnText.style.display = 'inline';
+        registerLoader.style.display = 'none';
+        registerBtn.disabled = false;
+        registerBtn.style.opacity = '1';
+    }
 }
 
 // ===== احراز هویت =====
@@ -130,7 +147,7 @@ async function loadMyIdeas() {
         if (!res.ok) throw new Error('خطا در دریافت ایده‌ها');
         const ideas = await res.json();
         if (ideas.length === 0) {
-            ideasList.innerHTML = '<p style="color:#666;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
+            ideasList.innerHTML = '<p style="color:#ADB5BD;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
             return;
         }
         ideasList.innerHTML = ideas.map(idea => `
@@ -143,11 +160,10 @@ async function loadMyIdeas() {
             </div>
         `).join('');
     } catch {
-        ideasList.innerHTML = '<p style="color:#FF4444;text-align:center;">خطا در دریافت ایده‌ها. دوباره تلاش کنید.</p>';
+        ideasList.innerHTML = '<p style="color:#DC3545;text-align:center;">خطا در دریافت ایده‌ها. دوباره تلاش کنید.</p>';
     }
 }
 
-// ===== اطلاعات اکانت =====
 async function loadAccountInfo() {
     if (!currentUserId) return;
     try {
@@ -160,7 +176,7 @@ async function loadAccountInfo() {
             <p><strong>تاریخ ثبت‌نام:</strong> <span>${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></p>
         `;
     } catch {
-        accountInfo.innerHTML = '<p style="color:#FF4444;">خطا در دریافت اطلاعات.</p>';
+        accountInfo.innerHTML = '<p style="color:#DC3545;">خطا در دریافت اطلاعات.</p>';
     }
 }
 
@@ -193,19 +209,26 @@ registerForm.addEventListener('submit', async (e) => {
         return;
     }
 
+    showLoading(true);
+
     try {
         const result = await registerUser(name, email, password);
         if (result.error) {
             errorEl.textContent = result.error;
+            showLoading(false);
             return;
         }
-        currentUserId = result.id;
-        currentUserData = result;
-        localStorage.setItem('ays_user_id', currentUserId);
-        showPage('dashboardPage');
-        registerForm.reset();
+        setTimeout(() => {
+            currentUserId = result.id;
+            currentUserData = result;
+            localStorage.setItem('ays_user_id', currentUserId);
+            showLoading(false);
+            showPage('dashboardPage');
+            registerForm.reset();
+        }, 1500);
     } catch {
         errorEl.textContent = 'خطا در ارتباط با سرور.';
+        showLoading(false);
     }
 });
 
@@ -270,5 +293,4 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-// ===== مقداردهی اولیه =====
 checkSession();
