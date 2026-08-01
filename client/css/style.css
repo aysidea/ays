@@ -63,7 +63,7 @@
 }
 
 body {
-    font-family: 'Shoklat', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
     background: var(--bg-body);
     color: var(--text-dark);
     min-height: 100vh;
@@ -124,8 +124,9 @@ body {
     display: none;
 }
 
+/* کلمه AYS در هدر با فونت DujitsuFont */
 .logo-header {
-    font-family: 'Acquire', 'Arial', sans-serif;
+    font-family: 'DujitsuFont', 'Arial', sans-serif;
     font-size: 30px;
     color: var(--primary);
     letter-spacing: 3px;
@@ -165,7 +166,7 @@ body {
     font-weight: 500;
     background: transparent;
     border: none;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .nav-item i {
@@ -251,7 +252,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* متن توضیحی با فونت AradVF */
+/* کل متن‌های صفحه خوش‌آمدگویی با فونت AradVF */
 .landing-text p {
     font-family: 'AradVF', 'Tahoma', sans-serif;
     font-size: 1rem;
@@ -339,10 +340,9 @@ body {
     font-weight: 600;
     color: var(--text-gray);
     margin-bottom: 4px;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
-/* ===== داخل همه کادرهای ثبت‌نام با فونت کاملاً عادی (Shoklat) ===== */
 .register-form input {
     width: 100%;
     padding: 12px 14px;
@@ -351,7 +351,7 @@ body {
     border-radius: 12px;
     font-size: 0.95rem;
     color: var(--text-dark);
-    font-family: 'Shoklat', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
     transition: var(--transition);
 }
 
@@ -365,7 +365,6 @@ body {
     color: #B0A8A0;
 }
 
-/* دکمه ثبت‌نام با فونت شکلات */
 .btn-register {
     width: 100%;
     padding: 14px;
@@ -400,7 +399,7 @@ body {
     text-align: center;
     margin-top: 10px;
     min-height: 22px;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .login-link {
@@ -408,7 +407,7 @@ body {
     margin-top: 12px;
     font-size: 0.85rem;
     color: var(--text-gray);
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .login-link a {
@@ -446,7 +445,6 @@ body {
     font-family: 'Shoklat', sans-serif;
 }
 
-/* متن "هر ایده‌ای حتی کوچک..." با فونت AradVF */
 .idea-submit-modern .sub-text {
     color: var(--text-gray);
     margin-bottom: 18px;
@@ -454,7 +452,7 @@ body {
     font-family: 'AradVF', 'Tahoma', sans-serif;
 }
 
-/* داخل کادر ایده با فونت عادی (Shoklat) */
+/* داخل کادر ارسال ایده با فونت AradVF */
 .idea-submit-modern textarea {
     width: 100%;
     padding: 16px;
@@ -463,7 +461,7 @@ body {
     border-radius: 16px;
     font-size: 0.95rem;
     color: var(--text-dark);
-    font-family: 'Shoklat', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
     min-height: 120px;
     resize: vertical;
     transition: var(--transition);
@@ -475,7 +473,6 @@ body {
     box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.06);
 }
 
-/* دکمه ارسال ایده با فونت شکلات */
 .btn-submit {
     margin-top: 14px;
     padding: 12px 35px;
@@ -501,7 +498,7 @@ body {
     opacity: 0;
     transition: var(--transition);
     min-height: 28px;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .feedback-message.show {
@@ -581,7 +578,7 @@ body {
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     padding: 12px;
     text-align: center;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .collage-overlay span:last-child {
@@ -610,7 +607,7 @@ body {
     gap: 12px;
     color: var(--text-gray);
     font-size: 0.9rem;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .info-banner-modern i {
@@ -642,7 +639,7 @@ body {
     font-size: 0.95rem;
     line-height: 1.9;
     color: var(--text-dark);
-    font-family: 'Shoklat', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
 }
 
 .idea-card-modern .idea-meta {
@@ -653,7 +650,7 @@ body {
     color: var(--text-gray);
     border-top: 1px solid var(--border-light);
     padding-top: 10px;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .idea-status-badge {
@@ -700,14 +697,14 @@ body {
     border: 1px solid var(--border-light);
 }
 
-/* ===== بقیه اطلاعات اکانت با فونت عادی (Shoklat) ===== */
+/* داخل کادرهای اکانت (بجز ایمیل) با فونت AradVF */
 .account-cards p {
     display: flex;
     justify-content: space-between;
     padding: 12px 0;
     border-bottom: 1px solid var(--border-light);
     font-size: 0.95rem;
-    font-family: 'Shoklat', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
 }
 
 .account-cards p:last-child {
@@ -717,7 +714,7 @@ body {
 .account-cards p strong {
     color: var(--text-gray);
     font-weight: 500;
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .account-cards p span {
@@ -725,16 +722,16 @@ body {
     font-weight: 600;
 }
 
-/* ===== مقدار ایمیل با فونت Electro Garden ===== */
+/* مقدار ایمیل با فونت Electro Garden */
 .account-cards p span.email-value {
     font-family: 'ElectroGarden', 'Tahoma', sans-serif;
     color: var(--text-dark);
     font-weight: 600;
 }
 
-/* ===== سایر مقادیر با فونت عادی (Shoklat) ===== */
+/* سایر مقادیر با فونت AradVF */
 .account-cards p span:not(.email-value) {
-    font-family: 'Shoklat', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
     color: var(--text-dark);
     font-weight: 600;
 }
@@ -788,7 +785,7 @@ body {
     text-align: center;
 }
 
-/* متن‌های درباره ما با فونت AradVF */
+/* کل متن‌های درباره ما با فونت AradVF */
 .about-text {
     font-family: 'AradVF', 'Tahoma', sans-serif;
     font-size: 1rem;
@@ -821,13 +818,13 @@ body {
     font-size: 2rem;
     font-weight: 700;
     color: var(--primary);
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 .stat-label {
     font-size: 0.8rem;
     color: var(--text-gray);
-    font-family: 'Shoklat', sans-serif;
+    font-family: 'AradVF', sans-serif;
 }
 
 /* ============================================================
