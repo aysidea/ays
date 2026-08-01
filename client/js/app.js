@@ -27,7 +27,6 @@ const registerBtn = document.getElementById('registerBtn');
 const registerBtnText = document.getElementById('registerBtnText');
 const registerLoader = document.getElementById('registerLoader');
 
-// ===== توابع کمکی =====
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -45,10 +44,14 @@ function showPage(pageId) {
         header.classList.add('hidden-header');
         bottomNav.classList.add('hidden-nav');
         document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.inset = '0';
     } else {
         header.classList.remove('hidden-header');
         bottomNav.classList.remove('hidden-nav');
         document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.inset = '';
     }
 
     if (pageId === 'myIdeasPage' && currentUserId) loadMyIdeas();
@@ -176,7 +179,7 @@ async function loadAccountInfo() {
         currentUserData = user;
         accountInfo.innerHTML = `
             <p><strong>نام:</strong> <span>${user.name}</span></p>
-            <p><strong>ایمیل:</strong> <span>${user.email}</span></p>
+            <p><strong>ایمیل:</strong> <span class="email-value">${user.email}</span></p>
             <p><strong>تاریخ ثبت‌نام:</strong> <span>${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></p>
         `;
     } catch {
@@ -297,7 +300,7 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-// ===== مقداردهی اولیه با سرعت بالا =====
+// ===== مقداردهی اولیه =====
 document.addEventListener('DOMContentLoaded', function() {
     checkSession();
 });
