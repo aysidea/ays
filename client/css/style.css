@@ -15,8 +15,16 @@
 }
 
 @font-face {
-    font-family: 'Afsoon';
-    src: url('../fonts/Afsoon_MRT.ttf') format('truetype');
+    font-family: 'AradVF';
+    src: url('../fonts/AradVF.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Acquire';
+    src: url('../fonts/Acquire-BW0ox.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -38,7 +46,7 @@
     font-display: swap;
 }
 
-/* ===== تم جدید (خاکستری-کرم) ===== */
+/* ===== تم (خاکستری-کرم) ===== */
 :root {
     --primary: #E67E22;
     --primary-dark: #D35400;
@@ -117,7 +125,7 @@ body {
 }
 
 .logo-header {
-    font-family: 'DujitsuFont', 'Arial', sans-serif;
+    font-family: 'Acquire', 'Arial', sans-serif;
     font-size: 30px;
     color: var(--primary);
     letter-spacing: 3px;
@@ -202,7 +210,7 @@ body {
 }
 
 /* ============================================================
-   صفحه لندینگ (خوش‌آمدگویی) - وسط‌چین شده
+   صفحه لندینگ (خوش‌آمدگویی)
    ============================================================ */
 .landing-wrapper {
     display: flex;
@@ -226,9 +234,9 @@ body {
     margin: 0 auto;
 }
 
-/* لوگو */
+/* لوگو با فونت Acquire */
 .landing-logo {
-    font-family: 'ElectroGarden', 'Arial', sans-serif;
+    font-family: 'Acquire', 'Arial', sans-serif;
     font-size: 55px;
     color: var(--primary);
     margin-bottom: 8px;
@@ -243,9 +251,9 @@ body {
     margin-bottom: 20px;
 }
 
-/* متن توضیحی با فونت Afsoon */
+/* متن توضیحی با فونت AradVF */
 .landing-text p {
-    font-family: 'Afsoon', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
     font-size: 1rem;
     line-height: 2.2;
     color: var(--text-gray);
@@ -253,7 +261,7 @@ body {
 }
 
 .landing-text .highlight-text {
-    font-family: 'Afsoon', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
     color: var(--primary);
     font-weight: 700;
     font-size: 1.1rem;
@@ -305,7 +313,7 @@ body {
 }
 
 .register-logo {
-    font-family: 'ElectroGarden', 'Arial', sans-serif;
+    font-family: 'Acquire', 'Arial', sans-serif;
     font-size: 44px;
     color: var(--primary);
     text-align: center;
@@ -334,7 +342,7 @@ body {
     font-family: 'Shoklat', sans-serif;
 }
 
-/* ===== داخل کادرهای ثبت‌نام با فونت عادی (Shoklat) ===== */
+/* ===== داخل همه کادرهای ثبت‌نام با فونت کاملاً عادی (Shoklat) ===== */
 .register-form input {
     width: 100%;
     padding: 12px 14px;
@@ -438,12 +446,12 @@ body {
     font-family: 'Shoklat', sans-serif;
 }
 
-/* متن "هر ایده‌ای حتی کوچک..." با فونت Afsoon */
+/* متن "هر ایده‌ای حتی کوچک..." با فونت AradVF */
 .idea-submit-modern .sub-text {
     color: var(--text-gray);
     margin-bottom: 18px;
     font-size: 0.95rem;
-    font-family: 'Afsoon', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
 }
 
 /* داخل کادر ایده با فونت عادی (Shoklat) */
@@ -630,7 +638,6 @@ body {
     transform: translateX(-4px);
 }
 
-/* محتوای ایده با فونت عادی */
 .idea-card-modern .idea-content {
     font-size: 0.95rem;
     line-height: 1.9;
@@ -693,7 +700,7 @@ body {
     border: 1px solid var(--border-light);
 }
 
-/* کادرهای اطلاعات اکانت با فونت عادی */
+/* ===== بقیه اطلاعات اکانت با فونت عادی (Shoklat) ===== */
 .account-cards p {
     display: flex;
     justify-content: space-between;
@@ -710,9 +717,24 @@ body {
 .account-cards p strong {
     color: var(--text-gray);
     font-weight: 500;
+    font-family: 'Shoklat', sans-serif;
 }
 
 .account-cards p span {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* ===== مقدار ایمیل با فونت Electro Garden ===== */
+.account-cards p span.email-value {
+    font-family: 'ElectroGarden', 'Tahoma', sans-serif;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* ===== سایر مقادیر با فونت عادی (Shoklat) ===== */
+.account-cards p span:not(.email-value) {
+    font-family: 'Shoklat', 'Tahoma', sans-serif;
     color: var(--text-dark);
     font-weight: 600;
 }
@@ -723,7 +745,6 @@ body {
     gap: 12px;
 }
 
-/* دکمه خروج با فونت شکلات */
 .btn-secondary {
     background: var(--bg-input);
     color: var(--text-dark);
@@ -759,7 +780,6 @@ body {
     border: 1px solid var(--border-light);
 }
 
-/* تیتر با فونت شکلات */
 .about-title {
     font-family: 'Shoklat', sans-serif;
     font-size: 2rem;
@@ -768,9 +788,9 @@ body {
     text-align: center;
 }
 
-/* متن‌های درباره ما با فونت Afsoon */
+/* متن‌های درباره ما با فونت AradVF */
 .about-text {
-    font-family: 'Afsoon', 'Tahoma', sans-serif;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
     font-size: 1rem;
     line-height: 2.2;
     color: var(--text-gray);
