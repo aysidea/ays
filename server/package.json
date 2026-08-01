@@ -1,7 +1,7 @@
 {
   "name": "ays-server",
   "version": "2.0.0",
-  "description": "سرور پلتفرم AYS",
+  "description": "سرور پلتفرم AYS با امنیت کامل",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -17,7 +17,7 @@
     "helmet": "^7.1.0",
     "express-rate-limit": "^7.1.5",
     "validator": "^13.11.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
     "winston": "^3.11.0"
   }
 }
