@@ -1,4 +1,5 @@
 const API_BASE_URL = 'https://ays-server.onrender.com/api';
+let currentToken = localStorage.getItem('ays_token');
 let currentUserId = localStorage.getItem('ays_user_id');
 let currentUserData = null;
 
@@ -56,8 +57,8 @@ function showPage(pageId) {
         document.body.style.inset = '';
     }
 
-    if (pageId === 'myIdeasPage' && currentUserId) loadMyIdeas();
-    if (pageId === 'accountPage' && currentUserId) loadAccountInfo();
+    if (pageId === 'myIdeasPage' && currentToken) loadMyIdeas();
+    if (pageId === 'accountPage' && currentToken) loadAccountInfo();
 }
 
 function showFeedback(message, isSuccess = true) {
@@ -95,6 +96,13 @@ function showLoading(show, type = 'register') {
     }
 }
 
+function getAuthHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+    };
+}
+
 // ===== احراز هویت =====
 async function registerUser(name, email, password) {
     const res = await fetch(`${API_BASE_URL}/register`, {
@@ -114,23 +122,27 @@ async function loginUser(email, password) {
     return res.json();
 }
 
-async function getUserData(userId) {
-    const res = await fetch(`${API_BASE_URL}/user/${userId}`);
+async function getUserData() {
+    const res = await fetch(`${API_BASE_URL}/user`, {
+        headers: getAuthHeaders()
+    });
     return res.json();
 }
 
 async function checkSession() {
-    if (!currentUserId) {
+    if (!currentToken || !currentUserId) {
         showPage('landingPage');
         return;
     }
     try {
-        const user = await getUserData(currentUserId);
+        const user = await getUserData();
         if (user.error) throw new Error('کاربر یافت نشد');
         currentUserData = user;
         showPage('dashboardPage');
     } catch {
+        localStorage.removeItem('ays_token');
         localStorage.removeItem('ays_user_id');
+        currentToken = null;
         currentUserId = null;
         showPage('landingPage');
     }
@@ -138,7 +150,7 @@ async function checkSession() {
 
 // ===== مدیریت ایده‌ها =====
 async function submitIdea(content) {
-    if (!currentUserId) {
+    if (!currentToken) {
         showFeedback('لطفاً ابتدا وارد شوید.', false);
         return false;
     }
@@ -149,8 +161,8 @@ async function submitIdea(content) {
     try {
         const res = await fetch(`${API_BASE_URL}/ideas`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: currentUserId, content: content.trim() })
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ content: content.trim() })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'خطا در ارسال ایده');
@@ -164,9 +176,11 @@ async function submitIdea(content) {
 }
 
 async function loadMyIdeas() {
-    if (!currentUserId) return;
+    if (!currentToken) return;
     try {
-        const res = await fetch(`${API_BASE_URL}/ideas?userId=${currentUserId}`);
+        const res = await fetch(`${API_BASE_URL}/ideas`, {
+            headers: getAuthHeaders()
+        });
         if (!res.ok) throw new Error('خطا در دریافت ایده‌ها');
         const ideas = await res.json();
         if (ideas.length === 0) {
@@ -188,9 +202,9 @@ async function loadMyIdeas() {
 }
 
 async function loadAccountInfo() {
-    if (!currentUserId) return;
+    if (!currentToken) return;
     try {
-        const user = await getUserData(currentUserId);
+        const user = await getUserData();
         if (user.error) throw new Error('کاربر یافت نشد');
         currentUserData = user;
         accountInfo.innerHTML = `
@@ -248,8 +262,10 @@ registerForm.addEventListener('submit', async (e) => {
             return;
         }
         setTimeout(() => {
+            currentToken = result.token;
             currentUserId = result.id;
             currentUserData = result;
+            localStorage.setItem('ays_token', currentToken);
             localStorage.setItem('ays_user_id', currentUserId);
             showLoading(false, 'register');
             showPage('dashboardPage');
@@ -279,8 +295,10 @@ loginForm.addEventListener('submit', async (e) => {
             errorEl.textContent = result.error;
             return;
         }
+        currentToken = result.token;
         currentUserId = result.id;
         currentUserData = result;
+        localStorage.setItem('ays_token', currentToken);
         localStorage.setItem('ays_user_id', currentUserId);
         showPage('dashboardPage');
         loginForm.reset();
@@ -307,7 +325,7 @@ submitIdeaBtn.addEventListener('click', async () => {
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
-        if (!currentUserId && pageId !== 'landingPage' && pageId !== 'registerPage' && pageId !== 'aboutPage') {
+        if (!currentToken && pageId !== 'landingPage' && pageId !== 'registerPage' && pageId !== 'aboutPage') {
             showPage('landingPage');
             return;
         }
@@ -316,7 +334,9 @@ navItems.forEach(item => {
 });
 
 logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('ays_token');
     localStorage.removeItem('ays_user_id');
+    currentToken = null;
     currentUserId = null;
     currentUserData = null;
     showPage('landingPage');
@@ -326,7 +346,6 @@ logoutBtn.addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', function() {
     checkSession();
 
-    // ثبت Service Worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
             .then(() => console.log('Service Worker ثبت شد'))
