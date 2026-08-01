@@ -38,20 +38,38 @@ db.serialize(() => {
 
 app.post('/api/register', (req, res) => {
     const { email, name, password } = req.body;
+
     if (!email || !name || !password) {
         return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
     }
     if (password.length < 6) {
         return res.status(400).json({ error: 'رمز عبور حداقل ۶ کاراکتر باشد.' });
     }
+    if (!email.includes('@') || !email.includes('.')) {
+        return res.status(400).json({ error: 'ایمیل معتبر وارد کنید.' });
+    }
+
     db.get('SELECT id FROM users WHERE email = ?', [email], (err, existing) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-        if (existing) return res.status(400).json({ error: 'این ایمیل قبلاً ثبت شده است.' });
-        db.run('INSERT INTO users (email, name, password) VALUES (?, ?, ?)',
+        if (err) {
+            return res.status(500).json({ error: 'خطای داخلی سرور' });
+        }
+        if (existing) {
+            return res.status(400).json({ error: 'این ایمیل قبلاً ثبت شده است.' });
+        }
+
+        db.run(
+            'INSERT INTO users (email, name, password) VALUES (?, ?, ?)',
             [email, name, password],
             function(err) {
-                if (err) return res.status(500).json({ error: 'خطا در ثبت‌نام' });
-                res.status(201).json({ id: this.lastID, email, name, created_at: new Date().toISOString() });
+                if (err) {
+                    return res.status(500).json({ error: 'خطا در ثبت‌نام' });
+                }
+                res.status(201).json({
+                    id: this.lastID,
+                    email,
+                    name,
+                    created_at: new Date().toISOString()
+                });
             }
         );
     });
@@ -62,11 +80,17 @@ app.post('/api/login', (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ error: 'ایمیل و رمز عبور الزامی هستند.' });
     }
-    db.get('SELECT id, email, name, created_at FROM users WHERE email = ? AND password = ?',
+
+    db.get(
+        'SELECT id, email, name, created_at FROM users WHERE email = ? AND password = ?',
         [email, password],
         (err, user) => {
-            if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-            if (!user) return res.status(401).json({ error: 'ایمیل یا رمز عبور اشتباه است.' });
+            if (err) {
+                return res.status(500).json({ error: 'خطای داخلی سرور' });
+            }
+            if (!user) {
+                return res.status(401).json({ error: 'ایمیل یا رمز عبور اشتباه است.' });
+            }
             res.json(user);
         }
     );
@@ -74,11 +98,16 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/user/:id', (req, res) => {
     const userId = req.params.id;
-    db.get('SELECT id, email, name, created_at FROM users WHERE id = ?',
+    db.get(
+        'SELECT id, email, name, created_at FROM users WHERE id = ?',
         [userId],
         (err, user) => {
-            if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-            if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
+            if (err) {
+                return res.status(500).json({ error: 'خطای داخلی سرور' });
+            }
+            if (!user) {
+                return res.status(404).json({ error: 'کاربر یافت نشد' });
+            }
             res.json(user);
         }
     );
@@ -89,14 +118,25 @@ app.post('/api/ideas', (req, res) => {
     if (!userId || !content || content.trim().length < 5) {
         return res.status(400).json({ error: 'متن ایده حداقل ۵ کاراکتر باشد.' });
     }
+
     db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی سرور' });
-        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
-        db.run('INSERT INTO ideas (user_id, content) VALUES (?, ?)',
+        if (err) {
+            return res.status(500).json({ error: 'خطای داخلی سرور' });
+        }
+        if (!user) {
+            return res.status(404).json({ error: 'کاربر یافت نشد' });
+        }
+
+        db.run(
+            'INSERT INTO ideas (user_id, content) VALUES (?, ?)',
             [userId, content.trim()],
             function(err) {
-                if (err) return res.status(500).json({ error: 'خطا در ذخیره ایده' });
+                if (err) {
+                    return res.status(500).json({ error: 'خطا در ذخیره ایده' });
+                }
+
                 sendToTelegram(user.name, user.email, content.trim());
+
                 res.status(201).json({
                     id: this.lastID,
                     user_id: userId,
@@ -111,11 +151,17 @@ app.post('/api/ideas', (req, res) => {
 
 app.get('/api/ideas', (req, res) => {
     const userId = req.query.userId;
-    if (!userId) return res.status(400).json({ error: 'شناسه کاربر الزامی است.' });
-    db.all('SELECT id, content, status, created_at FROM ideas WHERE user_id = ? ORDER BY created_at DESC',
+    if (!userId) {
+        return res.status(400).json({ error: 'شناسه کاربر الزامی است.' });
+    }
+
+    db.all(
+        'SELECT id, content, status, created_at FROM ideas WHERE user_id = ? ORDER BY created_at DESC',
         [userId],
         (err, ideas) => {
-            if (err) return res.status(500).json({ error: 'خطا در دریافت ایده‌ها' });
+            if (err) {
+                return res.status(500).json({ error: 'خطا در دریافت ایده‌ها' });
+            }
             res.json(ideas);
         }
     );
