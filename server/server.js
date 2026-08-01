@@ -8,7 +8,9 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const morgan = require('morgan');
+const winston = require('winston');
 const { sendToTelegram } = require('./utils/telegram');
+const { sendAlertToTelegram } = require('./utils/alert');
 require('dotenv').config();
 
 const app = express();
@@ -16,17 +18,35 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
 
 // ============================================================
-// ۱. Helmet.js - امنیت هدرهای HTTP
+// ۱. لاگر (Winston)
+// ============================================================
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'logs/combined.log' }),
+    ],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    }));
+}
+
+// ============================================================
+// ۲. Helmet.js
 // ============================================================
 app.use(helmet());
 
 // ============================================================
-// ۲. Morgan - لاگ‌گیری
+// ۳. Morgan
 // ============================================================
 app.use(morgan('combined'));
 
 // ============================================================
-// ۳. CORS محدودتر
+// ۴. CORS
 // ============================================================
 const corsOptions = {
     origin: process.env.CLIENT_URL || 'https://ays365.onrender.com',
@@ -38,13 +58,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ============================================================
-// ۴. محدودیت حجم درخواست‌ها
+// ۵. محدودیت حجم
 // ============================================================
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // ============================================================
-// ۵. Rate Limiting
+// ۶. Rate Limiting
 // ============================================================
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -64,7 +84,7 @@ app.use('/api/register', authLimiter);
 app.use('/api/login', authLimiter);
 
 // ============================================================
-// ۶. دیتابیس
+// ۷. دیتابیس
 // ============================================================
 const dbPath = path.join(__dirname, 'database', 'ays.db');
 const db = new sqlite3.Database(dbPath);
@@ -92,7 +112,7 @@ db.serialize(() => {
 });
 
 // ============================================================
-// ۷. توابع کمکی
+// ۸. توابع کمکی
 // ============================================================
 function sanitizeInput(input) {
     if (typeof input !== 'string') return input;
@@ -117,7 +137,72 @@ function validateIdea(content) {
 }
 
 // ============================================================
-// ۸. Middleware احراز هویت با JWT
+// ۹. Middleware تشخیص حملات (SQL Injection, XSS, ...)
+// ============================================================
+function detectAttack(req, res, next) {
+    const dangerousPatterns = [
+        /<script/i,
+        /javascript:/i,
+        /alert\(/i,
+        /onerror=/i,
+        /onclick=/i,
+        /SELECT.*FROM/i,
+        /DROP.*TABLE/i,
+        /INSERT.*INTO/i,
+        /UNION.*SELECT/i,
+        /--/,
+        /;/,
+        /\/\*/,
+        /\*\//,
+    ];
+
+    const check = (value) => {
+        if (typeof value !== 'string') return false;
+        return dangerousPatterns.some(pattern => pattern.test(value));
+    };
+
+    const body = req.body || {};
+    const query = req.query || {};
+    const params = req.params || {};
+
+    const allData = { ...body, ...query, ...params };
+    let found = false;
+    let detectedValue = '';
+
+    for (const [key, value] of Object.entries(allData)) {
+        if (typeof value === 'string' && check(value)) {
+            found = true;
+            detectedValue = value;
+            break;
+        }
+        if (typeof value === 'object' && value !== null) {
+            const jsonString = JSON.stringify(value);
+            if (check(jsonString)) {
+                found = true;
+                detectedValue = jsonString;
+                break;
+            }
+        }
+    }
+
+    if (found) {
+        const alertMessage = `🚨 تلاش برای نفوذ شناسایی شد!\nالگوی مخرب: ${detectedValue.substring(0, 100)}`;
+        sendAlertToTelegram('SECURITY', alertMessage, {
+            ip: req.ip || req.connection.remoteAddress,
+            path: req.path,
+            user: req.user?.email || 'کاربر مهمان',
+        });
+        logger.warn(`🚨 حمله شناسایی شد: ${req.path} از ${req.ip}`);
+        return res.status(403).json({ error: 'درخواست غیرمجاز' });
+    }
+
+    next();
+}
+
+app.use(detectAttack);
+
+// ============================================================
+// ۱۰. Middleware احراز هویت JWT
 // ============================================================
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -129,6 +214,13 @@ function authenticateToken(req, res, next) {
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
+            // هشدار برای توکن نامعتبر
+            sendAlertToTelegram('WARNING', `⚠️ توکن نامعتبر یا منقضی: ${err.message}`, {
+                ip: req.ip || req.connection.remoteAddress,
+                path: req.path,
+                user: req.user?.email || 'کاربر مهمان',
+            });
+            logger.warn(`⚠️ خطای JWT: ${err.message} - ${req.path} - ${req.ip}`);
             return res.status(403).json({ error: 'توکن نامعتبر. دوباره وارد شوید.' });
         }
         req.user = user;
@@ -137,9 +229,8 @@ function authenticateToken(req, res, next) {
 }
 
 // ============================================================
-// ۹. مسیرها
+// ۱۱. مسیرها
 // ============================================================
-
 app.post('/api/register', async (req, res) => {
     console.log('📨 دریافت درخواست ثبت‌نام:', req.body);
 
@@ -363,9 +454,52 @@ app.get('/api/health', (req, res) => {
 });
 
 // ============================================================
-// ۱۰. راه‌اندازی سرور
+// ۱۲. هشدار در صورت Rate Limit exceeded
+// ============================================================
+app.use((req, res, next) => {
+    const originalSend = res.send;
+    res.send = function(data) {
+        if (res.statusCode === 429) {
+            sendAlertToTelegram('WARNING', '⚠️ محدودیت نرخ درخواست (Rate Limit) فعال شد!', {
+                ip: req.ip || req.connection.remoteAddress,
+                path: req.path,
+                user: req.user?.email || 'کاربر مهمان',
+            });
+            logger.warn(`⚠️ Rate Limit exceeded: ${req.path} از ${req.ip}`);
+        }
+        originalSend.call(this, data);
+    };
+    next();
+});
+
+// ============================================================
+// ۱۳. Global Error Handler با هشدار
+// ============================================================
+app.use((err, req, res, next) => {
+    const statusCode = err.status || 500;
+    const message = err.message || 'خطای داخلی سرور';
+
+    logger.error(`❌ ${statusCode} - ${message} - ${req.path} - ${req.ip}`);
+
+    if (statusCode >= 500) {
+        sendAlertToTelegram('ERROR', message, {
+            ip: req.ip || req.connection.remoteAddress,
+            path: req.path,
+            user: req.user?.email || 'کاربر مهمان',
+            stack: err.stack,
+        });
+    }
+
+    res.status(statusCode).json({
+        error: message,
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
+});
+
+// ============================================================
+// ۱۴. راه‌اندازی سرور
 // ============================================================
 app.listen(PORT, () => {
     console.log(`🚀 سرور AYS روی پورت ${PORT} در حال اجرا است.`);
-    console.log(`🔒 حالت امنیت: فعال (JWT, bcrypt, Helmet, Rate Limit, XSS Prevention)`);
+    console.log(`🔒 حالت امنیت: فعال (JWT, bcrypt, Helmet, Rate Limit, XSS Prevention, Alert System)`);
 });
