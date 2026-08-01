@@ -27,6 +27,7 @@ const registerBtn = document.getElementById('registerBtn');
 const registerBtnText = document.getElementById('registerBtnText');
 const registerLoader = document.getElementById('registerLoader');
 
+// ===== توابع کمکی =====
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -39,12 +40,15 @@ function showPage(pageId) {
         }
     });
 
-    if (pageId === 'landingPage' || pageId === 'registerPage') {
+    const noScrollPages = ['landingPage', 'registerPage'];
+    if (noScrollPages.includes(pageId)) {
         header.classList.add('hidden-header');
         bottomNav.classList.add('hidden-nav');
+        document.body.style.overflow = 'hidden';
     } else {
         header.classList.remove('hidden-header');
         bottomNav.classList.remove('hidden-nav');
+        document.body.style.overflow = '';
     }
 
     if (pageId === 'myIdeasPage' && currentUserId) loadMyIdeas();
@@ -53,7 +57,7 @@ function showPage(pageId) {
 
 function showFeedback(message, isSuccess = true) {
     ideaFeedback.textContent = message;
-    ideaFeedback.style.color = isSuccess ? '#28A745' : '#DC3545';
+    ideaFeedback.style.color = isSuccess ? '#27AE60' : '#C0392B';
     ideaFeedback.classList.add('show');
     setTimeout(() => ideaFeedback.classList.remove('show'), 3000);
 }
@@ -147,7 +151,7 @@ async function loadMyIdeas() {
         if (!res.ok) throw new Error('خطا در دریافت ایده‌ها');
         const ideas = await res.json();
         if (ideas.length === 0) {
-            ideasList.innerHTML = '<p style="color:#ADB5BD;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
+            ideasList.innerHTML = '<p style="color:#B0A8A0;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
             return;
         }
         ideasList.innerHTML = ideas.map(idea => `
@@ -160,7 +164,7 @@ async function loadMyIdeas() {
             </div>
         `).join('');
     } catch {
-        ideasList.innerHTML = '<p style="color:#DC3545;text-align:center;">خطا در دریافت ایده‌ها. دوباره تلاش کنید.</p>';
+        ideasList.innerHTML = '<p style="color:#C0392B;text-align:center;">خطا در دریافت ایده‌ها. دوباره تلاش کنید.</p>';
     }
 }
 
@@ -176,7 +180,7 @@ async function loadAccountInfo() {
             <p><strong>تاریخ ثبت‌نام:</strong> <span>${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></p>
         `;
     } catch {
-        accountInfo.innerHTML = '<p style="color:#DC3545;">خطا در دریافت اطلاعات.</p>';
+        accountInfo.innerHTML = '<p style="color:#C0392B;">خطا در دریافت اطلاعات.</p>';
     }
 }
 
@@ -225,7 +229,7 @@ registerForm.addEventListener('submit', async (e) => {
             showLoading(false);
             showPage('dashboardPage');
             registerForm.reset();
-        }, 1500);
+        }, 1200);
     } catch {
         errorEl.textContent = 'خطا در ارتباط با سرور.';
         showLoading(false);
@@ -293,4 +297,7 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-checkSession();
+// ===== مقداردهی اولیه با سرعت بالا =====
+document.addEventListener('DOMContentLoaded', function() {
+    checkSession();
+});
