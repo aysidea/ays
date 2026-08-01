@@ -1,7 +1,7 @@
 {
     "name": "AYS | پلتفرمی که ایده‌های شما را می‌خرد",
     "short_name": "AYS",
-    "description": "پلتفرم آیس (Ays) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است.",
+    "description": "پلتفرم آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#F5F0EB",
