@@ -1,8 +1,14 @@
+// ============================================================
+// تنظیمات اولیه
+// ============================================================
 const API_BASE_URL = 'https://ays-server.onrender.com/api';
 let currentToken = localStorage.getItem('ays_token');
 let currentUserId = localStorage.getItem('ays_user_id');
 let currentUserData = null;
 
+// ============================================================
+// المان‌های DOM
+// ============================================================
 const pages = {
     landing: document.getElementById('landingPage'),
     register: document.getElementById('registerPage'),
@@ -30,6 +36,9 @@ const registerBtn = document.getElementById('registerBtn');
 const registerBtnText = document.getElementById('registerBtnText');
 const registerLoader = document.getElementById('registerLoader');
 
+// ============================================================
+// توابع کمکی
+// ============================================================
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -97,36 +106,69 @@ function showLoading(show, type = 'register') {
 }
 
 function getAuthHeaders() {
+    const token = localStorage.getItem('ays_token');
     return {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentToken}`
+        'Authorization': token ? `Bearer ${token}` : ''
     };
 }
 
-// ===== احراز هویت =====
+function handleApiError(error, defaultMessage = 'خطا در ارتباط با سرور.') {
+    console.error('❌ خطای API:', error);
+    if (error.message) return error.message;
+    return defaultMessage;
+}
+
+// ============================================================
+// توابع احراز هویت
+// ============================================================
 async function registerUser(name, email, password) {
-    const res = await fetch(`${API_BASE_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-    });
-    return res.json();
+    try {
+        const response = await fetch(`${API_BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'خطا در ثبت‌نام');
+        }
+        return data;
+    } catch (error) {
+        throw new Error(handleApiError(error, 'خطا در ارتباط با سرور.'));
+    }
 }
 
 async function loginUser(email, password) {
-    const res = await fetch(`${API_BASE_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-    });
-    return res.json();
+    try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'خطا در ورود');
+        }
+        return data;
+    } catch (error) {
+        throw new Error(handleApiError(error, 'خطا در ارتباط با سرور.'));
+    }
 }
 
 async function getUserData() {
-    const res = await fetch(`${API_BASE_URL}/user`, {
-        headers: getAuthHeaders()
-    });
-    return res.json();
+    try {
+        const response = await fetch(`${API_BASE_URL}/user`, {
+            headers: getAuthHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'خطا در دریافت اطلاعات');
+        }
+        return data;
+    } catch (error) {
+        throw new Error(handleApiError(error, 'خطا در دریافت اطلاعات کاربر.'));
+    }
 }
 
 async function checkSession() {
@@ -136,10 +178,10 @@ async function checkSession() {
     }
     try {
         const user = await getUserData();
-        if (user.error) throw new Error('کاربر یافت نشد');
         currentUserData = user;
         showPage('dashboardPage');
-    } catch {
+    } catch (error) {
+        console.warn('نشست منقضی یا نامعتبر:', error.message);
         localStorage.removeItem('ays_token');
         localStorage.removeItem('ays_user_id');
         currentToken = null;
@@ -148,7 +190,9 @@ async function checkSession() {
     }
 }
 
-// ===== مدیریت ایده‌ها =====
+// ============================================================
+// توابع مدیریت ایده‌ها
+// ============================================================
 async function submitIdea(content) {
     if (!currentToken) {
         showFeedback('لطفاً ابتدا وارد شوید.', false);
@@ -159,18 +203,20 @@ async function submitIdea(content) {
         return false;
     }
     try {
-        const res = await fetch(`${API_BASE_URL}/ideas`, {
+        const response = await fetch(`${API_BASE_URL}/ideas`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify({ content: content.trim() })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'خطا در ارسال ایده');
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'خطا در ارسال ایده');
+        }
         showFeedback('ایده شما ثبت شد', true);
         ideaInput.value = '';
         return true;
     } catch (error) {
-        showFeedback(error.message, false);
+        showFeedback(handleApiError(error, 'خطا در ارسال ایده.'), false);
         return false;
     }
 }
@@ -178,11 +224,13 @@ async function submitIdea(content) {
 async function loadMyIdeas() {
     if (!currentToken) return;
     try {
-        const res = await fetch(`${API_BASE_URL}/ideas`, {
+        const response = await fetch(`${API_BASE_URL}/ideas`, {
             headers: getAuthHeaders()
         });
-        if (!res.ok) throw new Error('خطا در دریافت ایده‌ها');
-        const ideas = await res.json();
+        if (!response.ok) {
+            throw new Error('خطا در دریافت ایده‌ها');
+        }
+        const ideas = await response.json();
         if (ideas.length === 0) {
             ideasList.innerHTML = '<p style="color:#B0A8A0;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
             return;
@@ -196,8 +244,8 @@ async function loadMyIdeas() {
                 </div>
             </div>
         `).join('');
-    } catch {
-        ideasList.innerHTML = '<p style="color:#C0392B;text-align:center;">خطا در دریافت ایده‌ها. دوباره تلاش کنید.</p>';
+    } catch (error) {
+        ideasList.innerHTML = `<p style="color:#C0392B;text-align:center;">${handleApiError(error, 'خطا در دریافت ایده‌ها.')}</p>`;
     }
 }
 
@@ -205,19 +253,22 @@ async function loadAccountInfo() {
     if (!currentToken) return;
     try {
         const user = await getUserData();
-        if (user.error) throw new Error('کاربر یافت نشد');
         currentUserData = user;
         accountInfo.innerHTML = `
             <p><strong>نام:</strong> <span>${user.name}</span></p>
             <p><strong>ایمیل:</strong> <span class="email-value">${user.email}</span></p>
             <p><strong>تاریخ ثبت‌نام:</strong> <span>${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></p>
         `;
-    } catch {
-        accountInfo.innerHTML = '<p style="color:#C0392B;">خطا در دریافت اطلاعات.</p>';
+    } catch (error) {
+        accountInfo.innerHTML = `<p style="color:#C0392B;">${handleApiError(error, 'خطا در دریافت اطلاعات.')}</p>`;
     }
 }
 
-// ===== رویدادها =====
+// ============================================================
+// رویدادها
+// ============================================================
+
+// دکمه شروع
 startBtn.addEventListener('click', function() {
     showLoading(true, 'start');
     setTimeout(() => {
@@ -226,6 +277,7 @@ startBtn.addEventListener('click', function() {
     }, 1200);
 });
 
+// ثبت‌نام
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('fullname').value.trim();
@@ -235,6 +287,7 @@ registerForm.addEventListener('submit', async (e) => {
     const errorEl = document.getElementById('registerError');
     errorEl.textContent = '';
 
+    // اعتبارسنجی سمت کلاینت
     if (!name || !email || !password || !confirm) {
         errorEl.textContent = 'همه فیلدها را پر کنید.';
         return;
@@ -256,27 +309,23 @@ registerForm.addEventListener('submit', async (e) => {
 
     try {
         const result = await registerUser(name, email, password);
-        if (result.error) {
-            errorEl.textContent = result.error;
-            showLoading(false, 'register');
-            return;
-        }
-        setTimeout(() => {
-            currentToken = result.token;
-            currentUserId = result.id;
-            currentUserData = result;
-            localStorage.setItem('ays_token', currentToken);
-            localStorage.setItem('ays_user_id', currentUserId);
-            showLoading(false, 'register');
-            showPage('dashboardPage');
-            registerForm.reset();
-        }, 1200);
-    } catch {
-        errorEl.textContent = 'خطا در ارتباط با سرور.';
+        // ذخیره توکن و اطلاعات
+        currentToken = result.token;
+        currentUserId = result.id;
+        currentUserData = result;
+        localStorage.setItem('ays_token', currentToken);
+        localStorage.setItem('ays_user_id', currentUserId);
+
+        showLoading(false, 'register');
+        showPage('dashboardPage');
+        registerForm.reset();
+    } catch (error) {
+        errorEl.textContent = error.message;
         showLoading(false, 'register');
     }
 });
 
+// ورود
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
@@ -291,10 +340,6 @@ loginForm.addEventListener('submit', async (e) => {
 
     try {
         const result = await loginUser(email, password);
-        if (result.error) {
-            errorEl.textContent = result.error;
-            return;
-        }
         currentToken = result.token;
         currentUserId = result.id;
         currentUserData = result;
@@ -302,11 +347,12 @@ loginForm.addEventListener('submit', async (e) => {
         localStorage.setItem('ays_user_id', currentUserId);
         showPage('dashboardPage');
         loginForm.reset();
-    } catch {
-        errorEl.textContent = 'خطا در ارتباط با سرور.';
+    } catch (error) {
+        errorEl.textContent = error.message;
     }
 });
 
+// تغییر بین فرم‌های ثبت‌نام و ورود
 document.getElementById('showLoginForm').addEventListener('click', (e) => {
     e.preventDefault();
     registerForm.style.display = 'none';
@@ -318,10 +364,12 @@ document.getElementById('showRegisterForm').addEventListener('click', (e) => {
     registerForm.style.display = 'block';
 });
 
+// ارسال ایده
 submitIdeaBtn.addEventListener('click', async () => {
     await submitIdea(ideaInput.value);
 });
 
+// ناوبری پایین
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
@@ -333,6 +381,7 @@ navItems.forEach(item => {
     });
 });
 
+// خروج
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('ays_token');
     localStorage.removeItem('ays_user_id');
@@ -342,13 +391,17 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-// ===== مقداردهی اولیه =====
+// ============================================================
+// مقداردهی اولیه
+// ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+    // بررسی نشست
     checkSession();
 
+    // ثبت Service Worker برای PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
-            .then(() => console.log('Service Worker ثبت شد'))
-            .catch(err => console.log('خطا در ثبت Service Worker:', err));
+            .then(() => console.log('✅ Service Worker ثبت شد'))
+            .catch(err => console.warn('⚠️ خطا در ثبت Service Worker:', err));
     }
 });
