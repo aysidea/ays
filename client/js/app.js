@@ -1,14 +1,8 @@
-// ============================================================
-// تنظیمات اولیه
-// ============================================================
 const API_BASE_URL = 'https://ays-server.onrender.com/api';
 let currentToken = localStorage.getItem('ays_token');
 let currentUserId = localStorage.getItem('ays_user_id');
 let currentUserData = null;
 
-// ============================================================
-// المان‌های DOM
-// ============================================================
 const pages = {
     landing: document.getElementById('landingPage'),
     register: document.getElementById('registerPage'),
@@ -36,9 +30,6 @@ const registerBtn = document.getElementById('registerBtn');
 const registerBtnText = document.getElementById('registerBtnText');
 const registerLoader = document.getElementById('registerLoader');
 
-// ============================================================
-// توابع کمکی
-// ============================================================
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -113,62 +104,41 @@ function getAuthHeaders() {
     };
 }
 
-function handleApiError(error, defaultMessage = 'خطا در ارتباط با سرور.') {
-    console.error('❌ خطای API:', error);
-    if (error.message) return error.message;
-    return defaultMessage;
-}
-
-// ============================================================
-// توابع احراز هویت
-// ============================================================
 async function registerUser(name, email, password) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'خطا در ثبت‌نام');
-        }
-        return data;
-    } catch (error) {
-        throw new Error(handleApiError(error, 'خطا در ارتباط با سرور.'));
+    const response = await fetch(`${API_BASE_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || 'خطا در ثبت‌نام');
     }
+    return data;
 }
 
 async function loginUser(email, password) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'خطا در ورود');
-        }
-        return data;
-    } catch (error) {
-        throw new Error(handleApiError(error, 'خطا در ارتباط با سرور.'));
+    const response = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || 'خطا در ورود');
     }
+    return data;
 }
 
 async function getUserData() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/user`, {
-            headers: getAuthHeaders()
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'خطا در دریافت اطلاعات');
-        }
-        return data;
-    } catch (error) {
-        throw new Error(handleApiError(error, 'خطا در دریافت اطلاعات کاربر.'));
+    const response = await fetch(`${API_BASE_URL}/user`, {
+        headers: getAuthHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || 'خطا در دریافت اطلاعات');
     }
+    return data;
 }
 
 async function checkSession() {
@@ -190,9 +160,6 @@ async function checkSession() {
     }
 }
 
-// ============================================================
-// توابع مدیریت ایده‌ها
-// ============================================================
 async function submitIdea(content) {
     if (!currentToken) {
         showFeedback('لطفاً ابتدا وارد شوید.', false);
@@ -216,7 +183,7 @@ async function submitIdea(content) {
         ideaInput.value = '';
         return true;
     } catch (error) {
-        showFeedback(handleApiError(error, 'خطا در ارسال ایده.'), false);
+        showFeedback(error.message || 'خطا در ارسال ایده.', false);
         return false;
     }
 }
@@ -245,7 +212,7 @@ async function loadMyIdeas() {
             </div>
         `).join('');
     } catch (error) {
-        ideasList.innerHTML = `<p style="color:#C0392B;text-align:center;">${handleApiError(error, 'خطا در دریافت ایده‌ها.')}</p>`;
+        ideasList.innerHTML = `<p style="color:#C0392B;text-align:center;">${error.message || 'خطا در دریافت ایده‌ها.'}</p>`;
     }
 }
 
@@ -260,15 +227,10 @@ async function loadAccountInfo() {
             <p><strong>تاریخ ثبت‌نام:</strong> <span>${new Date(user.created_at).toLocaleDateString('fa-IR')}</span></p>
         `;
     } catch (error) {
-        accountInfo.innerHTML = `<p style="color:#C0392B;">${handleApiError(error, 'خطا در دریافت اطلاعات.')}</p>`;
+        accountInfo.innerHTML = `<p style="color:#C0392B;">${error.message || 'خطا در دریافت اطلاعات.'}</p>`;
     }
 }
 
-// ============================================================
-// رویدادها
-// ============================================================
-
-// دکمه شروع
 startBtn.addEventListener('click', function() {
     showLoading(true, 'start');
     setTimeout(() => {
@@ -277,7 +239,6 @@ startBtn.addEventListener('click', function() {
     }, 1200);
 });
 
-// ثبت‌نام
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('fullname').value.trim();
@@ -287,7 +248,6 @@ registerForm.addEventListener('submit', async (e) => {
     const errorEl = document.getElementById('registerError');
     errorEl.textContent = '';
 
-    // اعتبارسنجی سمت کلاینت
     if (!name || !email || !password || !confirm) {
         errorEl.textContent = 'همه فیلدها را پر کنید.';
         return;
@@ -309,23 +269,20 @@ registerForm.addEventListener('submit', async (e) => {
 
     try {
         const result = await registerUser(name, email, password);
-        // ذخیره توکن و اطلاعات
         currentToken = result.token;
         currentUserId = result.id;
         currentUserData = result;
         localStorage.setItem('ays_token', currentToken);
         localStorage.setItem('ays_user_id', currentUserId);
-
         showLoading(false, 'register');
         showPage('dashboardPage');
         registerForm.reset();
     } catch (error) {
-        errorEl.textContent = error.message;
+        errorEl.textContent = error.message || 'خطا در ارتباط با سرور.';
         showLoading(false, 'register');
     }
 });
 
-// ورود
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
@@ -348,28 +305,26 @@ loginForm.addEventListener('submit', async (e) => {
         showPage('dashboardPage');
         loginForm.reset();
     } catch (error) {
-        errorEl.textContent = error.message;
+        errorEl.textContent = error.message || 'خطا در ارتباط با سرور.';
     }
 });
 
-// تغییر بین فرم‌های ثبت‌نام و ورود
 document.getElementById('showLoginForm').addEventListener('click', (e) => {
     e.preventDefault();
     registerForm.style.display = 'none';
     loginForm.style.display = 'block';
 });
+
 document.getElementById('showRegisterForm').addEventListener('click', (e) => {
     e.preventDefault();
     loginForm.style.display = 'none';
     registerForm.style.display = 'block';
 });
 
-// ارسال ایده
 submitIdeaBtn.addEventListener('click', async () => {
     await submitIdea(ideaInput.value);
 });
 
-// ناوبری پایین
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
@@ -381,7 +336,6 @@ navItems.forEach(item => {
     });
 });
 
-// خروج
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('ays_token');
     localStorage.removeItem('ays_user_id');
@@ -391,17 +345,11 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-// ============================================================
-// مقداردهی اولیه
-// ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // بررسی نشست
     checkSession();
-
-    // ثبت Service Worker برای PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
-            .then(() => console.log('✅ Service Worker ثبت شد'))
-            .catch(err => console.warn('⚠️ خطا در ثبت Service Worker:', err));
+            .then(() => console.log('Service Worker ثبت شد'))
+            .catch(err => console.warn('خطا در ثبت Service Worker:', err));
     }
 });
