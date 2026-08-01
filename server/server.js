@@ -24,17 +24,16 @@ app.use(helmet());
 // ۲. Morgan - لاگ‌گیری
 // ============================================================
 app.use(morgan('combined'));
-app.use((req, res, next) => {
-    console.log(`📨 ${req.method} ${req.url} از ${req.headers.origin}`);
-    next();
-});
+
 // ============================================================
 // ۳. CORS محدودتر
 // ============================================================
 const corsOptions = {
     origin: process.env.CLIENT_URL || 'https://ays365.onrender.com',
     optionsSuccessStatus: 200,
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 
@@ -48,15 +47,14 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // ۵. Rate Limiting
 // ============================================================
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 دقیقه
-    max: 100, // هر IP حداکثر ۱۰۰ درخواست
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: { error: 'تعداد درخواست‌های شما بیش از حد مجاز است. لطفاً ۱۵ دقیقه دیگر تلاش کنید.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
 app.use('/api/', limiter);
 
-// Rate Limiting سخت‌تر برای ثبت‌نام و لاگین
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 20,
@@ -142,11 +140,11 @@ function authenticateToken(req, res, next) {
 // ۹. مسیرها
 // ============================================================
 
-// ------ ثبت‌نام (با هش کردن رمز) ------
 app.post('/api/register', async (req, res) => {
+    console.log('📨 دریافت درخواست ثبت‌نام:', req.body);
+
     const { email, name, password } = req.body;
 
-    // اعتبارسنجی
     if (!email || !name || !password) {
         return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
     }
@@ -190,6 +188,7 @@ app.post('/api/register', async (req, res) => {
                         { expiresIn: '7d' }
                     );
 
+                    console.log('✅ ثبت‌نام موفق:', sanitizedEmail);
                     res.status(201).json({
                         id: this.lastID,
                         email: sanitizedEmail,
@@ -206,8 +205,9 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// ------ ورود (با بررسی رمز هش‌شده) ------
 app.post('/api/login', async (req, res) => {
+    console.log('📨 دریافت درخواست ورود:', req.body);
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -243,6 +243,7 @@ app.post('/api/login', async (req, res) => {
                     { expiresIn: '7d' }
                 );
 
+                console.log('✅ ورود موفق:', user.email);
                 res.json({
                     id: user.id,
                     email: user.email,
@@ -257,7 +258,6 @@ app.post('/api/login', async (req, res) => {
     );
 });
 
-// ------ دریافت اطلاعات کاربر (محافظت‌شده) ------
 app.get('/api/user', authenticateToken, (req, res) => {
     db.get(
         'SELECT id, email, name, created_at FROM users WHERE id = ?',
@@ -275,7 +275,6 @@ app.get('/api/user', authenticateToken, (req, res) => {
     );
 });
 
-// ------ دریافت اطلاعات کاربر با ID (برای استفاده در کلاینت) ------
 app.get('/api/user/:id', authenticateToken, (req, res) => {
     const userId = parseInt(req.params.id);
     if (userId !== req.user.id) {
@@ -298,7 +297,6 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
     );
 });
 
-// ------ ثبت ایده (با فیلتر XSS و اعتبارسنجی) ------
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { content } = req.body;
@@ -344,7 +342,6 @@ app.post('/api/ideas', authenticateToken, (req, res) => {
     });
 });
 
-// ------ دریافت ایده‌های کاربر (محافظت‌شده) ------
 app.get('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
 
@@ -361,7 +358,6 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
     );
 });
 
-// ------ سلامت سرور ------
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
