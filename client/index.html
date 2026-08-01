@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد</title>
-    <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است. ایده خود را ثبت کنید و آینده‌ساز باشید." />
+    <meta name="description" content="موسسه آیس (AYS) پل ارتباطی بین ایده‌های خلاقانه شما و شرکت‌های بزرگ است." />
     <meta name="keywords" content="ایده, ثبت ایده, فروش ایده, موسسه آیس, AYS" />
     <meta property="og:title" content="AYS | پلتفرمی که ایده‌های شما را می‌خرد" />
     <meta property="og:description" content="ایده خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید." />
@@ -12,11 +12,7 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://ays-client.onrender.com" />
 
-    <!-- فونت‌ها -->
-    <link href="https://fonts.googleapis.com/css2?family=Acquire&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=DujitsuFont&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Shabnam&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Mahbubr&display=swap" rel="stylesheet" />
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <link rel="stylesheet" href="css/style.css" />
@@ -32,8 +28,8 @@
 
     <!-- محتوای اصلی -->
     <main id="mainContent">
-        <!-- صفحه لندینگ (خوش‌آمدگویی) -->
-        <section id="landingPage" class="page active">
+        <!-- صفحه لندینگ -->
+        <section id="landingPage" class="page active no-scroll">
             <div class="landing-wrapper">
                 <div class="landing-card">
                     <div class="landing-logo">AYS</div>
@@ -51,7 +47,7 @@
         </section>
 
         <!-- صفحه ثبت‌نام -->
-        <section id="registerPage" class="page">
+        <section id="registerPage" class="page no-scroll">
             <div class="register-wrapper">
                 <div class="register-card">
                     <div class="register-logo">AYS</div>
@@ -73,7 +69,12 @@
                             <label for="confirmPassword">تکرار رمز عبور</label>
                             <input type="password" id="confirmPassword" placeholder="رمز را مجدد وارد کنید" required />
                         </div>
-                        <button type="submit" class="btn-primary btn-register">ثبت‌نام</button>
+                        <button type="submit" class="btn-primary btn-register" id="registerBtn">
+                            <span id="registerBtnText">ثبت‌نام</span>
+                            <span id="registerLoader" style="display:none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
                         <div id="registerError" class="error-message"></div>
                         <p class="login-link">قبلاً حساب دارید؟ <a href="#" id="showLoginForm">وارد شوید</a></p>
                     </form>
@@ -94,10 +95,9 @@
             </div>
         </section>
 
-        <!-- صفحه اصلی (داشبورد) -->
+        <!-- صفحه اصلی -->
         <section id="dashboardPage" class="page">
             <div class="dashboard-wrapper">
-                <!-- بخش ارسال ایده -->
                 <div class="idea-submit-modern">
                     <h2>ایده خود را ثبت کنید</h2>
                     <p class="sub-text">هر ایده‌ای، حتی کوچک، می‌تواند جرقه‌ای برای تحول باشد.</p>
@@ -106,7 +106,6 @@
                     <div id="ideaFeedback" class="feedback-message"></div>
                 </div>
 
-                <!-- کلاژ مدرن -->
                 <div class="collage-modern">
                     <div class="collage-item-large">
                         <div class="collage-image" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=400&fit=crop');">
@@ -148,9 +147,7 @@
                     <i class="fas fa-info-circle"></i>
                     <span>اگر ایده شما مورد قبول موسسه و شرکت‌های همکار باشد، از طریق ایمیل به شما اطلاع‌رسانی خواهد شد.</span>
                 </div>
-                <div id="ideasList" class="ideas-grid">
-                    <!-- لیست ایده‌ها توسط جاوااسکریپت پر می‌شود -->
-                </div>
+                <div id="ideasList" class="ideas-grid"></div>
             </div>
         </section>
 
@@ -158,9 +155,7 @@
         <section id="accountPage" class="page">
             <div class="account-wrapper">
                 <h2 class="account-title">حساب کاربری من</h2>
-                <div id="accountInfo" class="account-cards">
-                    <!-- اطلاعات کاربر توسط جاوااسکریپت پر می‌شود -->
-                </div>
+                <div id="accountInfo" class="account-cards"></div>
                 <div class="account-actions">
                     <button id="logoutBtn" class="btn-secondary">خروج از حساب</button>
                 </div>
@@ -174,13 +169,11 @@
                     <h2 class="about-title">درباره موسسه آیس (AYS)</h2>
                     <p class="about-text">
                         موسسه آیس با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است.
-                        ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد. به همین دلیل، بستری فراهم کرده‌ایم
-                        تا هر فردی بتواند ایده‌های خود را بدون دغدغه با ما در میان بگذارد.
+                        ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد.
                     </p>
                     <p class="about-text">
                         همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی،
-                        این امکان را فراهم می‌کند که ایده‌های ارزشمند، به سرعت به مرحله اجرا برسند
-                        و سرمایه‌گذاران مناسب را پیدا کنند.
+                        این امکان را فراهم می‌کند که ایده‌های ارزشمند به سرعت به مرحله اجرا برسند.
                     </p>
                     <p class="about-text highlight-about">
                         ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن،
