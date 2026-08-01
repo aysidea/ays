@@ -13,6 +13,8 @@ const pages = {
 
 const navItems = document.querySelectorAll('.nav-item');
 const startBtn = document.getElementById('startBtn');
+const startBtnText = document.getElementById('startBtnText');
+const startLoader = document.getElementById('startLoader');
 const registerForm = document.getElementById('registerForm');
 const loginForm = document.getElementById('loginForm');
 const submitIdeaBtn = document.getElementById('submitIdeaBtn');
@@ -65,17 +67,31 @@ function showFeedback(message, isSuccess = true) {
     setTimeout(() => ideaFeedback.classList.remove('show'), 3000);
 }
 
-function showLoading(show) {
-    if (show) {
-        registerBtnText.style.display = 'none';
-        registerLoader.style.display = 'inline-block';
-        registerBtn.disabled = true;
-        registerBtn.style.opacity = '0.7';
-    } else {
-        registerBtnText.style.display = 'inline';
-        registerLoader.style.display = 'none';
-        registerBtn.disabled = false;
-        registerBtn.style.opacity = '1';
+function showLoading(show, type = 'register') {
+    if (type === 'register') {
+        if (show) {
+            registerBtnText.style.display = 'none';
+            registerLoader.style.display = 'inline-block';
+            registerBtn.disabled = true;
+            registerBtn.style.opacity = '0.7';
+        } else {
+            registerBtnText.style.display = 'inline';
+            registerLoader.style.display = 'none';
+            registerBtn.disabled = false;
+            registerBtn.style.opacity = '1';
+        }
+    } else if (type === 'start') {
+        if (show) {
+            startBtnText.style.display = 'none';
+            startLoader.style.display = 'inline-block';
+            startBtn.disabled = true;
+            startBtn.style.opacity = '0.7';
+        } else {
+            startBtnText.style.display = 'inline';
+            startLoader.style.display = 'none';
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+        }
     }
 }
 
@@ -188,7 +204,13 @@ async function loadAccountInfo() {
 }
 
 // ===== رویدادها =====
-startBtn.addEventListener('click', () => showPage('registerPage'));
+startBtn.addEventListener('click', function() {
+    showLoading(true, 'start');
+    setTimeout(() => {
+        showLoading(false, 'start');
+        showPage('registerPage');
+    }, 1200);
+});
 
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -216,26 +238,26 @@ registerForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    showLoading(true);
+    showLoading(true, 'register');
 
     try {
         const result = await registerUser(name, email, password);
         if (result.error) {
             errorEl.textContent = result.error;
-            showLoading(false);
+            showLoading(false, 'register');
             return;
         }
         setTimeout(() => {
             currentUserId = result.id;
             currentUserData = result;
             localStorage.setItem('ays_user_id', currentUserId);
-            showLoading(false);
+            showLoading(false, 'register');
             showPage('dashboardPage');
             registerForm.reset();
         }, 1200);
     } catch {
         errorEl.textContent = 'خطا در ارتباط با سرور.';
-        showLoading(false);
+        showLoading(false, 'register');
     }
 });
 
@@ -303,4 +325,11 @@ logoutBtn.addEventListener('click', () => {
 // ===== مقداردهی اولیه =====
 document.addEventListener('DOMContentLoaded', function() {
     checkSession();
+
+    // ثبت Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(() => console.log('Service Worker ثبت شد'))
+            .catch(err => console.log('خطا در ثبت Service Worker:', err));
+    }
 });
