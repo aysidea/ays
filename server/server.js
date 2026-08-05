@@ -452,6 +452,80 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+// ============================================================
+// مسیرهای جدید برای ویژگی‌های خارق‌العاده
+// ============================================================
+
+// --- ایده در لحظه ---
+app.post('/api/flash-idea', authenticateToken, (req, res) => {
+    const { content } = req.body;
+    if (!content || content.trim().length < 5) {
+        return res.status(400).json({ error: 'ایده حداقل ۵ کاراکتر باشد.' });
+    }
+    db.run(
+        'INSERT INTO flash_ideas (user_id, content) VALUES (?, ?)',
+        [req.user.id, content.trim()],
+        function(err) {
+            if (err) return res.status(500).json({ error: 'خطا در ذخیره' });
+            res.status(201).json({ id: this.lastID, content });
+        }
+    );
+});
+
+app.get('/api/flash-ideas', (req, res) => {
+    db.all(`
+        SELECT fi.*, u.name as user_name 
+        FROM flash_ideas fi
+        JOIN users u ON fi.user_id = u.id
+        ORDER BY fi.created_at DESC LIMIT 50
+    `, (err, ideas) => {
+        if (err) return res.status(500).json({ error: 'خطا' });
+        res.json(ideas);
+    });
+});
+
+// --- ایده‌های کوتاه ---
+app.post('/api/micro-ideas', authenticateToken, (req, res) => {
+    const { title, description, price } = req.body;
+    if (!title || !description || !price) {
+        return res.status(400).json({ error: 'همه فیلدها الزامی است.' });
+    }
+    db.run(
+        'INSERT INTO micro_ideas (user_id, title, description, price) VALUES (?, ?, ?, ?)',
+        [req.user.id, title, description, price],
+        function(err) {
+            if (err) return res.status(500).json({ error: 'خطا' });
+            res.status(201).json({ id: this.lastID });
+        }
+    );
+});
+
+app.get('/api/micro-ideas', (req, res) => {
+    db.all(`
+        SELECT mi.*, u.name as seller_name 
+        FROM micro_ideas mi
+        JOIN users u ON mi.user_id = u.id
+        WHERE mi.status = 'available'
+        ORDER BY mi.created_at DESC
+    `, (err, ideas) => {
+        if (err) return res.status(500).json({ error: 'خطا' });
+        res.json(ideas);
+    });
+});
+
+app.post('/api/buy-micro-idea/:id', authenticateToken, (req, res) => {
+    const ideaId = req.params.id;
+    db.run(
+        'UPDATE micro_ideas SET status = "sold", buyer_id = ? WHERE id = ? AND status = "available"',
+        [req.user.id, ideaId],
+        function(err) {
+            if (err || this.changes === 0) {
+                return res.status(400).json({ error: 'ایده قبلاً فروخته شده یا وجود ندارد.' });
+            }
+            res.json({ message: '✅ خرید موفق!' });
+        }
+    );
+});
 
 // ============================================================
 // ۱۲. هشدار در صورت Rate Limit exceeded
