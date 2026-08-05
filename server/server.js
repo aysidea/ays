@@ -109,6 +109,32 @@ db.serialize(() => {
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     `);
+    db.run(`
+        CREATE TABLE IF NOT EXISTS flash_ideas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            likes INTEGER DEFAULT 0,
+            dislikes INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS micro_ideas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            price INTEGER NOT NULL,
+            status TEXT DEFAULT 'available',
+            buyer_id INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (buyer_id) REFERENCES users(id)
+        )
+    `);
 });
 
 // ============================================================
