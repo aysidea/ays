@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
 
 // ============================================================
-// ۱. لاگر (Winston)
+// لاگر
 // ============================================================
 const logger = winston.createLogger({
     level: 'info',
@@ -36,18 +36,11 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // ============================================================
-// ۲. Helmet.js
+// Middlewareها
 // ============================================================
 app.use(helmet());
-
-// ============================================================
-// ۳. Morgan
-// ============================================================
 app.use(morgan('combined'));
 
-// ============================================================
-// ۴. CORS
-// ============================================================
 const corsOptions = {
     origin: process.env.CLIENT_URL || 'https://ays365.onrender.com',
     optionsSuccessStatus: 200,
@@ -57,15 +50,10 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// ============================================================
-// ۵. محدودیت حجم
-// ============================================================
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// ============================================================
-// ۶. Rate Limiting
-// ============================================================
+// Rate Limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
@@ -84,7 +72,7 @@ app.use('/api/register', authLimiter);
 app.use('/api/login', authLimiter);
 
 // ============================================================
-// ۷. دیتابیس
+// دیتابیس
 // ============================================================
 const dbPath = path.join(__dirname, 'database', 'ays.db');
 const db = new sqlite3.Database(dbPath);
@@ -104,6 +92,24 @@ db.serialize(() => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             content TEXT NOT NULL,
+            category TEXT,
+            keywords TEXT,
+            innovation INTEGER DEFAULT 0,
+            market INTEGER DEFAULT 0,
+            stage INTEGER DEFAULT 0,
+            score INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `);
+    db.run(`
+        CREATE TABLE IF NOT EXISTS consultations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            phone TEXT NOT NULL,
+            topic TEXT NOT NULL,
+            description TEXT NOT NULL,
             status TEXT DEFAULT 'pending',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
@@ -112,7 +118,7 @@ db.serialize(() => {
 });
 
 // ============================================================
-// ۸. توابع کمکی
+// توابع کمکی
 // ============================================================
 function sanitizeInput(input) {
     if (typeof input !== 'string') return input;
@@ -137,23 +143,13 @@ function validateIdea(content) {
 }
 
 // ============================================================
-// ۹. Middleware تشخیص حملات (SQL Injection, XSS, ...)
+// تشخیص حملات
 // ============================================================
 function detectAttack(req, res, next) {
     const dangerousPatterns = [
-        /<script/i,
-        /javascript:/i,
-        /alert\(/i,
-        /onerror=/i,
-        /onclick=/i,
-        /SELECT.*FROM/i,
-        /DROP.*TABLE/i,
-        /INSERT.*INTO/i,
-        /UNION.*SELECT/i,
-        /--/,
-        /;/,
-        /\/\*/,
-        /\*\//,
+        /<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
+        /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i,
+        /--/, /;/, /\/\*/, /\*\//
     ];
 
     const check = (value) => {
@@ -161,11 +157,7 @@ function detectAttack(req, res, next) {
         return dangerousPatterns.some(pattern => pattern.test(value));
     };
 
-    const body = req.body || {};
-    const query = req.query || {};
-    const params = req.params || {};
-
-    const allData = { ...body, ...query, ...params };
+    const allData = { ...req.body, ...req.query, ...req.params };
     let found = false;
     let detectedValue = '';
 
@@ -202,19 +194,18 @@ function detectAttack(req, res, next) {
 app.use(detectAttack);
 
 // ============================================================
-// ۱۰. Middleware احراز هویت JWT
+// احراز هویت JWT
 // ============================================================
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    
+
     if (!token) {
         return res.status(401).json({ error: 'دسترسی غیرمجاز. لطفاً وارد شوید.' });
     }
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
-            // هشدار برای توکن نامعتبر
             sendAlertToTelegram('WARNING', `⚠️ توکن نامعتبر یا منقضی: ${err.message}`, {
                 ip: req.ip || req.connection.remoteAddress,
                 path: req.path,
@@ -229,11 +220,11 @@ function authenticateToken(req, res, next) {
 }
 
 // ============================================================
-// ۱۱. مسیرها
+// مسیرها
 // ============================================================
-app.post('/api/register', async (req, res) => {
-    console.log('📨 دریافت درخواست ثبت‌نام:', req.body);
 
+// ثبت‌نام
+app.post('/api/register', async (req, res) => {
     const { email, name, password } = req.body;
 
     if (!email || !name || !password) {
@@ -257,7 +248,7 @@ app.post('/api/register', async (req, res) => {
 
         db.get('SELECT id FROM users WHERE email = ?', [sanitizedEmail], (err, existing) => {
             if (err) {
-                console.error('خطای دیتابیس:', err);
+                logger.error('خطای دیتابیس:', err);
                 return res.status(500).json({ error: 'خطای داخلی سرور' });
             }
             if (existing) {
@@ -269,7 +260,7 @@ app.post('/api/register', async (req, res) => {
                 [sanitizedEmail, sanitizedName, hashedPassword],
                 function(err) {
                     if (err) {
-                        console.error('خطا در ثبت‌نام:', err);
+                        logger.error('خطا در ثبت‌نام:', err);
                         return res.status(500).json({ error: 'خطا در ثبت‌نام' });
                     }
 
@@ -279,7 +270,6 @@ app.post('/api/register', async (req, res) => {
                         { expiresIn: '7d' }
                     );
 
-                    console.log('✅ ثبت‌نام موفق:', sanitizedEmail);
                     res.status(201).json({
                         id: this.lastID,
                         email: sanitizedEmail,
@@ -291,14 +281,13 @@ app.post('/api/register', async (req, res) => {
             );
         });
     } catch (error) {
-        console.error('خطا در هش کردن رمز:', error);
+        logger.error('خطا در هش کردن رمز:', error);
         res.status(500).json({ error: 'خطای داخلی سرور' });
     }
 });
 
+// ورود
 app.post('/api/login', async (req, res) => {
-    console.log('📨 دریافت درخواست ورود:', req.body);
-
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -315,7 +304,7 @@ app.post('/api/login', async (req, res) => {
         [sanitizedEmail],
         async (err, user) => {
             if (err) {
-                console.error('خطای دیتابیس:', err);
+                logger.error('خطای دیتابیس:', err);
                 return res.status(500).json({ error: 'خطای داخلی سرور' });
             }
             if (!user) {
@@ -334,7 +323,6 @@ app.post('/api/login', async (req, res) => {
                     { expiresIn: '7d' }
                 );
 
-                console.log('✅ ورود موفق:', user.email);
                 res.json({
                     id: user.id,
                     email: user.email,
@@ -342,20 +330,21 @@ app.post('/api/login', async (req, res) => {
                     token
                 });
             } catch (error) {
-                console.error('خطا در مقایسه رمز:', error);
+                logger.error('خطا در مقایسه رمز:', error);
                 res.status(500).json({ error: 'خطای داخلی سرور' });
             }
         }
     );
 });
 
+// دریافت اطلاعات کاربر
 app.get('/api/user', authenticateToken, (req, res) => {
     db.get(
         'SELECT id, email, name, created_at FROM users WHERE id = ?',
         [req.user.id],
         (err, user) => {
             if (err) {
-                console.error('خطای دیتابیس:', err);
+                logger.error('خطای دیتابیس:', err);
                 return res.status(500).json({ error: 'خطای داخلی سرور' });
             }
             if (!user) {
@@ -369,7 +358,7 @@ app.get('/api/user', authenticateToken, (req, res) => {
 app.get('/api/user/:id', authenticateToken, (req, res) => {
     const userId = parseInt(req.params.id);
     if (userId !== req.user.id) {
-        return res.status(403).json({ error: 'دسترسی غیرمجاز به اطلاعات کاربر دیگر' });
+        return res.status(403).json({ error: 'دسترسی غیرمجاز' });
     }
 
     db.get(
@@ -377,7 +366,7 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
         [userId],
         (err, user) => {
             if (err) {
-                console.error('خطای دیتابیس:', err);
+                logger.error('خطای دیتابیس:', err);
                 return res.status(500).json({ error: 'خطای داخلی سرور' });
             }
             if (!user) {
@@ -388,34 +377,33 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
     );
 });
 
+// ثبت ایده
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
-    const { content } = req.body;
+    const { content, category, keywords, innovation, market, stage } = req.body;
 
-    if (!content) {
-        return res.status(400).json({ error: 'متن ایده الزامی است.' });
+    if (!content || content.trim().length < 5) {
+        return res.status(400).json({ error: 'متن ایده حداقل ۵ کاراکتر باشد.' });
     }
+
+    const score = (innovation || 0) * 3 + (market || 0) * 2 + (stage || 0) * 1;
 
     const sanitizedContent = sanitizeInput(content);
-    if (!validateIdea(sanitizedContent)) {
-        return res.status(400).json({ error: 'متن ایده باید حداقل ۵ کاراکتر و حداکثر ۵۰۰۰ کاراکتر باشد.' });
-    }
+    const sanitizedCategory = sanitizeInput(category || '');
+    const sanitizedKeywords = sanitizeInput(keywords || '');
 
     db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err) {
-            console.error('خطای دیتابیس:', err);
-            return res.status(500).json({ error: 'خطای داخلی سرور' });
-        }
-        if (!user) {
-            return res.status(404).json({ error: 'کاربر یافت نشد' });
+        if (err || !user) {
+            return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
         }
 
         db.run(
-            'INSERT INTO ideas (user_id, content) VALUES (?, ?)',
-            [userId, sanitizedContent],
+            `INSERT INTO ideas (user_id, content, category, keywords, innovation, market, stage, score) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [userId, sanitizedContent, sanitizedCategory, sanitizedKeywords, innovation || 0, market || 0, stage || 0, score],
             function(err) {
                 if (err) {
-                    console.error('خطا در ذخیره ایده:', err);
+                    logger.error('خطا در ذخیره ایده:', err);
                     return res.status(500).json({ error: 'خطا در ذخیره ایده' });
                 }
 
@@ -425,6 +413,12 @@ app.post('/api/ideas', authenticateToken, (req, res) => {
                     id: this.lastID,
                     user_id: userId,
                     content: sanitizedContent,
+                    category: sanitizedCategory,
+                    keywords: sanitizedKeywords,
+                    innovation: innovation || 0,
+                    market: market || 0,
+                    stage: stage || 0,
+                    score: score,
                     status: 'pending',
                     created_at: new Date().toISOString()
                 });
@@ -433,15 +427,33 @@ app.post('/api/ideas', authenticateToken, (req, res) => {
     });
 });
 
+// دریافت امتیاز ایده
+app.get('/api/ideas/score/:id', authenticateToken, (req, res) => {
+    const ideaId = req.params.id;
+    const userId = req.user.id;
+
+    db.get(
+        'SELECT id, content, category, keywords, score, innovation, market, stage, status, created_at FROM ideas WHERE id = ? AND user_id = ?',
+        [ideaId, userId],
+        (err, idea) => {
+            if (err || !idea) {
+                return res.status(404).json({ error: 'ایده یافت نشد' });
+            }
+            res.json(idea);
+        }
+    );
+});
+
+// دریافت ایده‌های کاربر
 app.get('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
 
     db.all(
-        'SELECT id, content, status, created_at FROM ideas WHERE user_id = ? ORDER BY created_at DESC',
+        'SELECT id, content, category, keywords, score, status, created_at FROM ideas WHERE user_id = ? ORDER BY created_at DESC',
         [userId],
         (err, ideas) => {
             if (err) {
-                console.error('خطا در دریافت ایده‌ها:', err);
+                logger.error('خطا در دریافت ایده‌ها:', err);
                 return res.status(500).json({ error: 'خطا در دریافت ایده‌ها' });
             }
             res.json(ideas);
@@ -449,14 +461,99 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
     );
 });
 
+// مشاوره
+app.post('/api/consultation', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+    const { phone, topic, description } = req.body;
+
+    if (!phone || !topic || !description) {
+        return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
+    }
+
+    db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err || !user) {
+            return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
+        }
+
+        db.run(
+            'INSERT INTO consultations (user_id, phone, topic, description) VALUES (?, ?, ?, ?)',
+            [userId, phone, topic, description],
+            function(err) {
+                if (err) {
+                    logger.error('خطا در ذخیره درخواست مشاوره:', err);
+                    return res.status(500).json({ error: 'خطا در ثبت درخواست' });
+                }
+
+                const message = `
+🆕 درخواست مشاوره جدید!
+
+👤 نام: ${user.name}
+📧 ایمیل: ${user.email}
+📱 شماره: ${phone}
+📌 موضوع: ${topic}
+💬 توضیحات:
+${description}
+                `;
+                sendToTelegram(user.name, user.email, message);
+
+                res.status(201).json({ message: 'درخواست مشاوره با موفقیت ثبت شد.' });
+            }
+        );
+    });
+});
+
+// سلامت
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // ============================================================
-// ۱۴. راه‌اندازی سرور
+// Rate Limit هشدار
+// ============================================================
+app.use((req, res, next) => {
+    const originalSend = res.send;
+    res.send = function(data) {
+        if (res.statusCode === 429) {
+            sendAlertToTelegram('WARNING', '⚠️ محدودیت نرخ درخواست (Rate Limit) فعال شد!', {
+                ip: req.ip || req.connection.remoteAddress,
+                path: req.path,
+                user: req.user?.email || 'کاربر مهمان',
+            });
+            logger.warn(`⚠️ Rate Limit exceeded: ${req.path} از ${req.ip}`);
+        }
+        originalSend.call(this, data);
+    };
+    next();
+});
+
+// ============================================================
+// Global Error Handler
+// ============================================================
+app.use((err, req, res, next) => {
+    const statusCode = err.status || 500;
+    const message = err.message || 'خطای داخلی سرور';
+
+    logger.error(`❌ ${statusCode} - ${message} - ${req.path} - ${req.ip}`);
+
+    if (statusCode >= 500) {
+        sendAlertToTelegram('ERROR', message, {
+            ip: req.ip || req.connection.remoteAddress,
+            path: req.path,
+            user: req.user?.email || 'کاربر مهمان',
+            stack: err.stack,
+        });
+    }
+
+    res.status(statusCode).json({
+        error: message,
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
+});
+
+// ============================================================
+// راه‌اندازی سرور
 // ============================================================
 app.listen(PORT, () => {
-    console.log(`🚀 سرور AYS روی پورت ${PORT} در حال اجرا است.`);
-    console.log(`🔒 حالت امنیت: فعال (JWT, bcrypt, Helmet, Rate Limit, XSS Prevention, Alert System)`);
+    console.log(`🚀 سرور روی پورت ${PORT} در حال اجرا است.`);
+    console.log(`🔒 حالت امنیت: فعال`);
 });
