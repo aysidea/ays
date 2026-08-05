@@ -1,7 +1,7 @@
 {
   "name": "ays-server",
   "version": "2.0.0",
-  "description": "سرور پلتفرم AYS با امنیت کامل",
+  "description": "سرور پلتفرم AYS",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
