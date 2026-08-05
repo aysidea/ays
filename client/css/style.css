@@ -5,7 +5,6 @@
     box-sizing: border-box;
 }
 
-/* ===== فونت‌های داخلی ===== */
 @font-face {
     font-family: 'Shoklat';
     src: url('../fonts/شکلات.ttf') format('truetype');
@@ -46,7 +45,6 @@
     font-display: swap;
 }
 
-/* ===== تم (خاکستری-کرم) ===== */
 :root {
     --primary: #E67E22;
     --primary-dark: #D35400;
@@ -124,7 +122,6 @@ body {
     display: none;
 }
 
-/* کلمه AYS در هدر با فونت DujitsuFont */
 .logo-header {
     font-family: 'DujitsuFont', 'Arial', sans-serif;
     font-size: 30px;
@@ -210,9 +207,7 @@ body {
     }
 }
 
-/* ============================================================
-   صفحه لندینگ (خوش‌آمدگویی)
-   ============================================================ */
+/* ===== لندینگ ===== */
 .landing-wrapper {
     display: flex;
     align-items: center;
@@ -235,7 +230,6 @@ body {
     margin: 0 auto;
 }
 
-/* لوگو با فونت Acquire */
 .landing-logo {
     font-family: 'Acquire', 'Arial', sans-serif;
     font-size: 55px;
@@ -244,7 +238,6 @@ body {
     letter-spacing: 4px;
 }
 
-/* تیتر با فونت شکلات */
 .landing-title {
     font-family: 'Shoklat', sans-serif;
     font-size: 1.9rem;
@@ -252,7 +245,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* کل متن‌های صفحه خوش‌آمدگویی با فونت AradVF */
 .landing-text p {
     font-family: 'AradVF', 'Tahoma', sans-serif;
     font-size: 1rem;
@@ -269,7 +261,6 @@ body {
     margin-top: 8px;
 }
 
-/* دکمه‌ها با فونت شکلات */
 .btn-start {
     margin-top: 25px;
     padding: 14px 50px;
@@ -289,9 +280,7 @@ body {
     box-shadow: 0 12px 35px rgba(230, 126, 34, 0.3);
 }
 
-/* ============================================================
-   صفحه ثبت‌نام
-   ============================================================ */
+/* ===== ثبت‌نام ===== */
 .register-wrapper {
     display: flex;
     align-items: center;
@@ -420,15 +409,59 @@ body {
     text-decoration: underline;
 }
 
-/* ============================================================
-   صفحه اصلی (داشبورد)
-   ============================================================ */
+/* ===== داشبورد ===== */
 .dashboard-wrapper {
     max-width: 1100px;
     margin: 0 auto;
     padding: 18px;
 }
 
+/* کارت طلایی */
+.gold-card {
+    background: linear-gradient(135deg, #FFD700, #F5A623);
+    border-radius: 20px;
+    padding: 25px;
+    color: #2D2D2D;
+    box-shadow: 0 12px 40px rgba(255, 215, 0, 0.3);
+    margin-bottom: 25px;
+    text-align: center;
+    display: none;
+}
+
+.gold-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.gold-card-header .gold-icon {
+    font-size: 2rem;
+}
+
+.score-number {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #1A1A1A;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.score-details {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #4A4A4A;
+}
+
+.score-details span {
+    background: rgba(255,255,255,0.4);
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+/* فرم ثبت ایده */
 .idea-submit-modern {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -452,7 +485,6 @@ body {
     font-family: 'AradVF', 'Tahoma', sans-serif;
 }
 
-/* داخل کادر ارسال ایده با فونت AradVF */
 .idea-submit-modern textarea {
     width: 100%;
     padding: 16px;
@@ -465,6 +497,7 @@ body {
     min-height: 120px;
     resize: vertical;
     transition: var(--transition);
+    margin-bottom: 16px;
 }
 
 .idea-submit-modern textarea:focus {
@@ -473,8 +506,72 @@ body {
     box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.06);
 }
 
+.custom-select {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    font-family: 'AradVF', 'Tahoma', sans-serif;
+    transition: var(--transition);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: left 1rem center;
+    background-size: 1em;
+}
+
+.custom-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.08);
+}
+
+.range-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 16px;
+}
+
+.range-group label {
+    min-width: 140px;
+    font-weight: 600;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.range-group input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    background: var(--bg-input);
+    height: 6px;
+    border-radius: 10px;
+    outline: none;
+    transition: var(--transition);
+}
+
+.range-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+}
+
+.range-group span {
+    min-width: 30px;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
 .btn-submit {
-    margin-top: 14px;
+    margin-top: 10px;
     padding: 12px 35px;
     border-radius: 50px;
     background: var(--primary);
@@ -521,9 +618,7 @@ body {
     }
 }
 
-/* ============================================================
-   کلاژ
-   ============================================================ */
+/* ===== کلاژ ===== */
 .collage-modern {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -587,9 +682,7 @@ body {
     opacity: 0.9;
 }
 
-/* ============================================================
-   ایده‌های من
-   ============================================================ */
+/* ===== ایده‌های من ===== */
 .my-ideas-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -673,9 +766,7 @@ body {
     color: #922B21;
 }
 
-/* ============================================================
-   اکانت
-   ============================================================ */
+/* ===== اکانت ===== */
 .account-wrapper {
     max-width: 650px;
     margin: 0 auto;
@@ -697,7 +788,6 @@ body {
     border: 1px solid var(--border-light);
 }
 
-/* داخل کادرهای اکانت (بجز ایمیل) با فونت AradVF */
 .account-cards p {
     display: flex;
     justify-content: space-between;
@@ -722,14 +812,12 @@ body {
     font-weight: 600;
 }
 
-/* مقدار ایمیل با فونت Electro Garden */
 .account-cards p span.email-value {
     font-family: 'ElectroGarden', 'Tahoma', sans-serif;
     color: var(--text-dark);
     font-weight: 600;
 }
 
-/* سایر مقادیر با فونت AradVF */
 .account-cards p span:not(.email-value) {
     font-family: 'AradVF', 'Tahoma', sans-serif;
     color: var(--text-dark);
@@ -760,9 +848,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* ============================================================
-   درباره ما
-   ============================================================ */
+/* ===== درباره ما ===== */
 .about-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -785,7 +871,6 @@ body {
     text-align: center;
 }
 
-/* کل متن‌های درباره ما با فونت AradVF */
 .about-text {
     font-family: 'AradVF', 'Tahoma', sans-serif;
     font-size: 1rem;
@@ -827,9 +912,145 @@ body {
     font-family: 'AradVF', sans-serif;
 }
 
-/* ============================================================
-   واکنش‌گرایی
-   ============================================================ */
+/* ===== دکمه مشاوره شناور ===== */
+.consult-fab {
+    position: fixed;
+    bottom: 100px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B00, #E05A00);
+    color: #fff;
+    border: none;
+    font-size: 28px;
+    box-shadow: 0 8px 30px rgba(255, 107, 0, 0.4);
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.consult-fab:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 40px rgba(255, 107, 0, 0.5);
+}
+
+.consult-fab i {
+    pointer-events: none;
+}
+
+/* ===== مودال مشاوره ===== */
+.consult-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.consult-content {
+    background: #fff;
+    border-radius: 24px;
+    padding: 35px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.consult-close {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #888;
+    transition: var(--transition);
+}
+
+.consult-close:hover {
+    color: #333;
+    transform: rotate(90deg);
+}
+
+.consult-content h2 {
+    color: #FF6B00;
+    margin-bottom: 5px;
+    font-family: 'Shoklat', sans-serif;
+}
+
+.consult-content p {
+    color: #666;
+    margin-bottom: 20px;
+    font-family: 'AradVF', sans-serif;
+}
+
+.consult-content .form-group {
+    margin-bottom: 16px;
+}
+
+.consult-content .form-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-gray);
+    margin-bottom: 4px;
+    font-family: 'AradVF', sans-serif;
+}
+
+.consult-content .form-group input,
+.consult-content .form-group select,
+.consult-content .form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    font-family: 'AradVF', 'Tahoma', sans-serif;
+    transition: var(--transition);
+}
+
+.consult-content .form-group input:focus,
+.consult-content .form-group select:focus,
+.consult-content .form-group textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.08);
+}
+
+.consult-content .btn-primary {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 50px;
+    background: var(--primary);
+    border: none;
+    color: #fff;
+    font-family: 'Shoklat', sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.consult-content .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(230, 126, 34, 0.25);
+}
+
+.consult-content .feedback-message {
+    margin-top: 12px;
+    font-weight: 600;
+    text-align: center;
+    min-height: 28px;
+    font-family: 'AradVF', sans-serif;
+}
+
+/* ===== واکنش‌گرایی ===== */
 @media (max-width: 992px) {
     .collage-modern {
         grid-template-columns: 1fr 1fr;
@@ -886,6 +1107,20 @@ body {
         flex-direction: column;
         gap: 4px;
     }
+    .consult-content {
+        padding: 25px 20px;
+        margin: 15px;
+    }
+    .score-details {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .range-group {
+        flex-wrap: wrap;
+    }
+    .range-group label {
+        min-width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -910,5 +1145,12 @@ body {
     }
     .nav-item i {
         font-size: 1.1rem;
+    }
+    .consult-fab {
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
+        bottom: 85px;
+        right: 15px;
     }
 }
