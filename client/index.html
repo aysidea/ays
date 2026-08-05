@@ -10,16 +10,12 @@
     <meta property="og:description" content="ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید. پلتفرمی برای تبدیل ایده به کسب‌وکار." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://ays365.onrender.com" />
-
-    <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#E67E22" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="AYS" />
     <link rel="apple-touch-icon" href="assets/images/ays-icon1.png" />
-
-    <!-- Schema.org -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -29,22 +25,17 @@
         "description": "ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید."
     }
     </script>
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-    <!-- هدر -->
     <header id="mainHeader" class="hidden-header">
         <div class="header-content">
             <span class="logo-header">AYS</span>
         </div>
     </header>
 
-    <!-- محتوای اصلی -->
     <main id="mainContent">
 
         <!-- صفحه لندینگ -->
@@ -62,8 +53,8 @@
                     </div>
                     <button id="startBtn" class="btn-primary btn-start">
                         <span id="startBtnText">شروع کنید</span>
-                        <span id="startLoader" style="display:none;">
-                            <i class="fas fa-spinner fa-spin"></i>
+                        <span id="startBtnLoader" class="loader-dots" style="display:none;">
+                            <span></span><span></span><span></span>
                         </span>
                     </button>
                 </div>
@@ -95,8 +86,8 @@
                         </div>
                         <button type="submit" class="btn-primary btn-register" id="registerBtn">
                             <span id="registerBtnText">ثبت‌نام</span>
-                            <span id="registerLoader" style="display:none;">
-                                <i class="fas fa-spinner fa-spin"></i>
+                            <span id="registerBtnLoader" class="loader-dots" style="display:none;">
+                                <span></span><span></span><span></span>
                             </span>
                         </button>
                         <div id="registerError" class="error-message"></div>
@@ -111,7 +102,12 @@
                             <label for="loginPassword">رمز عبور</label>
                             <input type="password" id="loginPassword" placeholder="رمز عبور" required />
                         </div>
-                        <button type="submit" class="btn-primary btn-register">ورود</button>
+                        <button type="submit" class="btn-primary btn-register" id="loginBtn">
+                            <span id="loginBtnText">ورود</span>
+                            <span id="loginBtnLoader" class="loader-dots" style="display:none;">
+                                <span></span><span></span><span></span>
+                            </span>
+                        </button>
                         <div id="loginError" class="error-message"></div>
                         <p class="login-link">حساب ندارید؟ <a href="#" id="showRegisterForm">ثبت‌نام کنید</a></p>
                     </form>
@@ -143,47 +139,78 @@
                 <div class="idea-submit-modern">
                     <h2>ایده خود را ثبت کنید</h2>
                     <p class="sub-text">هر ایده‌ای، حتی کوچک، می‌تواند جرقه‌ای برای تحول باشد.</p>
-                    <textarea id="ideaInput" placeholder="ایده خود را به طور کامل و شفاف توضیح دهید..."></textarea>
 
-                    <!-- فیلدهای تطبیق -->
-                    <div class="form-group">
-                        <label>حوزه ایده (برای تطبیق)</label>
-                        <select id="ideaCategory" class="custom-select">
-                            <option value="">انتخاب کنید...</option>
-                            <option value="technology">فناوری</option>
-                            <option value="health">سلامت و پزشکی</option>
-                            <option value="education">آموزش</option>
-                            <option value="agriculture">کشاورزی</option>
-                            <option value="services">خدمات</option>
-                            <option value="industry">صنعت</option>
-                            <option value="creative">خلاقیت و هنر</option>
-                        </select>
+                    <div class="steps-indicator">
+                        <span class="step active" data-step="1">۱</span>
+                        <span class="step" data-step="2">۲</span>
+                        <span class="step" data-step="3">۳</span>
                     </div>
 
-                    <div class="form-group">
-                        <label>کلمات کلیدی (برای تطبیق)</label>
-                        <input type="text" id="ideaKeywords" placeholder="۳ تا ۵ کلمه کلیدی، با کاما جدا کنید">
+                    <div class="step-content active" data-step="1">
+                        <textarea id="ideaInput" placeholder="ایده خود را به طور کامل و شفاف توضیح دهید..."></textarea>
+                        <button class="btn-next-step" id="stepNext1">
+                            <span>بعدی</span>
+                        </button>
                     </div>
 
-                    <div class="form-group range-group">
-                        <label>سطح نوآوری (۱ تا ۵)</label>
-                        <input type="range" id="ideaInnovation" min="1" max="5" value="3">
-                        <span id="innovationDisplay">۳</span>
+                    <div class="step-content" data-step="2">
+                        <div class="criteria-group">
+                            <p><strong>نوآوری:</strong> این ایده چقدر با ایده‌های موجود تفاوت دارد؟</p>
+                            <div class="criteria-options">
+                                <label><input type="radio" name="innovation" value="1"> خیلی کم</label>
+                                <label><input type="radio" name="innovation" value="2"> کم</label>
+                                <label><input type="radio" name="innovation" value="3" checked> متوسط</label>
+                                <label><input type="radio" name="innovation" value="4"> زیاد</label>
+                                <label><input type="radio" name="innovation" value="5"> خیلی زیاد</label>
+                            </div>
+                        </div>
+                        <div class="criteria-group">
+                            <p><strong>بازار:</strong> این ایده چقدر بازار هدف دارد؟</p>
+                            <div class="criteria-options">
+                                <label><input type="radio" name="market" value="1"> خیلی کوچک</label>
+                                <label><input type="radio" name="market" value="2"> کوچک</label>
+                                <label><input type="radio" name="market" value="3" checked> متوسط</label>
+                                <label><input type="radio" name="market" value="4"> بزرگ</label>
+                                <label><input type="radio" name="market" value="5"> خیلی بزرگ</label>
+                            </div>
+                        </div>
+                        <div class="criteria-group">
+                            <p><strong>مرحله فعلی:</strong> ایده در چه مرحله‌ای است؟</p>
+                            <div class="criteria-options">
+                                <label><input type="radio" name="stage" value="1"> فقط یک ایده</label>
+                                <label><input type="radio" name="stage" value="2"> طرح اولیه</label>
+                                <label><input type="radio" name="stage" value="3" checked> نمونه اولیه</label>
+                                <label><input type="radio" name="stage" value="4"> محصول آماده</label>
+                                <label><input type="radio" name="stage" value="5"> در حال فروش</label>
+                            </div>
+                        </div>
+                        <button class="btn-prev-step" id="stepPrev2">قبلی</button>
+                        <button class="btn-next-step" id="stepNext2">بعدی</button>
                     </div>
 
-                    <div class="form-group range-group">
-                        <label>اندازه بازار هدف (۱ تا ۵)</label>
-                        <input type="range" id="ideaMarket" min="1" max="5" value="3">
-                        <span id="marketDisplay">۳</span>
+                    <div class="step-content" data-step="3">
+                        <div class="form-group">
+                            <label>حوزه ایده</label>
+                            <select id="ideaCategory" class="custom-select">
+                                <option value="">انتخاب کنید...</option>
+                                <option value="technology">فناوری</option>
+                                <option value="health">سلامت و پزشکی</option>
+                                <option value="education">آموزش</option>
+                                <option value="agriculture">کشاورزی</option>
+                                <option value="services">خدمات</option>
+                                <option value="industry">صنعت</option>
+                                <option value="creative">خلاقیت و هنر</option>
+                            </select>
+                        </div>
+                        <button class="btn-prev-step" id="stepPrev3">قبلی</button>
+                        <button id="submitIdeaBtn" class="btn-primary btn-submit">
+                            <span id="submitIdeaText">ارسال ایده</span>
+                            <span id="submitIdeaLoader" class="loader-dots" style="display:none;">
+                                <span></span><span></span><span></span>
+                            </span>
+                        </button>
                     </div>
 
-                    <div class="form-group range-group">
-                        <label>مرحله فعلی ایده (۱ تا ۵)</label>
-                        <input type="range" id="ideaStage" min="1" max="5" value="3">
-                        <span id="stageDisplay">۳</span>
-                    </div>
-
-                    <button id="submitIdeaBtn" class="btn-primary btn-submit">ارسال ایده</button>
                     <div id="ideaFeedback" class="feedback-message"></div>
                 </div>
 
@@ -300,8 +327,8 @@
         </div>
     </nav>
 
-    <!-- دکمه مشاوره شناور -->
-    <button id="consultBtn" class="consult-fab">
+    <!-- دکمه مشاوره -->
+    <button id="consultBtn" class="consult-fab" style="display:none;">
         <i class="fas fa-headset"></i>
     </button>
 
@@ -331,9 +358,32 @@
                     <label>توضیحات (اجباری)</label>
                     <textarea id="consultDesc" rows="4" placeholder="لطفاً توضیح دهید چه کمکی نیاز دارید..." required></textarea>
                 </div>
-                <button type="submit" class="btn-primary">ارسال درخواست</button>
+                <button type="submit" class="btn-primary" id="consultSubmitBtn">
+                    <span id="consultSubmitText">ارسال درخواست</span>
+                    <span id="consultSubmitLoader" class="loader-dots" style="display:none;">
+                        <span></span><span></span><span></span>
+                    </span>
+                </button>
                 <div id="consultFeedback" class="feedback-message"></div>
             </form>
+        </div>
+    </div>
+
+    <!-- کارت اشتراک‌گذاری -->
+    <div id="ideaShareCard" class="share-card" style="display:none;">
+        <div class="share-card-content">
+            <span class="share-close">&times;</span>
+            <h3>ایده شما ثبت شد!</h3>
+            <p>لینک اشتراک‌گذاری:</p>
+            <div class="share-link-box">
+                <input type="text" id="shareLink" readonly>
+                <button id="copyShareLink"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="share-buttons">
+                <button onclick="shareOn('telegram')"><i class="fab fa-telegram-plane"></i> تلگرام</button>
+                <button onclick="shareOn('whatsapp')"><i class="fab fa-whatsapp"></i> واتساپ</button>
+                <button onclick="shareOn('twitter')"><i class="fab fa-twitter"></i> توییتر</button>
+            </div>
         </div>
     </div>
 
