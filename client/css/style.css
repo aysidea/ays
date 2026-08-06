@@ -986,19 +986,22 @@ body {
 
 .consult-fab {
     position: fixed;
-    bottom: 100px;
-    right: 25px;
-    width: 60px;
-    height: 60px;
+    bottom: 95px;
+    right: 20px;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     background: linear-gradient(135deg, #FF6B00, #E05A00);
     color: #fff;
     border: none;
-    font-size: 28px;
+    font-size: 26px;
     box-shadow: 0 8px 30px rgba(255, 107, 0, 0.4);
     cursor: pointer;
     z-index: 999;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .consult-fab:hover {
