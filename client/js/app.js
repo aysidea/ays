@@ -15,7 +15,7 @@ const pages = {
 const navItems = document.querySelectorAll('.nav-item');
 const startBtn = document.getElementById('startBtn');
 const startBtnText = document.getElementById('startBtnText');
-const startLoader = document.getElementById('startLoader');
+const startBtnLoader = document.getElementById('startBtnLoader');
 const registerForm = document.getElementById('registerForm');
 const loginForm = document.getElementById('loginForm');
 const submitIdeaBtn = document.getElementById('submitIdeaBtn');
@@ -28,10 +28,33 @@ const header = document.getElementById('mainHeader');
 const bottomNav = document.getElementById('bottomNav');
 const registerBtn = document.getElementById('registerBtn');
 const registerBtnText = document.getElementById('registerBtnText');
-const registerLoader = document.getElementById('registerLoader');
+const registerBtnLoader = document.getElementById('registerBtnLoader');
+const loginBtn = document.getElementById('loginBtn');
+const loginBtnText = document.getElementById('loginBtnText');
+const loginBtnLoader = document.getElementById('loginBtnLoader');
 const consultBtn = document.getElementById('consultBtn');
 const consultModal = document.getElementById('consultModal');
 const consultClose = document.querySelector('.consult-close');
+const consultSubmitBtn = document.getElementById('consultSubmitBtn');
+const consultSubmitText = document.getElementById('consultSubmitText');
+const consultSubmitLoader = document.getElementById('consultSubmitLoader');
+
+// ===== توابع کمکی لودینگ =====
+function showLoader(btnId, loaderId, textId, show) {
+    const btn = document.getElementById(btnId);
+    const loader = document.getElementById(loaderId);
+    const text = document.getElementById(textId);
+    if (!btn || !loader || !text) return;
+    if (show) {
+        text.style.display = 'none';
+        loader.style.display = 'inline-flex';
+        btn.disabled = true;
+    } else {
+        text.style.display = 'inline';
+        loader.style.display = 'none';
+        btn.disabled = false;
+    }
+}
 
 function showPage(pageId) {
     Object.values(pages).forEach(p => p.classList.remove('active'));
@@ -60,6 +83,12 @@ function showPage(pageId) {
         document.body.style.inset = '';
     }
 
+    if (pageId === 'dashboardPage' && currentToken) {
+        consultBtn.style.display = 'block';
+    } else {
+        consultBtn.style.display = 'none';
+    }
+
     if (pageId === 'myIdeasPage' && currentToken) loadMyIdeas();
     if (pageId === 'accountPage' && currentToken) loadAccountInfo();
 }
@@ -71,34 +100,6 @@ function showFeedback(message, isSuccess = true) {
     setTimeout(() => ideaFeedback.classList.remove('show'), 3000);
 }
 
-function showLoading(show, type = 'register') {
-    if (type === 'register') {
-        if (show) {
-            registerBtnText.style.display = 'none';
-            registerLoader.style.display = 'inline-block';
-            registerBtn.disabled = true;
-            registerBtn.style.opacity = '0.7';
-        } else {
-            registerBtnText.style.display = 'inline';
-            registerLoader.style.display = 'none';
-            registerBtn.disabled = false;
-            registerBtn.style.opacity = '1';
-        }
-    } else if (type === 'start') {
-        if (show) {
-            startBtnText.style.display = 'none';
-            startLoader.style.display = 'inline-block';
-            startBtn.disabled = true;
-            startBtn.style.opacity = '0.7';
-        } else {
-            startBtnText.style.display = 'inline';
-            startLoader.style.display = 'none';
-            startBtn.disabled = false;
-            startBtn.style.opacity = '1';
-        }
-    }
-}
-
 function getAuthHeaders() {
     const token = localStorage.getItem('ays_token');
     return {
@@ -107,6 +108,7 @@ function getAuthHeaders() {
     };
 }
 
+// ===== احراز هویت =====
 async function registerUser(name, email, password) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -163,7 +165,7 @@ async function checkSession() {
     }
 }
 
-// ===== سیستم امتیازدهی =====
+// ===== امتیازدهی =====
 async function showScoreCard(ideaId) {
     const token = localStorage.getItem('ays_token');
     if (!token) return;
@@ -187,7 +189,7 @@ async function showScoreCard(ideaId) {
 }
 
 // ===== مدیریت ایده‌ها =====
-async function submitIdea(content, category, keywords, innovation, market, stage) {
+async function submitIdea(content, category, innovation, market, stage) {
     if (!currentToken) {
         showFeedback('لطفاً ابتدا وارد شوید.', false);
         return false;
@@ -196,6 +198,11 @@ async function submitIdea(content, category, keywords, innovation, market, stage
         showFeedback('لطفاً متن ایده را با جزئیات بیشتر وارد کنید.', false);
         return false;
     }
+    if (!category) {
+        showFeedback('لطفاً حوزه ایده را انتخاب کنید.', false);
+        return false;
+    }
+
     try {
         const response = await fetch(`${API_BASE_URL}/ideas`, {
             method: 'POST',
@@ -203,7 +210,7 @@ async function submitIdea(content, category, keywords, innovation, market, stage
             body: JSON.stringify({
                 content: content.trim(),
                 category,
-                keywords,
+                keywords: '',
                 innovation,
                 market,
                 stage
@@ -216,19 +223,13 @@ async function submitIdea(content, category, keywords, innovation, market, stage
         showFeedback('ایده شما ثبت شد', true);
         ideaInput.value = '';
         document.getElementById('ideaCategory').value = '';
-        document.getElementById('ideaKeywords').value = '';
-        document.getElementById('ideaInnovation').value = 3;
-        document.getElementById('ideaMarket').value = 3;
-        document.getElementById('ideaStage').value = 3;
-        document.getElementById('innovationDisplay').textContent = '3';
-        document.getElementById('marketDisplay').textContent = '3';
-        document.getElementById('stageDisplay').textContent = '3';
-        // نمایش کارت امتیاز
+        document.querySelectorAll('input[type="radio"]:checked').forEach(el => el.checked = false);
+        document.querySelectorAll('input[type="radio"][value="3"]').forEach(el => el.checked = true);
         setTimeout(() => showScoreCard(data.id), 500);
-        return true;
+        return data;
     } catch (error) {
         showFeedback(error.message || 'خطا در ارسال ایده.', false);
-        return false;
+        return null;
     }
 }
 
@@ -278,9 +279,9 @@ async function loadAccountInfo() {
 
 // ===== رویدادها =====
 startBtn.addEventListener('click', function() {
-    showLoading(true, 'start');
+    showLoader('startBtn', 'startBtnLoader', 'startBtnText', true);
     setTimeout(() => {
-        showLoading(false, 'start');
+        showLoader('startBtn', 'startBtnLoader', 'startBtnText', false);
         showPage('registerPage');
     }, 1200);
 });
@@ -311,7 +312,7 @@ registerForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    showLoading(true, 'register');
+    showLoader('registerBtn', 'registerBtnLoader', 'registerBtnText', true);
 
     try {
         const result = await registerUser(name, email, password);
@@ -320,12 +321,12 @@ registerForm.addEventListener('submit', async (e) => {
         currentUserData = result;
         localStorage.setItem('ays_token', currentToken);
         localStorage.setItem('ays_user_id', currentUserId);
-        showLoading(false, 'register');
+        showLoader('registerBtn', 'registerBtnLoader', 'registerBtnText', false);
         showPage('dashboardPage');
         registerForm.reset();
     } catch (error) {
         errorEl.textContent = error.message || 'خطا در ارتباط با سرور.';
-        showLoading(false, 'register');
+        showLoader('registerBtn', 'registerBtnLoader', 'registerBtnText', false);
     }
 });
 
@@ -341,6 +342,8 @@ loginForm.addEventListener('submit', async (e) => {
         return;
     }
 
+    showLoader('loginBtn', 'loginBtnLoader', 'loginBtnText', true);
+
     try {
         const result = await loginUser(email, password);
         currentToken = result.token;
@@ -348,10 +351,12 @@ loginForm.addEventListener('submit', async (e) => {
         currentUserData = result;
         localStorage.setItem('ays_token', currentToken);
         localStorage.setItem('ays_user_id', currentUserId);
+        showLoader('loginBtn', 'loginBtnLoader', 'loginBtnText', false);
         showPage('dashboardPage');
         loginForm.reset();
     } catch (error) {
         errorEl.textContent = error.message || 'خطا در ارتباط با سرور.';
+        showLoader('loginBtn', 'loginBtnLoader', 'loginBtnText', false);
     }
 });
 
@@ -367,29 +372,106 @@ document.getElementById('showRegisterForm').addEventListener('click', (e) => {
     registerForm.style.display = 'block';
 });
 
-// اسلایدرها
-document.getElementById('ideaInnovation').addEventListener('input', function() {
-    document.getElementById('innovationDisplay').textContent = this.value;
-});
-document.getElementById('ideaMarket').addEventListener('input', function() {
-    document.getElementById('marketDisplay').textContent = this.value;
-});
-document.getElementById('ideaStage').addEventListener('input', function() {
-    document.getElementById('stageDisplay').textContent = this.value;
+// ===== مراحل ثبت ایده =====
+let currentStep = 1;
+const totalSteps = 3;
+
+function showStep(step) {
+    document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+    const target = document.querySelector(`.step-content[data-step="${step}"]`);
+    const indicator = document.querySelector(`.step[data-step="${step}"]`);
+    if (target) target.classList.add('active');
+    if (indicator) indicator.classList.add('active');
+}
+
+document.querySelectorAll('.btn-next-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    });
 });
 
-// ثبت ایده
+document.querySelectorAll('.btn-prev-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (currentStep > 1) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+});
+
+// ===== ثبت ایده نهایی =====
 submitIdeaBtn.addEventListener('click', async () => {
     const content = ideaInput.value;
     const category = document.getElementById('ideaCategory').value;
-    const keywords = document.getElementById('ideaKeywords').value;
-    const innovation = parseInt(document.getElementById('ideaInnovation').value);
-    const market = parseInt(document.getElementById('ideaMarket').value);
-    const stage = parseInt(document.getElementById('ideaStage').value);
-    await submitIdea(content, category, keywords, innovation, market, stage);
+    const innovation = parseInt(document.querySelector('input[name="innovation"]:checked')?.value || 3);
+    const market = parseInt(document.querySelector('input[name="market"]:checked')?.value || 3);
+    const stage = parseInt(document.querySelector('input[name="stage"]:checked')?.value || 3);
+
+    if (!content || content.trim().length < 5) {
+        showFeedback('لطفاً متن ایده را با جزئیات بیشتر وارد کنید.', false);
+        return;
+    }
+    if (!category) {
+        showFeedback('لطفاً حوزه ایده را انتخاب کنید.', false);
+        return;
+    }
+
+    showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', true);
+
+    try {
+        const result = await submitIdea(content, category, innovation, market, stage);
+        if (result) {
+            const shareCard = document.getElementById('ideaShareCard');
+            const shareLink = document.getElementById('shareLink');
+            shareLink.value = `${window.location.origin}/idea/${result.id}`;
+            shareCard.style.display = 'flex';
+            currentStep = 1;
+            showStep(1);
+            document.getElementById('ideaCategory').value = '';
+            document.querySelectorAll('input[type="radio"][value="3"]').forEach(el => el.checked = true);
+        }
+    } catch (error) {
+        showFeedback(error.message, false);
+    }
+
+    showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', false);
 });
 
-// ناوبری
+// ===== اشتراک‌گذاری =====
+document.querySelector('.share-close').addEventListener('click', () => {
+    document.getElementById('ideaShareCard').style.display = 'none';
+});
+
+document.getElementById('copyShareLink').addEventListener('click', () => {
+    const input = document.getElementById('shareLink');
+    input.select();
+    document.execCommand('copy');
+    alert('لینک کپی شد!');
+});
+
+window.shareOn = function(platform) {
+    const url = document.getElementById('shareLink').value;
+    const text = 'ایده‌ای که ثبت کردم را ببینید:';
+    let shareUrl = '';
+    switch(platform) {
+        case 'telegram':
+            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            break;
+        case 'whatsapp':
+            shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + url)}`;
+            break;
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            break;
+    }
+    if (shareUrl) window.open(shareUrl, '_blank');
+};
+
+// ===== ناوبری =====
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
@@ -401,7 +483,7 @@ navItems.forEach(item => {
     });
 });
 
-// خروج
+// ===== خروج =====
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('ays_token');
     localStorage.removeItem('ays_user_id');
@@ -445,6 +527,8 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
         return;
     }
 
+    showLoader('consultSubmitBtn', 'consultSubmitLoader', 'consultSubmitText', true);
+
     try {
         const response = await fetch(`${API_BASE_URL}/consultation`, {
             method: 'POST',
@@ -468,6 +552,8 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
         feedback.textContent = 'خطا در ارتباط با سرور.';
         feedback.style.color = '#C0392B';
     }
+
+    showLoader('consultSubmitBtn', 'consultSubmitLoader', 'consultSubmitText', false);
 });
 
 // ===== مقداردهی اولیه =====
