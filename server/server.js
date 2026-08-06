@@ -17,7 +17,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
 
-// ===== لاگر =====
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -32,7 +31,6 @@ if (process.env.NODE_ENV !== 'production') {
     }));
 }
 
-// ===== Middlewareها =====
 app.use(helmet());
 app.use(morgan('combined'));
 
@@ -63,7 +61,6 @@ const authLimiter = rateLimit({
 app.use('/api/register', authLimiter);
 app.use('/api/login', authLimiter);
 
-// ===== دیتابیس =====
 const dbPath = path.join(__dirname, 'database', 'ays.db');
 const db = new sqlite3.Database(dbPath);
 
@@ -107,7 +104,6 @@ db.serialize(() => {
     `);
 });
 
-// ===== توابع کمکی =====
 function sanitizeInput(input) {
     if (typeof input !== 'string') return input;
     return validator.escape(input.trim());
@@ -125,7 +121,6 @@ function validateName(name) {
     return validator.isLength(name, { min: 2, max: 50 }) && validator.matches(name, /^[\u0600-\u06FFa-zA-Z\s]+$/);
 }
 
-// ===== تشخیص حملات =====
 function detectAttack(req, res, next) {
     const patterns = [/<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
         /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i, /--/, /;/, /\/\*/, /\*\//];
@@ -151,7 +146,6 @@ function detectAttack(req, res, next) {
 }
 app.use(detectAttack);
 
-// ===== JWT =====
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -166,7 +160,6 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// ===== مسیرها =====
 app.post('/api/register', async (req, res) => {
     const { email, name, password } = req.body;
     if (!email || !name || !password) return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
@@ -324,7 +317,7 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
                 }
                 const msg = `🆕 درخواست مشاوره جدید!\n👤 نام: ${user.name}\n📧 ایمیل: ${user.email}\n📱 شماره: ${phone}\n📌 موضوع: ${topic}\n💬 توضیحات:\n${description}`;
                 sendToTelegram(user.name, user.email, msg);
-                res.status(201).json({ message: 'درخواست مشاوره با موفقیت ثبت شد.' });
+                res.status(201).json({ message: '✅ درخواست مشاوره با موفقیت ثبت شد.' });
             }
         );
     });
@@ -334,7 +327,6 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// ===== Global Error Handler =====
 app.use((err, req, res, next) => {
     const statusCode = err.status || 500;
     const message = err.message || 'خطای داخلی سرور';
@@ -350,7 +342,6 @@ app.use((err, req, res, next) => {
     res.status(statusCode).json({ error: message });
 });
 
-// ===== راه‌اندازی سرور =====
 app.listen(PORT, () => {
     console.log(`🚀 سرور روی پورت ${PORT} در حال اجرا است.`);
 });
