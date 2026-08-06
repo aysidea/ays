@@ -216,7 +216,7 @@ async function submitIdea(content, category, innovation, market, stage) {
         if (!response.ok) {
             throw new Error(data.error || 'خطا در ارسال ایده');
         }
-        showFeedback('ایده شما ثبت شد', true);
+        showFeedback('✅ ایده شما با موفقیت ثبت شد!', true);
         ideaInput.value = '';
         document.getElementById('ideaCategory').value = '';
         document.querySelectorAll('input[type="radio"]:checked').forEach(el => el.checked = false);
@@ -418,10 +418,6 @@ submitIdeaBtn.addEventListener('click', async () => {
     try {
         const result = await submitIdea(content, category, innovation, market, stage);
         if (result) {
-            const shareCard = document.getElementById('ideaShareCard');
-            const shareLink = document.getElementById('shareLink');
-            shareLink.value = `${window.location.origin}/idea/${result.id}`;
-            shareCard.style.display = 'flex';
             currentStep = 1;
             showStep(1);
             document.getElementById('ideaCategory').value = '';
@@ -433,35 +429,6 @@ submitIdeaBtn.addEventListener('click', async () => {
 
     showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', false);
 });
-
-document.querySelector('.share-close').addEventListener('click', () => {
-    document.getElementById('ideaShareCard').style.display = 'none';
-});
-
-document.getElementById('copyShareLink').addEventListener('click', () => {
-    const input = document.getElementById('shareLink');
-    input.select();
-    document.execCommand('copy');
-    alert('لینک کپی شد!');
-});
-
-window.shareOn = function(platform) {
-    const url = document.getElementById('shareLink').value;
-    const text = 'ایده‌ای که ثبت کردم را ببینید:';
-    let shareUrl = '';
-    switch(platform) {
-        case 'telegram':
-            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-            break;
-        case 'whatsapp':
-            shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + url)}`;
-            break;
-        case 'twitter':
-            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-            break;
-    }
-    if (shareUrl) window.open(shareUrl, '_blank');
-};
 
 navItems.forEach(item => {
     item.addEventListener('click', function() {
