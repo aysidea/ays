@@ -39,7 +39,6 @@ const consultSubmitBtn = document.getElementById('consultSubmitBtn');
 const consultSubmitText = document.getElementById('consultSubmitText');
 const consultSubmitLoader = document.getElementById('consultSubmitLoader');
 
-// ===== توابع کمکی لودینگ =====
 function showLoader(btnId, loaderId, textId, show) {
     const btn = document.getElementById(btnId);
     const loader = document.getElementById(loaderId);
@@ -108,7 +107,6 @@ function getAuthHeaders() {
     };
 }
 
-// ===== احراز هویت =====
 async function registerUser(name, email, password) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -165,7 +163,6 @@ async function checkSession() {
     }
 }
 
-// ===== امتیازدهی =====
 async function showScoreCard(ideaId) {
     const token = localStorage.getItem('ays_token');
     if (!token) return;
@@ -188,19 +185,18 @@ async function showScoreCard(ideaId) {
     }
 }
 
-// ===== مدیریت ایده‌ها =====
 async function submitIdea(content, category, innovation, market, stage) {
     if (!currentToken) {
         showFeedback('لطفاً ابتدا وارد شوید.', false);
-        return false;
+        return null;
     }
     if (!content || content.trim().length < 5) {
         showFeedback('لطفاً متن ایده را با جزئیات بیشتر وارد کنید.', false);
-        return false;
+        return null;
     }
     if (!category) {
         showFeedback('لطفاً حوزه ایده را انتخاب کنید.', false);
-        return false;
+        return null;
     }
 
     try {
@@ -277,7 +273,6 @@ async function loadAccountInfo() {
     }
 }
 
-// ===== رویدادها =====
 startBtn.addEventListener('click', function() {
     showLoader('startBtn', 'startBtnLoader', 'startBtnText', true);
     setTimeout(() => {
@@ -372,7 +367,6 @@ document.getElementById('showRegisterForm').addEventListener('click', (e) => {
     registerForm.style.display = 'block';
 });
 
-// ===== مراحل ثبت ایده =====
 let currentStep = 1;
 const totalSteps = 3;
 
@@ -403,7 +397,6 @@ document.querySelectorAll('.btn-prev-step').forEach(btn => {
     });
 });
 
-// ===== ثبت ایده نهایی =====
 submitIdeaBtn.addEventListener('click', async () => {
     const content = ideaInput.value;
     const category = document.getElementById('ideaCategory').value;
@@ -441,7 +434,6 @@ submitIdeaBtn.addEventListener('click', async () => {
     showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', false);
 });
 
-// ===== اشتراک‌گذاری =====
 document.querySelector('.share-close').addEventListener('click', () => {
     document.getElementById('ideaShareCard').style.display = 'none';
 });
@@ -471,7 +463,6 @@ window.shareOn = function(platform) {
     if (shareUrl) window.open(shareUrl, '_blank');
 };
 
-// ===== ناوبری =====
 navItems.forEach(item => {
     item.addEventListener('click', function() {
         const pageId = this.dataset.page;
@@ -483,7 +474,6 @@ navItems.forEach(item => {
     });
 });
 
-// ===== خروج =====
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('ays_token');
     localStorage.removeItem('ays_user_id');
@@ -493,7 +483,6 @@ logoutBtn.addEventListener('click', () => {
     showPage('landingPage');
 });
 
-// ===== مشاوره =====
 consultBtn?.addEventListener('click', () => {
     consultModal.style.display = 'flex';
 });
@@ -543,7 +532,10 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
             feedback.textContent = '✅ درخواست مشاوره با موفقیت ثبت شد.';
             feedback.style.color = '#27AE60';
             document.getElementById('consultForm').reset();
-            setTimeout(() => consultModal.style.display = 'none', 2000);
+            setTimeout(() => {
+                consultModal.style.display = 'none';
+                feedback.textContent = '';
+            }, 3000);
         } else {
             feedback.textContent = data.error || 'خطا در ثبت درخواست.';
             feedback.style.color = '#C0392B';
@@ -556,7 +548,6 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
     showLoader('consultSubmitBtn', 'consultSubmitLoader', 'consultSubmitText', false);
 });
 
-// ===== مقداردهی اولیه =====
 document.addEventListener('DOMContentLoaded', function() {
     checkSession();
     if ('serviceWorker' in navigator) {
