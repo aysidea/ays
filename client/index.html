@@ -3,28 +3,39 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>پلتفرم تبدیل ایده به فرصت | ثبت و فروش ایده</title>
-    <meta name="description" content="ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید. پلتفرمی برای تبدیل ایده به کسب‌وکار و فروش ایده‌های خلاقانه." />
-    <meta name="keywords" content="ثبت ایده, فروش ایده, تبدیل ایده به کسب و کار, معرفی ایده به شرکت, پلتفرم ایده, نوآوری" />
-    <meta property="og:title" content="پلتفرم تبدیل ایده به فرصت" />
-    <meta property="og:description" content="ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید. پلتفرمی برای تبدیل ایده به کسب‌وکار." />
+    <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد</title>
+    <meta name="description" content="ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید. پلتفرمی برای تبدیل ایده به کسب‌وکار و فروش ایده‌های خلاقانه. با AYS، ایده‌های شما به سرنوشت تبدیل می‌شوند." />
+    <meta name="keywords" content="ثبت ایده, فروش ایده, تبدیل ایده به کسب و کار, معرفی ایده به شرکت, پلتفرم ایده, نوآوری, سرمایه‌گذاری روی ایده" />
+    <meta property="og:title" content="AYS | پلتفرمی که ایده‌های شما را می‌خرد" />
+    <meta property="og:description" content="ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید. پلتفرمی برای تبدیل ایده به کسب‌وکار و فروش ایده‌های خلاقانه." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ays365.onrender.com" />
+    <meta property="og:image" content="https://ays365.onrender.com/assets/images/ays-icon1.png" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://ays365.onrender.com" />
+
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#E67E22" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="AYS" />
     <link rel="apple-touch-icon" href="assets/images/ays-icon1.png" />
+
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "پلتفرم تبدیل ایده به فرصت",
+        "name": "AYS | پلتفرمی که ایده‌های شما را می‌خرد",
         "url": "https://ays365.onrender.com",
-        "description": "ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید."
+        "description": "ایده‌های خود را ثبت کنید و به شرکت‌های بزرگ معرفی کنید. پلتفرمی برای تبدیل ایده به کسب‌وکار.",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://ays365.onrender.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
     }
     </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -38,7 +49,6 @@
 
     <main id="mainContent">
 
-        <!-- صفحه لندینگ -->
         <section id="landingPage" class="page active no-scroll">
             <div class="landing-wrapper">
                 <div class="landing-card">
@@ -61,7 +71,6 @@
             </div>
         </section>
 
-        <!-- صفحه ثبت‌نام -->
         <section id="registerPage" class="page no-scroll">
             <div class="register-wrapper">
                 <div class="register-card">
@@ -115,11 +124,9 @@
             </div>
         </section>
 
-        <!-- صفحه اصلی (داشبورد) -->
         <section id="dashboardPage" class="page">
             <div class="dashboard-wrapper">
 
-                <!-- کارت امتیاز طلایی -->
                 <div id="scoreCard" class="gold-card" style="display:none;">
                     <div class="gold-card-header">
                         <span class="gold-icon">⭐</span>
@@ -135,7 +142,6 @@
                     </div>
                 </div>
 
-                <!-- فرم ثبت ایده -->
                 <div class="idea-submit-modern">
                     <h2>ایده خود را ثبت کنید</h2>
                     <p class="sub-text">هر ایده‌ای، حتی کوچک، می‌تواند جرقه‌ای برای تحول باشد.</p>
@@ -148,9 +154,7 @@
 
                     <div class="step-content active" data-step="1">
                         <textarea id="ideaInput" placeholder="ایده خود را به طور کامل و شفاف توضیح دهید..."></textarea>
-                        <button class="btn-next-step" id="stepNext1">
-                            <span>بعدی</span>
-                        </button>
+                        <button class="btn-next-step" id="stepNext1">بعدی</button>
                     </div>
 
                     <div class="step-content" data-step="2">
@@ -214,7 +218,6 @@
                     <div id="ideaFeedback" class="feedback-message"></div>
                 </div>
 
-                <!-- کلاژ -->
                 <div class="collage-modern">
                     <div class="collage-item-large">
                         <div class="collage-image" style="background-image: url('assets/images/collage-1.jpg');">
@@ -249,7 +252,6 @@
             </div>
         </section>
 
-        <!-- صفحه ایده‌های من -->
         <section id="myIdeasPage" class="page">
             <div class="my-ideas-wrapper">
                 <div class="info-banner-modern">
@@ -260,7 +262,6 @@
             </div>
         </section>
 
-        <!-- صفحه اکانت -->
         <section id="accountPage" class="page">
             <div class="account-wrapper">
                 <h2 class="account-title">حساب کاربری من</h2>
@@ -271,7 +272,6 @@
             </div>
         </section>
 
-        <!-- صفحه درباره ما -->
         <section id="aboutPage" class="page">
             <div class="about-wrapper">
                 <div class="about-card">
@@ -307,7 +307,6 @@
         </section>
     </main>
 
-    <!-- ناوبری پایین -->
     <nav id="bottomNav" class="hidden-nav">
         <div class="nav-item active" data-page="dashboardPage">
             <i class="fas fa-home"></i>
@@ -327,12 +326,10 @@
         </div>
     </nav>
 
-    <!-- دکمه مشاوره -->
     <button id="consultBtn" class="consult-fab" style="display:none;">
         <i class="fas fa-headset"></i>
     </button>
 
-    <!-- مودال مشاوره -->
     <div id="consultModal" class="consult-modal" style="display:none;">
         <div class="consult-content">
             <span class="consult-close">&times;</span>
@@ -369,7 +366,6 @@
         </div>
     </div>
 
-    <!-- کارت اشتراک‌گذاری -->
     <div id="ideaShareCard" class="share-card" style="display:none;">
         <div class="share-card-content">
             <span class="share-close">&times;</span>
