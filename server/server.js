@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const morgan = require('morgan');
 const winston = require('winston');
-const { sendToTelegram } = require('./utils/telegram');
+const { sendToTelegram, sendConsultationToTelegram } = require('./utils/telegram');
 const { sendAlertToTelegram } = require('./utils/alert');
 require('dotenv').config();
 
@@ -306,7 +306,10 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
     const { phone, topic, description } = req.body;
     if (!phone || !topic || !description) return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
     db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err || !user) return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
+        if (err || !user) {
+            logger.error('خطا در دریافت اطلاعات کاربر:', err);
+            return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
+        }
         db.run(
             'INSERT INTO consultations (user_id, phone, topic, description) VALUES (?, ?, ?, ?)',
             [userId, phone, topic, description],
@@ -315,8 +318,7 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
                     logger.error('خطا در ذخیره مشاوره:', err);
                     return res.status(500).json({ error: 'خطا در ثبت درخواست' });
                 }
-                const msg = `🆕 درخواست مشاوره جدید!\n👤 نام: ${user.name}\n📧 ایمیل: ${user.email}\n📱 شماره: ${phone}\n📌 موضوع: ${topic}\n💬 توضیحات:\n${description}`;
-                sendToTelegram(user.name, user.email, msg);
+                sendConsultationToTelegram(user.name, user.email, phone, topic, description);
                 res.status(201).json({ message: '✅ درخواست مشاوره با موفقیت ثبت شد.' });
             }
         );
