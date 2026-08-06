@@ -1,4 +1,3 @@
-/* ===== تنظیمات پایه ===== */
 * {
     margin: 0;
     padding: 0;
@@ -69,7 +68,6 @@ body {
     direction: rtl;
 }
 
-/* ===== غیرفعال کردن اسکرول در صفحات لندینگ و ثبت‌نام ===== */
 .page.no-scroll {
     overflow: hidden !important;
     height: 100vh !important;
@@ -89,7 +87,6 @@ body {
     justify-content: center;
 }
 
-/* ===== اسکرول بار ===== */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -101,7 +98,6 @@ body {
     border-radius: 10px;
 }
 
-/* ===== هدر ===== */
 #mainHeader {
     position: fixed;
     top: 0;
@@ -129,7 +125,6 @@ body {
     letter-spacing: 3px;
 }
 
-/* ===== ناوبری پایین ===== */
 #bottomNav {
     position: fixed;
     bottom: 0;
@@ -183,7 +178,6 @@ body {
     color: var(--primary-light);
 }
 
-/* ===== صفحات ===== */
 .page {
     display: none;
     animation: fadeInUp 0.4s ease;
@@ -207,7 +201,6 @@ body {
     }
 }
 
-/* ===== لندینگ ===== */
 .landing-wrapper {
     display: flex;
     align-items: center;
@@ -280,7 +273,7 @@ body {
     min-width: 180px;
 }
 
-.btn-start:hover {
+.btn-start:hover:not(:disabled) {
     transform: translateY(-3px) scale(1.02);
     box-shadow: 0 12px 35px rgba(230, 126, 34, 0.3);
 }
@@ -290,7 +283,6 @@ body {
     cursor: not-allowed;
 }
 
-/* ===== ثبت‌نام ===== */
 .register-wrapper {
     display: flex;
     align-items: center;
@@ -384,7 +376,7 @@ body {
     min-height: 54px;
 }
 
-.btn-register:hover {
+.btn-register:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(230, 126, 34, 0.25);
 }
@@ -421,14 +413,12 @@ body {
     text-decoration: underline;
 }
 
-/* ===== داشبورد ===== */
 .dashboard-wrapper {
     max-width: 1100px;
     margin: 0 auto;
     padding: 18px;
 }
 
-/* ===== کارت طلایی ===== */
 .gold-card {
     background: linear-gradient(135deg, #FFD700, #F5A623);
     border-radius: 20px;
@@ -473,7 +463,6 @@ body {
     border-radius: 20px;
 }
 
-/* ===== فرم ثبت ایده ===== */
 .idea-submit-modern {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -497,7 +486,6 @@ body {
     font-family: 'AradVF', 'Tahoma', sans-serif;
 }
 
-/* مراحل */
 .steps-indicator {
     display: flex;
     justify-content: center;
@@ -709,7 +697,6 @@ body {
     }
 }
 
-/* ===== کلاژ ===== */
 .collage-modern {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -773,7 +760,6 @@ body {
     opacity: 0.9;
 }
 
-/* ===== ایده‌های من ===== */
 .my-ideas-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -860,7 +846,6 @@ body {
     color: #922B21;
 }
 
-/* ===== اکانت ===== */
 .account-wrapper {
     max-width: 650px;
     margin: 0 auto;
@@ -936,7 +921,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* ===== درباره ما ===== */
 .about-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -1000,7 +984,6 @@ body {
     font-family: 'AradVF', sans-serif;
 }
 
-/* ===== دکمه مشاوره ===== */
 .consult-fab {
     position: fixed;
     bottom: 100px;
@@ -1023,7 +1006,6 @@ body {
     box-shadow: 0 12px 40px rgba(255, 107, 0, 0.5);
 }
 
-/* ===== مودال مشاوره ===== */
 .consult-modal {
     position: fixed;
     inset: 0;
@@ -1144,7 +1126,6 @@ body {
     font-family: 'AradVF', sans-serif;
 }
 
-/* ===== کارت اشتراک‌گذاری ===== */
 .share-card {
     position: fixed;
     inset: 0;
@@ -1251,7 +1232,6 @@ body {
     transform: scale(1.05);
 }
 
-/* ===== لودینگ یکدست (نقطه‌های جهنده) ===== */
 .loader-dots {
     display: inline-flex;
     gap: 6px;
@@ -1278,7 +1258,6 @@ body {
     40% { transform: scale(1); opacity: 1; }
 }
 
-/* ===== واکنش‌گرایی ===== */
 @media (max-width: 992px) {
     .collage-modern {
         grid-template-columns: 1fr 1fr;
