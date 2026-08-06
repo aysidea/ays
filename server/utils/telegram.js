@@ -5,12 +5,22 @@ const CHAT_ID = process.env.CHAT_ID;
 
 async function sendToTelegram(userName, userEmail, message) {
     if (!BOT_TOKEN || !CHAT_ID) {
-        console.error('BOT_TOKEN یا CHAT_ID در محیط تعریف نشده است.');
+        console.error('❌ BOT_TOKEN یا CHAT_ID در محیط تعریف نشده است.');
+        return false;
+    }
+
+    if (!message || message.trim().length === 0) {
+        console.error('❌ پیام خالی است، ارسال نشد.');
         return false;
     }
 
     const fullMessage = `
-${message}
+🆕 ایده جدید ثبت شد!
+
+👤 نام: ${userName || 'نامشخص'}
+📧 ایمیل: ${userEmail || 'نامشخص'}
+💡 متن ایده:
+${message.trim()}
 
 📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
     `;
@@ -21,7 +31,7 @@ ${message}
             text: fullMessage,
             parse_mode: 'HTML'
         });
-        console.log('✅ پیام به تلگرام ارسال شد.');
+        console.log('✅ پیام ایده به تلگرام ارسال شد.');
         return true;
     } catch (error) {
         console.error('❌ خطا در ارسال به تلگرام:', error.message);
@@ -31,19 +41,19 @@ ${message}
 
 async function sendConsultationToTelegram(userName, userEmail, phone, topic, description) {
     if (!BOT_TOKEN || !CHAT_ID) {
-        console.error('BOT_TOKEN یا CHAT_ID در محیط تعریف نشده است.');
+        console.error('❌ BOT_TOKEN یا CHAT_ID در محیط تعریف نشده است.');
         return false;
     }
 
     const message = `
 🆕 درخواست مشاوره جدید!
 
-👤 نام: ${userName}
-📧 ایمیل: ${userEmail}
-📱 شماره: ${phone}
-📌 موضوع: ${topic}
+👤 نام: ${userName || 'نامشخص'}
+📧 ایمیل: ${userEmail || 'نامشخص'}
+📱 شماره: ${phone || 'نامشخص'}
+📌 موضوع: ${topic || 'نامشخص'}
 💬 توضیحات:
-${description}
+${description || 'توضیحی وارد نشده است'}
 
 📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
     `;
