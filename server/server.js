@@ -9,7 +9,6 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const morgan = require('morgan');
 const winston = require('winston');
-console.log('📨 ارسال به تلگرام:', user.name, user.email, sanitizedContent);
 const { sendToTelegram, sendConsultationToTelegram } = require('./utils/telegram');
 const { sendAlertToTelegram } = require('./utils/alert');
 require('dotenv').config();
