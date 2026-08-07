@@ -199,14 +199,6 @@ async function submitIdea(content, category, innovation, market, stage) {
         return null;
     }
 
-    console.log('📤 ارسال ایده به سرور:', {
-        content: content.trim(),
-        category,
-        innovation,
-        market,
-        stage
-    });
-
     try {
         const response = await fetch(`${API_BASE_URL}/ideas`, {
             method: 'POST',
@@ -224,8 +216,6 @@ async function submitIdea(content, category, innovation, market, stage) {
         if (!response.ok) {
             throw new Error(data.error || 'خطا در ارسال ایده');
         }
-
-        console.log(' ایده با موفقیت ثبت شد:', data);
 
         showFeedback('ایده شما ثبت شد', true);
         ideaInput.value = '';
@@ -258,19 +248,13 @@ async function loadMyIdeas() {
             return;
         }
 
-        const showCount = 3;
-        const hasMore = ideas.length > showCount;
-
-        let cardsHtml = ideas.map((idea, index) => {
-            const summary = idea.content.length > 25 
-                ? idea.content.substring(0, 25) + '...' 
+        container.innerHTML = ideas.map(idea => {
+            const summary = idea.content.length > 20 
+                ? idea.content.substring(0, 20) + '...' 
                 : idea.content;
 
-            const isHidden = index >= showCount;
-            const hideClass = isHidden ? 'idea-card-hidden' : '';
-
             return `
-                <div class="idea-card-modern ${hideClass}" data-idea-id="${idea.id}">
+                <div class="idea-card-modern">
                     <div class="idea-card-header">
                         <span class="idea-card-score">⭐ ${idea.score || 0}</span>
                         <span class="idea-card-date">${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
@@ -278,93 +262,14 @@ async function loadMyIdeas() {
                     <div class="idea-card-summary">${summary}</div>
                     <div class="idea-card-status">
                         <span class="idea-status-badge ${idea.status}">${idea.status === 'pending' ? 'در انتظار بررسی' : idea.status === 'approved' ? 'تأیید شده' : 'رد شده'}</span>
-                        <button class="idea-card-share" onclick="event.stopPropagation(); copyLink('https://ays365.onrender.com/idea/${idea.id}')">
-                            <i class="fas fa-link"></i>
-                        </button>
                     </div>
                 </div>
             `;
         }).join('');
 
-        let toggleButton = '';
-        if (hasMore) {
-            toggleButton = `
-                <div class="idea-toggle-container">
-                    <button id="ideaToggleBtn" class="idea-toggle-btn">
-                        <span id="toggleText">بیشتر ▼</span>
-                    </button>
-                </div>
-            `;
-        }
-
-        container.innerHTML = cardsHtml + toggleButton;
-
-        const toggleBtn = document.getElementById('ideaToggleBtn');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                const hiddenCards = container.querySelectorAll('.idea-card-hidden');
-                const toggleText = document.getElementById('toggleText');
-                const allCards = container.querySelectorAll('.idea-card-modern');
-                
-                if (hiddenCards.length > 0) {
-                    hiddenCards.forEach(card => card.classList.remove('idea-card-hidden'));
-                    toggleText.textContent = `کمتر ▲`;
-                    setTimeout(() => {
-                        container.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                    }, 100);
-                } else {
-                    allCards.forEach((card, index) => {
-                        if (index >= showCount) {
-                            card.classList.add('idea-card-hidden');
-                        }
-                    });
-                    toggleText.textContent = `بیشتر ▼`;
-                }
-            });
-        }
-
     } catch (error) {
         document.getElementById('ideasList').innerHTML = `<p style="color:#C0392B;text-align:center;">${error.message || 'خطا در دریافت ایده‌ها.'}</p>`;
     }
-}
-
-function copyLink(link) {
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(link).then(() => {
-            showCustomToast(' لینک کپی شد!');
-        }).catch(() => {
-            fallbackCopy(link);
-        });
-    } else {
-        fallbackCopy(link);
-    }
-}
-
-function fallbackCopy(link) {
-    const input = document.createElement('input');
-    input.value = link;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-    showCustomToast(' لینک کپی شد!');
-}
-
-function showCustomToast(message) {
-    const oldToast = document.querySelector('.custom-toast');
-    if (oldToast) oldToast.remove();
-
-    const toast = document.createElement('div');
-    toast.className = 'custom-toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-
-    setTimeout(() => toast.classList.add('show'), 10);
-
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 400);
-    }, 2500);
 }
 
 async function loadAccountInfo() {
@@ -527,10 +432,6 @@ submitIdeaBtn.addEventListener('click', async () => {
     try {
         const result = await submitIdea(content, category, innovation, market, stage);
         if (result) {
-            const shareCard = document.getElementById('ideaShareCard');
-            const shareLink = document.getElementById('shareLink');
-            shareLink.value = `${window.location.origin}/idea/${result.id}`;
-            shareCard.style.display = 'flex';
             currentStep = 1;
             showStep(1);
             document.getElementById('ideaCategory').value = '';
@@ -542,35 +443,6 @@ submitIdeaBtn.addEventListener('click', async () => {
 
     showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', false);
 });
-
-document.querySelector('.share-close').addEventListener('click', () => {
-    document.getElementById('ideaShareCard').style.display = 'none';
-});
-
-document.getElementById('copyShareLink').addEventListener('click', () => {
-    const input = document.getElementById('shareLink');
-    input.select();
-    document.execCommand('copy');
-    showCustomToast(' لینک کپی شد!');
-});
-
-window.shareOn = function(platform) {
-    const url = document.getElementById('shareLink').value;
-    const text = 'ایده‌ای که ثبت کردم را ببینید:';
-    let shareUrl = '';
-    switch(platform) {
-        case 'telegram':
-            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-            break;
-        case 'whatsapp':
-            shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + url)}`;
-            break;
-        case 'twitter':
-            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-            break;
-    }
-    if (shareUrl) window.open(shareUrl, '_blank');
-};
 
 navItems.forEach(item => {
     item.addEventListener('click', function() {
@@ -638,7 +510,7 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
         });
         const data = await response.json();
         if (response.ok) {
-            feedback.textContent = ' درخواست مشاوره با موفقیت ثبت شد.';
+            feedback.textContent = '✅ درخواست مشاوره با موفقیت ثبت شد.';
             feedback.style.color = '#27AE60';
             document.getElementById('consultForm').reset();
             setTimeout(() => {
