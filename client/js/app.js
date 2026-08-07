@@ -154,7 +154,6 @@ async function checkSession() {
         currentUserData = user;
         showPage('dashboardPage');
     } catch (error) {
-        console.warn('نشست منقضی یا نامعتبر:', error.message);
         localStorage.removeItem('ays_token');
         localStorage.removeItem('ays_user_id');
         currentToken = null;
@@ -226,7 +225,7 @@ async function submitIdea(content, category, innovation, market, stage) {
         setTimeout(() => showScoreCard(data.id), 500);
         return data;
     } catch (error) {
-        console.error('❌ خطا در ثبت ایده:', error);
+        console.error('خطا در ثبت ایده:', error);
         showFeedback(error.message || 'خطا در ارسال ایده.', false);
         return null;
     }
@@ -249,17 +248,13 @@ async function loadMyIdeas() {
         }
 
         container.innerHTML = ideas.map(idea => {
-            const summary = idea.content.length > 20 
-                ? idea.content.substring(0, 20) + '...' 
-                : idea.content;
-
             return `
                 <div class="idea-card-modern">
                     <div class="idea-card-header">
                         <span class="idea-card-score">⭐ ${idea.score || 0}</span>
                         <span class="idea-card-date">${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
                     </div>
-                    <div class="idea-card-summary">${summary}</div>
+                    <div class="idea-card-content">${idea.content}</div>
                     <div class="idea-card-status">
                         <span class="idea-status-badge ${idea.status}">${idea.status === 'pending' ? 'در انتظار بررسی' : idea.status === 'approved' ? 'تأیید شده' : 'رد شده'}</span>
                     </div>
@@ -510,7 +505,7 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
         });
         const data = await response.json();
         if (response.ok) {
-            feedback.textContent = '✅ درخواست مشاوره با موفقیت ثبت شد.';
+            feedback.textContent = 'درخواست مشاوره با موفقیت ثبت شد.';
             feedback.style.color = '#27AE60';
             document.getElementById('consultForm').reset();
             setTimeout(() => {
@@ -530,10 +525,9 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    checkSession();
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
-            .then(() => console.log('Service Worker ثبت شد'))
-            .catch(err => console.warn('خطا در ثبت Service Worker:', err));
+    if (currentToken && currentUserId) {
+        checkSession();
+    } else {
+        showPage('landingPage');
     }
 });
