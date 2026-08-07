@@ -336,10 +336,23 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
     });
 });
 
-// ===== دریافت ایده با لینک منحصر‌به‌فرد =====
 app.get('/idea/:id', (req, res) => {
     const ideaId = req.params.id;
     
+    if (!/^\d+$/.test(ideaId)) {
+        return res.status(404).send(`
+            <!DOCTYPE html>
+            <html dir="rtl">
+            <head><meta charset="UTF-8"><title>ایده یافت نشد</title></head>
+            <body style="font-family:Tahoma;text-align:center;padding:50px;">
+                <h2>❌ ایده یافت نشد</h2>
+                <p>لینک نامعتبر است.</p>
+                <a href="https://ays365.onrender.com" style="color:#E67E22;">بازگشت به صفحه اصلی</a>
+            </body>
+            </html>
+        `);
+    }
+
     db.get(
         `SELECT i.id, i.content, i.category, i.score, i.created_at, u.name as user_name 
          FROM ideas i
