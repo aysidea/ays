@@ -121,6 +121,53 @@ function validateName(name) {
     return validator.isLength(name, { min: 2, max: 50 }) && validator.matches(name, /^[\u0600-\u06FFa-zA-Z\s]+$/);
 }
 
+// ===== توابع تبدیل اعداد به متن برای پیام تلگرام =====
+function getInnovationText(value) {
+    const map = {
+        1: 'خیلی کم',
+        2: 'کم',
+        3: 'متوسط',
+        4: 'زیاد',
+        5: 'خیلی زیاد'
+    };
+    return map[value] || 'نامشخص';
+}
+
+function getMarketText(value) {
+    const map = {
+        1: 'خیلی کوچک',
+        2: 'کوچک',
+        3: 'متوسط',
+        4: 'بزرگ',
+        5: 'خیلی بزرگ'
+    };
+    return map[value] || 'نامشخص';
+}
+
+function getStageText(value) {
+    const map = {
+        1: 'فقط یک ایده',
+        2: 'طرح اولیه',
+        3: 'نمونه اولیه',
+        4: 'محصول آماده',
+        5: 'در حال فروش'
+    };
+    return map[value] || 'نامشخص';
+}
+
+function getCategoryText(value) {
+    const map = {
+        'technology': 'فناوری',
+        'health': 'سلامت و پزشکی',
+        'education': 'آموزش',
+        'agriculture': 'کشاورزی',
+        'services': 'خدمات',
+        'industry': 'صنعت',
+        'creative': 'خلاقیت و هنر'
+    };
+    return map[value] || value || 'متفرقه';
+}
+
 function detectAttack(req, res, next) {
     const patterns = [/<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
         /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i, /--/, /;/, /\/\*/, /\*\//];
@@ -254,10 +301,26 @@ app.post('/api/ideas', authenticateToken, (req, res) => {
                     return res.status(500).json({ error: 'خطا در ذخیره ایده' });
                 }
 
-                console.log('📨 ارسال ایده به تلگرام:', sanitizedContent);
-                console.log('👤 کاربر:', user.name, user.email);
-                
-                sendToTelegram(user.name, user.email, sanitizedContent);
+                // ===== ارسال اطلاعات کامل ایده با متن‌های دقیق =====
+                const ideaDetails = `
+🆕 ایده جدید ثبت شد!
+
+👤 نام: ${user.name}
+📧 ایمیل: ${user.email}
+
+💡 متن ایده:
+${sanitizedContent}
+
+📂 حوزه: ${getCategoryText(sanitizedCategory)}
+🔬 نوآوری: ${getInnovationText(innovation || 0)}
+📊 بازار: ${getMarketText(market || 0)}
+📌 مرحله: ${getStageText(stage || 0)}
+⭐ امتیاز: ${score}
+
+📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
+                `;
+
+                sendToTelegram(user.name, user.email, ideaDetails);
 
                 res.status(201).json({
                     id: this.lastID,
@@ -330,7 +393,7 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
                 console.log('📨 ارسال مشاوره به تلگرام:', user.name, user.email);
                 sendConsultationToTelegram(user.name, user.email, phone, topic, description);
 
-                res.status(201).json({ message: '✅ درخواست مشاوره با موفقیت ثبت شد.' });
+                res.status(201).json({ message: 'درخواست مشاوره با موفقیت ثبت شد.' });
             }
         );
     });
@@ -494,7 +557,7 @@ app.get('/idea/:id', (req, res) => {
                         </div>
                         <div class="idea-page-meta">
                             <span>👤 ${idea.user_name}</span>
-                            <span>📂 ${idea.category || 'متفرقه'}</span>
+                            <span>📂 ${getCategoryText(idea.category)}</span>
                             <span class="score">⭐ ${idea.score || 0}</span>
                             <span>📅 ${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
                         </div>
