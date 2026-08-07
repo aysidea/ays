@@ -446,7 +446,7 @@ body {
     font-size: 4rem;
     font-weight: 900;
     color: #1A1A1A;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .score-details {
@@ -458,7 +458,7 @@ body {
 }
 
 .score-details span {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255, 255, 255, 0.4);
     padding: 5px 12px;
     border-radius: 20px;
 }
@@ -788,89 +788,73 @@ body {
 
 .ideas-grid {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
 }
 
 .idea-card-modern {
     background: var(--bg-card);
-    border-radius: 14px;
-    padding: 14px 18px;
+    border-radius: 10px;
+    padding: 8px 12px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-light);
     transition: var(--transition);
-    cursor: default;
-    position: relative;
+    width: 100%;
+    max-width: 280px;
 }
 
 .idea-card-modern:hover {
     border-color: var(--primary-light);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
-}
-
-.idea-card-modern.idea-card-hidden {
-    display: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
 }
 
 .idea-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
 }
 
 .idea-card-score {
     font-weight: 700;
     color: var(--primary);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     background: rgba(230, 126, 34, 0.08);
-    padding: 2px 10px;
+    padding: 1px 8px;
     border-radius: 20px;
 }
 
 .idea-card-date {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     color: var(--text-gray);
 }
 
 .idea-card-summary {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.8rem;
+    line-height: 1.4;
     color: var(--text-dark);
     font-family: 'AradVF', 'Tahoma', sans-serif;
-    margin-bottom: 8px;
-    padding: 4px 0;
+    margin-bottom: 4px;
+    padding: 2px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .idea-card-status {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 6px;
+    justify-content: flex-end;
+    margin-top: 2px;
     border-top: 1px solid var(--border-light);
-    padding-top: 8px;
-}
-
-.idea-card-share {
-    background: transparent;
-    border: none;
-    color: var(--text-gray);
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: var(--transition);
-    padding: 4px 8px;
-    border-radius: 8px;
-}
-
-.idea-card-share:hover {
-    color: var(--primary);
-    background: rgba(230, 126, 34, 0.08);
+    padding-top: 4px;
 }
 
 .idea-status-badge {
-    padding: 2px 10px;
+    padding: 1px 8px;
     border-radius: 20px;
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     font-weight: 600;
 }
 
@@ -885,30 +869,6 @@ body {
 .idea-status-badge.rejected {
     background: #FDEDEC;
     color: #922B21;
-}
-
-.idea-toggle-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 12px;
-}
-
-.idea-toggle-btn {
-    background: transparent;
-    border: 1px solid var(--border-light);
-    padding: 8px 24px;
-    border-radius: 30px;
-    font-family: 'Shoklat', sans-serif;
-    font-size: 0.9rem;
-    color: var(--text-gray);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.idea-toggle-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: rgba(230, 126, 34, 0.05);
 }
 
 .account-wrapper {
@@ -1194,135 +1154,6 @@ body {
     font-family: 'AradVF', sans-serif;
 }
 
-.share-card {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1100;
-    padding: 20px;
-}
-
-.share-card-content {
-    background: #fff;
-    border-radius: 24px;
-    padding: 30px;
-    max-width: 450px;
-    width: 100%;
-    position: relative;
-    text-align: center;
-}
-
-.share-close {
-    position: absolute;
-    top: 12px;
-    left: 18px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #888;
-}
-
-.share-card-content h3 {
-    color: var(--primary);
-    margin-bottom: 5px;
-    font-family: 'Shoklat', sans-serif;
-}
-
-.share-link-box {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
-}
-
-.share-link-box input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid var(--border-light);
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-family: 'AradVF', sans-serif;
-    background: var(--bg-input);
-}
-
-.share-link-box button {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 12px;
-    background: var(--primary);
-    color: #fff;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.share-link-box button:hover {
-    background: var(--primary-dark);
-}
-
-.share-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.share-buttons button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 50px;
-    font-family: 'AradVF', sans-serif;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.share-buttons button:nth-child(1) {
-    background: #0088cc;
-    color: #fff;
-}
-
-.share-buttons button:nth-child(2) {
-    background: #25D366;
-    color: #fff;
-}
-
-.share-buttons button:nth-child(3) {
-    background: #1DA1F2;
-    color: #fff;
-}
-
-.share-buttons button:hover {
-    transform: scale(1.05);
-}
-
-.custom-toast {
-    position: fixed;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--text-dark);
-    color: #fff;
-    padding: 10px 28px;
-    border-radius: 50px;
-    font-family: 'Shoklat', sans-serif;
-    font-size: 0.95rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    z-index: 2000;
-    pointer-events: none;
-}
-
-.custom-toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
 .loader-dots {
     display: inline-flex;
     gap: 6px;
@@ -1421,9 +1252,6 @@ body {
         flex-direction: column;
         gap: 8px;
     }
-    .share-card-content {
-        padding: 25px 20px;
-    }
     .criteria-options {
         flex-direction: column;
         gap: 6px;
@@ -1461,15 +1289,7 @@ body {
         bottom: 85px;
         right: 15px;
     }
-    .share-buttons button {
-        padding: 8px 14px;
-        font-size: 0.85rem;
-    }
-    .custom-toast {
-        bottom: 80px;
-        padding: 8px 20px;
-        font-size: 0.85rem;
-        width: 80%;
-        text-align: center;
+    .idea-card-modern {
+        max-width: 100%;
     }
 }
