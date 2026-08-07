@@ -199,6 +199,14 @@ async function submitIdea(content, category, innovation, market, stage) {
         return null;
     }
 
+    console.log('📤 ارسال ایده به سرور:', {
+        content: content.trim(),
+        category,
+        innovation,
+        market,
+        stage
+    });
+
     try {
         const response = await fetch(`${API_BASE_URL}/ideas`, {
             method: 'POST',
@@ -216,14 +224,19 @@ async function submitIdea(content, category, innovation, market, stage) {
         if (!response.ok) {
             throw new Error(data.error || 'خطا در ارسال ایده');
         }
-        showFeedback('✅ ایده شما با موفقیت ثبت شد!', true);
+
+        console.log(' ایده با موفقیت ثبت شد:', data);
+
+        showFeedback('ایده شما ثبت شد', true);
         ideaInput.value = '';
         document.getElementById('ideaCategory').value = '';
         document.querySelectorAll('input[type="radio"]:checked').forEach(el => el.checked = false);
         document.querySelectorAll('input[type="radio"][value="3"]').forEach(el => el.checked = true);
+        
         setTimeout(() => showScoreCard(data.id), 500);
         return data;
     } catch (error) {
+        console.error('❌ خطا در ثبت ایده:', error);
         showFeedback(error.message || 'خطا در ارسال ایده.', false);
         return null;
     }
@@ -235,27 +248,72 @@ async function loadMyIdeas() {
         const response = await fetch(`${API_BASE_URL}/ideas`, {
             headers: getAuthHeaders()
         });
-        if (!response.ok) {
-            throw new Error('خطا در دریافت ایده‌ها');
-        }
+        if (!response.ok) throw new Error('خطا در دریافت ایده‌ها');
         const ideas = await response.json();
+
+        const container = document.getElementById('ideasList');
+        
         if (ideas.length === 0) {
-            ideasList.innerHTML = '<p style="color:#B0A8A0;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
+            container.innerHTML = '<p style="color:#B0A8A0;text-align:center;padding:30px;">هنوز ایده‌ای ثبت نکرده‌اید.</p>';
             return;
         }
-        ideasList.innerHTML = ideas.map(idea => `
-            <div class="idea-card-modern" onclick="showScoreCard(${idea.id})">
-                <div class="idea-content">${idea.content}</div>
-                <div class="idea-meta">
-                    <span class="idea-status-badge ${idea.status}">${idea.status === 'pending' ? 'در انتظار بررسی' : idea.status === 'approved' ? 'تأیید شده' : 'رد شده'}</span>
-                    <span>امتیاز: ${idea.score || 0}</span>
-                    <span>${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
+
+        let cardClass = 'idea-card-large';
+        if (ideas.length > 6) {
+            cardClass = 'idea-card-small';
+        } else if (ideas.length > 3) {
+            cardClass = 'idea-card-medium';
+        }
+
+        container.innerHTML = ideas.map(idea => {
+            const summary = idea.content.length > 30 
+                ? idea.content.substring(0, 30) + '...' 
+                : idea.content;
+
+            const ideaLink = `https://ays365.onrender.com/idea/${idea.id}`;
+
+            return `
+                <div class="${cardClass}" onclick="window.open('${ideaLink}', '_blank')">
+                    <div class="idea-card-header">
+                        <span class="idea-card-score">⭐ ${idea.score || 0}</span>
+                        <span class="idea-card-date">${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
+                    </div>
+                    <div class="idea-card-summary">${summary}</div>
+                    <div class="idea-card-status">
+                        <span class="idea-status-badge ${idea.status}">${idea.status === 'pending' ? 'در انتظار بررسی' : idea.status === 'approved' ? 'تأیید شده' : 'رد شده'}</span>
+                        <button class="idea-card-share" onclick="event.stopPropagation(); copyLink('${ideaLink}')">
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+
     } catch (error) {
-        ideasList.innerHTML = `<p style="color:#C0392B;text-align:center;">${error.message || 'خطا در دریافت ایده‌ها.'}</p>`;
+        document.getElementById('ideasList').innerHTML = `<p style="color:#C0392B;text-align:center;">${error.message || 'خطا در دریافت ایده‌ها.'}</p>`;
     }
+}
+
+function copyLink(link) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(link).then(() => {
+            alert(' لینک کپی شد!');
+        }).catch(() => {
+            fallbackCopy(link);
+        });
+    } else {
+        fallbackCopy(link);
+    }
+}
+
+function fallbackCopy(link) {
+    const input = document.createElement('input');
+    input.value = link;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    alert(' لینک کپی شد!');
 }
 
 async function loadAccountInfo() {
@@ -418,6 +476,10 @@ submitIdeaBtn.addEventListener('click', async () => {
     try {
         const result = await submitIdea(content, category, innovation, market, stage);
         if (result) {
+            const shareCard = document.getElementById('ideaShareCard');
+            const shareLink = document.getElementById('shareLink');
+            shareLink.value = `${window.location.origin}/idea/${result.id}`;
+            shareCard.style.display = 'flex';
             currentStep = 1;
             showStep(1);
             document.getElementById('ideaCategory').value = '';
@@ -429,6 +491,35 @@ submitIdeaBtn.addEventListener('click', async () => {
 
     showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', false);
 });
+
+document.querySelector('.share-close').addEventListener('click', () => {
+    document.getElementById('ideaShareCard').style.display = 'none';
+});
+
+document.getElementById('copyShareLink').addEventListener('click', () => {
+    const input = document.getElementById('shareLink');
+    input.select();
+    document.execCommand('copy');
+    alert('لینک کپی شد!');
+});
+
+window.shareOn = function(platform) {
+    const url = document.getElementById('shareLink').value;
+    const text = 'ایده‌ای که ثبت کردم را ببینید:';
+    let shareUrl = '';
+    switch(platform) {
+        case 'telegram':
+            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            break;
+        case 'whatsapp':
+            shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + url)}`;
+            break;
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            break;
+    }
+    if (shareUrl) window.open(shareUrl, '_blank');
+};
 
 navItems.forEach(item => {
     item.addEventListener('click', function() {
@@ -496,7 +587,7 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
         });
         const data = await response.json();
         if (response.ok) {
-            feedback.textContent = '✅ درخواست مشاوره با موفقیت ثبت شد.';
+            feedback.textContent = ' درخواست مشاوره با موفقیت ثبت شد.';
             feedback.style.color = '#27AE60';
             document.getElementById('consultForm').reset();
             setTimeout(() => {
