@@ -14,24 +14,13 @@ async function sendToTelegram(userName, userEmail, message) {
         return false;
     }
 
-    const fullMessage = `
-🆕 ایده جدید ثبت شد!
-
-👤 نام: ${userName || 'نامشخص'}
-📧 ایمیل: ${userEmail || 'نامشخص'}
-💡 متن ایده:
-${message.trim()}
-
-📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
-    `;
-
     try {
         await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             chat_id: CHAT_ID,
-            text: fullMessage,
+            text: message,
             parse_mode: 'HTML'
         });
-        console.log('✅ پیام ایده به تلگرام ارسال شد.');
+        console.log('✅ پیام به تلگرام ارسال شد.');
         return true;
     } catch (error) {
         console.error('❌ خطا در ارسال به تلگرام:', error.message);
