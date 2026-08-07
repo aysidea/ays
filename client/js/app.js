@@ -145,7 +145,6 @@ async function getUserData() {
 }
 
 async function checkSession() {
-    // ===== اگر توکن یا userId وجود نداشت، برو به صفحه خوش‌آمدگویی =====
     if (!currentToken || !currentUserId) {
         showPage('landingPage');
         return;
@@ -156,9 +155,8 @@ async function checkSession() {
         currentUserData = user;
         showPage('dashboardPage');
     } catch (error) {
-        // ===== اگر خطا بود، فقط لاگ کن ولی صفحه رو عوض نکن =====
         console.warn('خطا در دریافت اطلاعات کاربر:', error.message);
-        showPage('dashboardPage'); // ===== حتی با خطا هم صفحه اصلی رو نشون بده =====
+        showPage('dashboardPage');
     }
 }
 
@@ -259,7 +257,6 @@ async function loadAccountInfo() {
     }
 }
 
-// ===== رویدادها =====
 startBtn.addEventListener('click', function() {
     showLoader('startBtn', 'startBtnLoader', 'startBtnText', true);
     setTimeout(() => {
@@ -385,6 +382,10 @@ document.querySelectorAll('.btn-prev-step').forEach(btn => {
 });
 
 submitIdeaBtn.addEventListener('click', async () => {
+    // ===== غیرفعال کردن دکمه برای جلوگیری از ارسال دوباره =====
+    submitIdeaBtn.disabled = true;
+    submitIdeaBtn.style.opacity = '0.7';
+
     const content = ideaInput.value;
     const category = document.getElementById('ideaCategory').value;
     const innovation = parseInt(document.querySelector('input[name="innovation"]:checked')?.value || 3);
@@ -393,10 +394,14 @@ submitIdeaBtn.addEventListener('click', async () => {
 
     if (!content || content.trim().length < 5) {
         showFeedback('لطفاً متن ایده را با جزئیات بیشتر وارد کنید.', false);
+        submitIdeaBtn.disabled = false;
+        submitIdeaBtn.style.opacity = '1';
         return;
     }
     if (!category) {
         showFeedback('لطفاً حوزه ایده را انتخاب کنید.', false);
+        submitIdeaBtn.disabled = false;
+        submitIdeaBtn.style.opacity = '1';
         return;
     }
 
@@ -415,6 +420,10 @@ submitIdeaBtn.addEventListener('click', async () => {
     }
 
     showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', false);
+    
+    // ===== فعال کردن مجدد دکمه =====
+    submitIdeaBtn.disabled = false;
+    submitIdeaBtn.style.opacity = '1';
 });
 
 navItems.forEach(item => {
@@ -502,29 +511,22 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
     showLoader('consultSubmitBtn', 'consultSubmitLoader', 'consultSubmitText', false);
 });
 
-// ===== مقداردهی اولیه (رفع خطای رفرش) =====
 document.addEventListener('DOMContentLoaded', function() {
-    // ===== اول ببین توکن و userId وجود داره یا نه =====
     if (currentToken && currentUserId) {
-        // ===== اگر هست، مستقیم برو به صفحه اصلی (بدون چک کردن سرور) =====
         showPage('dashboardPage');
-        // ===== بعدش در پس‌زمینه اطلاعات رو بگیر =====
         getUserData().then(user => {
             if (user && !user.error) {
                 currentUserData = user;
             } else {
-                // ===== اگر خطا بود، لاگ کن ولی صفحه رو عوض نکن =====
                 console.warn('خطا در دریافت اطلاعات کاربر:', user?.error || 'نامشخص');
             }
         }).catch(err => {
             console.warn('خطا در دریافت اطلاعات کاربر:', err.message);
         });
     } else {
-        // ===== اگر توکن نبود، برو به صفحه خوش‌آمدگویی =====
         showPage('landingPage');
     }
 
-    // ===== ثبت Service Worker =====
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
             .then(() => console.log('Service Worker ثبت شد'))
