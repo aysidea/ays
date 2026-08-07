@@ -121,7 +121,6 @@ function validateName(name) {
     return validator.isLength(name, { min: 2, max: 50 }) && validator.matches(name, /^[\u0600-\u06FFa-zA-Z\s]+$/);
 }
 
-// ===== توابع تبدیل اعداد به متن برای پیام تلگرام =====
 function getInnovationText(value) {
     const map = {
         1: 'خیلی کم',
@@ -301,7 +300,7 @@ app.post('/api/ideas', authenticateToken, (req, res) => {
                     return res.status(500).json({ error: 'خطا در ذخیره ایده' });
                 }
 
-                // ===== ارسال اطلاعات کامل ایده با متن‌های دقیق =====
+                // ===== ارسال اطلاعات کامل ایده با متن‌های دقیق (فقط یک بار) =====
                 const ideaDetails = `
 🆕 ایده جدید ثبت شد!
 
@@ -320,6 +319,7 @@ ${sanitizedContent}
 📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
                 `;
 
+                // ===== فقط یک بار ارسال به تلگرام =====
                 sendToTelegram(user.name, user.email, ideaDetails);
 
                 res.status(201).json({
@@ -390,7 +390,6 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
                     return res.status(500).json({ error: 'خطا در ثبت درخواست' });
                 }
 
-                console.log('📨 ارسال مشاوره به تلگرام:', user.name, user.email);
                 sendConsultationToTelegram(user.name, user.email, phone, topic, description);
 
                 res.status(201).json({ message: 'درخواست مشاوره با موفقیت ثبت شد.' });
