@@ -68,7 +68,6 @@ body {
     direction: rtl;
 }
 
-/* ===== غیرفعال کردن اسکرول در صفحات لندینگ و ثبت‌نام ===== */
 .page.no-scroll {
     overflow: hidden !important;
     height: 100vh !important;
@@ -88,7 +87,6 @@ body {
     justify-content: center;
 }
 
-/* ===== اسکرول بار ===== */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -100,7 +98,6 @@ body {
     border-radius: 10px;
 }
 
-/* ===== هدر ===== */
 #mainHeader {
     position: fixed;
     top: 0;
@@ -128,7 +125,6 @@ body {
     letter-spacing: 3px;
 }
 
-/* ===== ناوبری پایین ===== */
 #bottomNav {
     position: fixed;
     bottom: 0;
@@ -182,7 +178,6 @@ body {
     color: var(--primary-light);
 }
 
-/* ===== صفحات ===== */
 .page {
     display: none;
     animation: fadeInUp 0.4s ease;
@@ -206,7 +201,6 @@ body {
     }
 }
 
-/* ===== صفحه لندینگ ===== */
 .landing-wrapper {
     display: flex;
     align-items: center;
@@ -289,7 +283,6 @@ body {
     cursor: not-allowed;
 }
 
-/* ===== صفحه ثبت‌نام ===== */
 .register-wrapper {
     display: flex;
     align-items: center;
@@ -420,14 +413,12 @@ body {
     text-decoration: underline;
 }
 
-/* ===== داشبورد ===== */
 .dashboard-wrapper {
     max-width: 1100px;
     margin: 0 auto;
     padding: 18px;
 }
 
-/* ===== کارت طلایی امتیاز ===== */
 .gold-card {
     background: linear-gradient(135deg, #FFD700, #F5A623);
     border-radius: 20px;
@@ -472,7 +463,6 @@ body {
     border-radius: 20px;
 }
 
-/* ===== فرم ثبت ایده ===== */
 .idea-submit-modern {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -586,7 +576,8 @@ body {
     height: 16px;
 }
 
-.btn-next-step, .btn-prev-step {
+.btn-next-step,
+.btn-prev-step {
     padding: 10px 25px;
     border-radius: 50px;
     border: none;
@@ -707,7 +698,6 @@ body {
     }
 }
 
-/* ===== کلاژ ===== */
 .collage-modern {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -771,7 +761,6 @@ body {
     opacity: 0.9;
 }
 
-/* ===== ایده‌های من ===== */
 .my-ideas-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -797,93 +786,69 @@ body {
     font-size: 1.2rem;
 }
 
-/* ===== کارت‌های ایده با اندازه پویا ===== */
 .ideas-grid {
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: flex-start;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.idea-card-large {
-    width: 100%;
-    max-width: 100%;
+.idea-card-modern {
     background: var(--bg-card);
-    border-radius: 16px;
-    padding: 20px 24px;
+    border-radius: 14px;
+    padding: 14px 18px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-light);
     transition: var(--transition);
-    cursor: pointer;
+    cursor: default;
+    position: relative;
 }
 
-.idea-card-medium {
-    width: calc(50% - 8px);
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 18px 20px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border-light);
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.idea-card-small {
-    width: calc(33.33% - 11px);
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 14px 16px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border-light);
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.idea-card-large:hover,
-.idea-card-medium:hover,
-.idea-card-small:hover {
+.idea-card-modern:hover {
     border-color: var(--primary-light);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+.idea-card-modern.idea-card-hidden {
+    display: none;
 }
 
 .idea-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .idea-card-score {
     font-weight: 700;
     color: var(--primary);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    background: rgba(230, 126, 34, 0.08);
+    padding: 2px 10px;
+    border-radius: 20px;
 }
 
 .idea-card-date {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-gray);
 }
 
 .idea-card-summary {
-    font-size: 0.95rem;
-    line-height: 1.6;
+    font-size: 0.9rem;
+    line-height: 1.5;
     color: var(--text-dark);
     font-family: 'AradVF', 'Tahoma', sans-serif;
-    margin-bottom: 10px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin-bottom: 8px;
+    padding: 4px 0;
 }
 
 .idea-card-status {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
+    margin-top: 6px;
     border-top: 1px solid var(--border-light);
-    padding-top: 10px;
+    padding-top: 8px;
 }
 
 .idea-card-share {
@@ -891,9 +856,9 @@ body {
     border: none;
     color: var(--text-gray);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: var(--transition);
-    padding: 4px 10px;
+    padding: 4px 8px;
     border-radius: 8px;
 }
 
@@ -903,9 +868,9 @@ body {
 }
 
 .idea-status-badge {
-    padding: 2px 12px;
+    padding: 2px 10px;
     border-radius: 20px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
 }
 
@@ -922,7 +887,30 @@ body {
     color: #922B21;
 }
 
-/* ===== اکانت ===== */
+.idea-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.idea-toggle-btn {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-family: 'Shoklat', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.idea-toggle-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(230, 126, 34, 0.05);
+}
+
 .account-wrapper {
     max-width: 650px;
     margin: 0 auto;
@@ -998,7 +986,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* ===== درباره ما ===== */
 .about-wrapper {
     max-width: 850px;
     margin: 0 auto;
@@ -1062,7 +1049,6 @@ body {
     font-family: 'AradVF', sans-serif;
 }
 
-/* ===== دکمه مشاوره ===== */
 .consult-fab {
     position: fixed;
     bottom: 95px;
@@ -1088,7 +1074,6 @@ body {
     box-shadow: 0 12px 40px rgba(255, 107, 0, 0.5);
 }
 
-/* ===== مودال مشاوره ===== */
 .consult-modal {
     position: fixed;
     inset: 0;
@@ -1209,7 +1194,6 @@ body {
     font-family: 'AradVF', sans-serif;
 }
 
-/* ===== کارت اشتراک‌گذاری ===== */
 .share-card {
     position: fixed;
     inset: 0;
@@ -1316,7 +1300,29 @@ body {
     transform: scale(1.05);
 }
 
-/* ===== لودینگ یکدست (نقطه‌های جهنده) ===== */
+.custom-toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text-dark);
+    color: #fff;
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-family: 'Shoklat', sans-serif;
+    font-size: 0.95rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.custom-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 .loader-dots {
     display: inline-flex;
     gap: 6px;
@@ -1351,7 +1357,6 @@ body {
     }
 }
 
-/* ===== واکنش‌گرایی ===== */
 @media (max-width: 992px) {
     .collage-modern {
         grid-template-columns: 1fr 1fr;
@@ -1423,12 +1428,6 @@ body {
         flex-direction: column;
         gap: 6px;
     }
-    .idea-card-medium {
-        width: 100%;
-    }
-    .idea-card-small {
-        width: calc(50% - 8px);
-    }
 }
 
 @media (max-width: 480px) {
@@ -1466,7 +1465,11 @@ body {
         padding: 8px 14px;
         font-size: 0.85rem;
     }
-    .idea-card-small {
-        width: 100%;
+    .custom-toast {
+        bottom: 80px;
+        padding: 8px 20px;
+        font-size: 0.85rem;
+        width: 80%;
+        text-align: center;
     }
 }
