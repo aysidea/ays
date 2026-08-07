@@ -229,21 +229,36 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { content, category, innovation, market, stage } = req.body;
-    if (!content || content.trim().length < 5) return res.status(400).json({ error: 'متن ایده حداقل ۵ کاراکتر باشد.' });
+
+    if (!content || content.trim().length < 5) {
+        return res.status(400).json({ error: 'متن ایده حداقل ۵ کاراکتر باشد.' });
+    }
+
     const score = (innovation || 0) * 3 + (market || 0) * 2 + (stage || 0) * 1;
     const sanitizedContent = sanitizeInput(content);
     const sanitizedCategory = sanitizeInput(category || '');
+
     db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err || !user) return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
+        if (err || !user) {
+            logger.error('خطا در دریافت اطلاعات کاربر:', err);
+            return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
+        }
+
         db.run(
-            `INSERT INTO ideas (user_id, content, category, innovation, market, stage, score) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO ideas (user_id, content, category, innovation, market, stage, score) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [userId, sanitizedContent, sanitizedCategory, innovation || 0, market || 0, stage || 0, score],
             function(err) {
                 if (err) {
                     logger.error('خطا در ذخیره ایده:', err);
                     return res.status(500).json({ error: 'خطا در ذخیره ایده' });
                 }
+
+                console.log('📨 ارسال ایده به تلگرام:', sanitizedContent);
+                console.log('👤 کاربر:', user.name, user.email);
+                
                 sendToTelegram(user.name, user.email, sanitizedContent);
+
                 res.status(201).json({
                     id: this.lastID,
                     user_id: userId,
@@ -289,27 +304,20 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
     );
 });
 
-app.get('/api/idea/:id', (req, res) => {
-    const ideaId = req.params.id;
-    db.get(
-        'SELECT id, content, category, score, status, created_at FROM ideas WHERE id = ? AND status != "rejected"',
-        [ideaId],
-        (err, idea) => {
-            if (err || !idea) return res.status(404).json({ error: 'ایده یافت نشد' });
-            res.json(idea);
-        }
-    );
-});
-
 app.post('/api/consultation', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { phone, topic, description } = req.body;
-    if (!phone || !topic || !description) return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
+
+    if (!phone || !topic || !description) {
+        return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
+    }
+
     db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
         if (err || !user) {
             logger.error('خطا در دریافت اطلاعات کاربر:', err);
             return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
         }
+
         db.run(
             'INSERT INTO consultations (user_id, phone, topic, description) VALUES (?, ?, ?, ?)',
             [userId, phone, topic, description],
@@ -318,11 +326,175 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
                     logger.error('خطا در ذخیره مشاوره:', err);
                     return res.status(500).json({ error: 'خطا در ثبت درخواست' });
                 }
+
+                console.log('📨 ارسال مشاوره به تلگرام:', user.name, user.email);
                 sendConsultationToTelegram(user.name, user.email, phone, topic, description);
+
                 res.status(201).json({ message: '✅ درخواست مشاوره با موفقیت ثبت شد.' });
             }
         );
     });
+});
+
+// ===== دریافت ایده با لینک منحصر‌به‌فرد =====
+app.get('/idea/:id', (req, res) => {
+    const ideaId = req.params.id;
+    
+    db.get(
+        `SELECT i.id, i.content, i.category, i.score, i.created_at, u.name as user_name 
+         FROM ideas i
+         JOIN users u ON i.user_id = u.id
+         WHERE i.id = ? AND i.status != 'rejected'`,
+        [ideaId],
+        (err, idea) => {
+            if (err || !idea) {
+                return res.status(404).send(`
+                    <!DOCTYPE html>
+                    <html dir="rtl">
+                    <head><meta charset="UTF-8"><title>ایده یافت نشد</title></head>
+                    <body style="font-family:Tahoma;text-align:center;padding:50px;">
+                        <h2>❌ ایده یافت نشد</h2>
+                        <p>این ایده وجود ندارد یا حذف شده است.</p>
+                        <a href="https://ays365.onrender.com" style="color:#E67E22;">بازگشت به صفحه اصلی</a>
+                    </body>
+                    </html>
+                `);
+            }
+
+            res.send(`
+                <!DOCTYPE html>
+                <html lang="fa" dir="rtl">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>مشاهده ایده | AYS</title>
+                    <meta property="og:title" content="مشاهده ایده | AYS" />
+                    <meta property="og:description" content="ایده ای که توسط ${idea.user_name} ثبت شده است." />
+                    <meta property="og:image" content="https://ays365.onrender.com/assets/images/ays-icon1.png" />
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: 'Tahoma', sans-serif;
+                            background: #F5F0EB;
+                            min-height: 100vh;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 20px;
+                            direction: rtl;
+                        }
+                        .idea-page-card {
+                            background: #fff;
+                            border-radius: 24px;
+                            padding: 40px;
+                            max-width: 650px;
+                            width: 100%;
+                            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+                            border: 1px solid #E8E0D8;
+                        }
+                        .idea-page-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 20px;
+                            border-bottom: 2px solid #E67E22;
+                            padding-bottom: 15px;
+                        }
+                        .idea-page-header .logo {
+                            font-size: 28px;
+                            font-weight: 900;
+                            color: #E67E22;
+                            font-family: 'Acquire', sans-serif;
+                        }
+                        .idea-page-header .badge {
+                            background: #E67E22;
+                            color: #fff;
+                            padding: 5px 16px;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                        }
+                        .idea-page-content {
+                            font-size: 1.1rem;
+                            line-height: 2;
+                            color: #3D3D3D;
+                            margin: 20px 0;
+                            padding: 20px;
+                            background: #F8F6F3;
+                            border-radius: 16px;
+                        }
+                        .idea-page-meta {
+                            display: flex;
+                            justify-content: space-between;
+                            color: #6B6B6B;
+                            font-size: 0.9rem;
+                            border-top: 1px solid #E8E0D8;
+                            padding-top: 15px;
+                            margin-top: 10px;
+                            flex-wrap: wrap;
+                            gap: 8px;
+                        }
+                        .idea-page-meta .score {
+                            color: #E67E22;
+                            font-weight: 700;
+                        }
+                        .idea-page-footer {
+                            margin-top: 25px;
+                            text-align: center;
+                            padding-top: 20px;
+                            border-top: 1px solid #E8E0D8;
+                        }
+                        .idea-page-footer a {
+                            display: inline-block;
+                            padding: 12px 35px;
+                            background: #E67E22;
+                            color: #fff;
+                            border-radius: 50px;
+                            text-decoration: none;
+                            font-weight: 600;
+                            transition: 0.3s;
+                        }
+                        .idea-page-footer a:hover {
+                            background: #D35400;
+                            transform: translateY(-2px);
+                            box-shadow: 0 8px 25px rgba(230,126,34,0.3);
+                        }
+                        .idea-page-footer .sub-text {
+                            color: #6B6B6B;
+                            font-size: 0.85rem;
+                            margin-top: 10px;
+                        }
+                        @media (max-width: 480px) {
+                            .idea-page-card { padding: 25px 20px; }
+                            .idea-page-content { font-size: 1rem; padding: 15px; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="idea-page-card">
+                        <div class="idea-page-header">
+                            <span class="logo">AYS</span>
+                            <span class="badge">⭐ امتیاز: ${idea.score || 0}</span>
+                        </div>
+                        <div class="idea-page-content">
+                            ${idea.content}
+                        </div>
+                        <div class="idea-page-meta">
+                            <span>👤 ${idea.user_name}</span>
+                            <span>📂 ${idea.category || 'متفرقه'}</span>
+                            <span class="score">⭐ ${idea.score || 0}</span>
+                            <span>📅 ${new Date(idea.created_at).toLocaleDateString('fa-IR')}</span>
+                        </div>
+                        <div class="idea-page-footer">
+                            <a href="https://ays365.onrender.com">🚀 ثبت ایده جدید</a>
+                            <p class="sub-text">ایده‌های خود را ثبت کنید تا به شرکت‌های بزرگ معرفی شوند.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+    );
 });
 
 app.get('/api/health', (req, res) => {
