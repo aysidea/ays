@@ -419,61 +419,6 @@ body {
     padding: 18px;
 }
 
-.gold-card {
-    background: linear-gradient(135deg, #FFD700, #F5A623);
-    border-radius: 14px;
-    padding: 16px 20px;
-    color: #2D2D2D;
-    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.25);
-    margin-bottom: 20px;
-    text-align: center;
-    display: none;
-    max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.gold-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.gold-card-header .gold-icon {
-    font-size: 1.5rem;
-}
-
-.gold-card-header h3 {
-    font-size: 1rem;
-    font-family: 'Shoklat', sans-serif;
-    color: #1A1A1A;
-}
-
-.score-number {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: #1A1A1A;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.score-details {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 8px;
-    font-size: 0.75rem;
-    color: #4A4A4A;
-    flex-wrap: wrap;
-}
-
-.score-details span {
-    background: rgba(255,255,255,0.5);
-    padding: 3px 10px;
-    border-radius: 20px;
-}
-
 .idea-submit-modern {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -1251,16 +1196,9 @@ body {
         padding: 25px 20px;
         margin: 15px;
     }
-    .score-details {
-        flex-direction: column;
-        gap: 8px;
-    }
     .criteria-options {
         flex-direction: column;
         gap: 6px;
-    }
-    .gold-card {
-        max-width: 100%;
     }
 }
 
@@ -1294,9 +1232,6 @@ body {
         font-size: 22px;
         bottom: 85px;
         right: 15px;
-    }
-    .gold-card {
-        max-width: 100%;
     }
     .idea-card-modern {
         padding: 12px 14px;
