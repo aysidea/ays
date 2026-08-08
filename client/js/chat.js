@@ -14,7 +14,7 @@ async function loadMessages() {
         });
         container.scrollTop = container.scrollHeight;
     } catch (error) {
-        console.error('خطا در دریافت پیام‌ها:', error);
+        console.error('❌ خطا در دریافت پیام‌ها:', error);
     }
 }
 
@@ -46,6 +46,8 @@ async function sendMessage() {
     const content = input.value.trim();
     if (!content) return;
 
+    console.log('📤 ارسال پیام:', content);
+
     try {
         const response = await fetch(`${API_BASE_URL}/group-messages`, {
             method: 'POST',
@@ -55,10 +57,17 @@ async function sendMessage() {
             },
             body: JSON.stringify({ content })
         });
-        if (!response.ok) throw new Error('خطا در ارسال پیام');
+        const data = await response.json();
+        if (!response.ok) {
+            console.error('❌ خطا در ارسال پیام:', data);
+            alert('خطا در ارسال پیام: ' + (data.error || 'نامشخص'));
+            return;
+        }
+        console.log('✅ پیام ارسال شد:', data);
         input.value = '';
     } catch (error) {
-        console.error('خطا در ارسال پیام:', error);
+        console.error('❌ خطا در ارسال پیام:', error);
+        alert('خطا در ارتباط با سرور');
     }
 }
 
@@ -73,6 +82,7 @@ const channel = pusher.subscribe('presence-chat-channel');
 
 // ===== دریافت پیام جدید =====
 channel.bind('new-message', function(data) {
+    console.log('📩 پیام جدید:', data);
     const container = document.getElementById('chatMessages');
     const isOwn = data.user_id == currentUserId;
     const msgElement = createMessageElement(data, isOwn);
@@ -80,19 +90,25 @@ channel.bind('new-message', function(data) {
     container.scrollTop = container.scrollHeight;
 });
 
-// ===== آنلاین‌ها =====
+// ===== آنلاین‌ها (با +۳ نفر ثابت) =====
 channel.bind('pusher:subscription_succeeded', function(members) {
-    document.getElementById('onlineCount').textContent = `🟢 ${members.count} نفر آنلاین`;
+    const count = members.count + 3;
+    document.getElementById('onlineCount').textContent = `🟢 ${count} نفر آنلاین`;
 });
 
 channel.bind('pusher:member_added', function(member) {
-    const count = channel.members.count;
+    const count = channel.members.count + 3;
     document.getElementById('onlineCount').textContent = `🟢 ${count} نفر آنلاین`;
 });
 
 channel.bind('pusher:member_removed', function(member) {
-    const count = channel.members.count;
+    const count = channel.members.count + 3;
     document.getElementById('onlineCount').textContent = `🟢 ${count} نفر آنلاین`;
+});
+
+// ===== دکمه برگشت =====
+document.getElementById('backBtn').addEventListener('click', function() {
+    window.location.href = '/';
 });
 
 // ===== بارگذاری اولیه =====
