@@ -1,3 +1,11 @@
+// ===== تنظیمات اولیه =====
+const container = document.getElementById('chatMessages');
+const input = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendChatBtn');
+const onlineCount = document.getElementById('onlineCount');
+
+let isFirstLoad = true;
+
 // ===== دریافت پیام‌های قدیمی =====
 async function loadMessages() {
     try {
@@ -6,13 +14,12 @@ async function loadMessages() {
         });
         if (!response.ok) throw new Error('خطا در دریافت پیام‌ها');
         const messages = await response.json();
-        const container = document.getElementById('chatMessages');
         container.innerHTML = '';
         messages.forEach(msg => {
             const isOwn = msg.user_id == currentUserId;
             container.appendChild(createMessageElement(msg, isOwn));
         });
-        container.scrollTop = container.scrollHeight;
+        scrollToBottom();
     } catch (error) {
         console.error('❌ خطا در دریافت پیام‌ها:', error);
     }
@@ -23,9 +30,9 @@ function createMessageElement(msg, isOwn) {
     const div = document.createElement('div');
     div.className = `chat-message ${isOwn ? 'own' : 'other'}`;
     
-    const time = new Date(msg.created_at);
-    const timeStr = time.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-    const dateStr = time.toLocaleDateString('fa-IR');
+    const date = new Date(msg.created_at);
+    const timeStr = date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = date.toLocaleDateString('fa-IR');
     
     div.innerHTML = `
         <span class="msg-user">${isOwn ? 'شما' : msg.user_name}</span>
@@ -35,18 +42,20 @@ function createMessageElement(msg, isOwn) {
     return div;
 }
 
-// ===== ارسال پیام =====
-document.getElementById('sendChatBtn').addEventListener('click', sendMessage);
-document.getElementById('chatInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
-});
+// ===== اسکرول به پایین =====
+function scrollToBottom() {
+    setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+    }, 50);
+}
 
+// ===== ارسال پیام =====
 async function sendMessage() {
-    const input = document.getElementById('chatInput');
     const content = input.value.trim();
     if (!content) return;
 
-    console.log('📤 ارسال پیام:', content);
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.6';
 
     try {
         const response = await fetch(`${API_BASE_URL}/group-messages`, {
@@ -59,17 +68,29 @@ async function sendMessage() {
         });
         const data = await response.json();
         if (!response.ok) {
-            console.error('❌ خطا در ارسال پیام:', data);
-            alert('خطا در ارسال پیام: ' + (data.error || 'نامشخص'));
+            alert('خطا: ' + (data.error || 'مشکل در ارسال'));
             return;
         }
-        console.log('✅ پیام ارسال شد:', data);
         input.value = '';
     } catch (error) {
-        console.error('❌ خطا در ارسال پیام:', error);
+        console.error('❌ خطا در ارسال:', error);
         alert('خطا در ارتباط با سرور');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
     }
 }
+
+// ===== رویدادها =====
+sendBtn.addEventListener('click', sendMessage);
+input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
+
+// ===== دکمه برگشت =====
+document.getElementById('backBtn').addEventListener('click', function() {
+    window.location.href = '/';
+});
 
 // ===== تنظیم Pusher =====
 const pusher = new Pusher(pusherKey, {
@@ -80,36 +101,46 @@ const pusher = new Pusher(pusherKey, {
 
 const channel = pusher.subscribe('presence-chat-channel');
 
-// ===== دریافت پیام جدید =====
+// ===== دریافت پیام جدید (لحظه‌ای) =====
 channel.bind('new-message', function(data) {
     console.log('📩 پیام جدید:', data);
-    const container = document.getElementById('chatMessages');
     const isOwn = data.user_id == currentUserId;
     const msgElement = createMessageElement(data, isOwn);
     container.appendChild(msgElement);
-    container.scrollTop = container.scrollHeight;
+    scrollToBottom();
 });
 
-// ===== آنلاین‌ها (با +۳ نفر ثابت) =====
+// ===== آنلاین‌ها (+۳ نفر ثابت) =====
 channel.bind('pusher:subscription_succeeded', function(members) {
     const count = members.count + 3;
-    document.getElementById('onlineCount').textContent = `🟢 ${count} نفر آنلاین`;
+    onlineCount.textContent = `🟢 ${count} نفر آنلاین`;
 });
 
 channel.bind('pusher:member_added', function(member) {
     const count = channel.members.count + 3;
-    document.getElementById('onlineCount').textContent = `🟢 ${count} نفر آنلاین`;
+    onlineCount.textContent = `🟢 ${count} نفر آنلاین`;
 });
 
 channel.bind('pusher:member_removed', function(member) {
     const count = channel.members.count + 3;
-    document.getElementById('onlineCount').textContent = `🟢 ${count} نفر آنلاین`;
+    onlineCount.textContent = `🟢 ${count} نفر آنلاین`;
 });
 
-// ===== دکمه برگشت =====
-document.getElementById('backBtn').addEventListener('click', function() {
-    window.location.href = '/';
+// ===== خطاهای Pusher =====
+pusher.connection.bind('error', function(err) {
+    console.error('❌ خطای Pusher:', err);
 });
 
 // ===== بارگذاری اولیه =====
 loadMessages();
+
+// ===== فعال کردن آیتم منو =====
+document.addEventListener('DOMContentLoaded', function() {
+    // آیتم گفتگو رو در صفحه جداگانه فعال کن
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if (item.dataset.page === 'chatPage') {
+            item.classList.add('active');
+        }
+    });
+});
