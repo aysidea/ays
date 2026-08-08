@@ -16,43 +16,41 @@
         </div>
     </header>
 
-    <main id="mainContent">
-        <section id="chatPage" class="page active">
-            <div class="chat-container">
-                
-                <div class="chat-header">
+    <main id="chatMain">
+        <div class="chat-wrapper">
+            
+            <!-- هدر چت -->
+            <div class="chat-header-fixed">
+                <div class="chat-header-content">
                     <h2>💬 گفتگو</h2>
                     <span id="onlineCount" class="online-count">🟢 ۰ نفر آنلاین</span>
                 </div>
-
                 <div class="chat-info-box">
                     <i class="fas fa-users"></i>
                     <div class="chat-info-text">
-                        <strong>هدف از گفتگو:</strong>
-                        اینجا فضایی برای همفکری، تبادل نظر و تکمیل ایده‌هاست. 
-                        با دیگران گفتگو کنید، از تجربه‌ها بیاموزید و ایده‌های خود را به بلوغ برسانید. 
-                        هر پیام می‌تواند جرقه‌ای برای یک همکاری بزرگ باشد.
+                        <strong>هدف از گفتگو:</strong> همفکری، تبادل نظر و تکمیل ایده‌ها. هر پیام می‌تواند جرقه‌ای برای همکاری باشد.
                     </div>
                 </div>
-
                 <div class="chat-rules">
                     <i class="fas fa-info-circle"></i>
-                    <span>پیام‌ها پس از ۱۴ روز به‌طور خودکار حذف می‌شوند. لطفاً با احترام با دیگران گفتگو کنید.</span>
+                    <span>پیام‌ها پس از ۱۴ روز حذف می‌شوند. با احترام گفتگو کنید.</span>
                 </div>
-
-                <div id="chatMessages" class="chat-messages">
-                    <!-- پیام‌ها -->
-                </div>
-
-                <div class="chat-input-wrapper">
-                    <div class="chat-input-container">
-                        <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." />
-                        <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
-
             </div>
-        </section>
+
+            <!-- بخش پیام‌ها (تنها قسمتی که اسکرول می‌خوره) -->
+            <div id="chatMessages" class="chat-messages-scroll">
+                <!-- پیام‌ها اینجا قرار می‌گیرند -->
+            </div>
+
+            <!-- ورودی پیام (همیشه پایین) -->
+            <div class="chat-input-fixed">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." />
+                    <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+
+        </div>
     </main>
 
     <script>
@@ -65,6 +63,12 @@
         if (!token) {
             window.location.href = '/';
         }
+
+        // ===== فعال کردن آیتم منوی گفتگو =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // در صفحه جداگانه، آیتم گفتگو رو فعال می‌کنیم
+            localStorage.setItem('activeNav', 'chatPage');
+        });
     </script>
     <script src="js/chat.js"></script>
 </body>
