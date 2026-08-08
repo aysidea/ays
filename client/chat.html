@@ -18,17 +18,36 @@
     <main id="mainContent">
         <section id="chatPage" class="page active">
             <div class="chat-container">
+                
+                <!-- هدر چت -->
                 <div class="chat-header">
                     <h2>💬 گفتگو</h2>
                     <span id="onlineCount" class="online-count">🔴 ۰ نفر آنلاین</span>
                 </div>
+
+                <!-- ===== کادر توضیحی (همیشه در بالا) ===== -->
+                <div class="chat-info-box">
+                    <i class="fas fa-users"></i>
+                    <div class="chat-info-text">
+                        <strong>هدف از گفتگو:</strong>
+                        اینجا فضایی برای همفکری، تبادل نظر و تکمیل ایده‌هاست. 
+                        با دیگران گفتگو کنید، از تجربه‌ها بیاموزید و ایده‌های خود را به بلوغ برسانید. 
+                        هر پیام می‌تواند جرقه‌ای برای یک همکاری بزرگ باشد.
+                    </div>
+                </div>
+
+                <!-- قوانین -->
                 <div class="chat-rules">
                     <i class="fas fa-info-circle"></i>
                     <span>پیام‌ها پس از ۱۴ روز به‌طور خودکار حذف می‌شوند. لطفاً با احترام با دیگران گفتگو کنید.</span>
                 </div>
+
+                <!-- پیام‌ها -->
                 <div id="chatMessages" class="chat-messages">
                     <!-- پیام‌ها اینجا قرار می‌گیرند -->
                 </div>
+
+                <!-- ورودی پیام -->
                 <div class="chat-input-container">
                     <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." />
                     <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
@@ -41,8 +60,8 @@
         const API_BASE_URL = 'https://ays-server.onrender.com/api';
         const token = localStorage.getItem('ays_token');
         const currentUserId = localStorage.getItem('ays_user_id');
-        const pusherKey = 'YOUR_PUSHER_KEY';
-        const pusherCluster = 'YOUR_PUSHER_CLUSTER';
+        const pusherKey = 'c001529546705bdb1a57';
+        const pusherCluster = 'eu';
 
         if (!token) {
             window.location.href = '/';
