@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>گفتگو | AYS</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://js.pusher.com/8.0/pusher.min.js"></script>
+</head>
+<body>
+
+    <header id="mainHeader">
+        <div class="header-content">
+            <span class="logo-header">AYS</span>
+        </div>
+    </header>
+
+    <main id="mainContent">
+        <section id="chatPage" class="page active">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>💬 گفتگو</h2>
+                    <span id="onlineCount" class="online-count">🔴 ۰ نفر آنلاین</span>
+                </div>
+                <div class="chat-rules">
+                    <i class="fas fa-info-circle"></i>
+                    <span>پیام‌ها پس از ۱۴ روز به‌طور خودکار حذف می‌شوند. لطفاً با احترام با دیگران گفتگو کنید.</span>
+                </div>
+                <div id="chatMessages" class="chat-messages">
+                    <!-- پیام‌ها اینجا قرار می‌گیرند -->
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." />
+                    <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const API_BASE_URL = 'https://ays-server.onrender.com/api';
+        const token = localStorage.getItem('ays_token');
+        const currentUserId = localStorage.getItem('ays_user_id');
+        const pusherKey = 'YOUR_PUSHER_KEY';
+        const pusherCluster = 'YOUR_PUSHER_CLUSTER';
+
+        if (!token) {
+            window.location.href = '/';
+        }
+    </script>
+    <script src="js/chat.js"></script>
+</body>
+</html>
