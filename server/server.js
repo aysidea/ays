@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const morgan = require('morgan');
 const winston = require('winston');
+const Pusher = require('pusher');
 const { sendToTelegram, sendConsultationToTelegram } = require('./utils/telegram');
 const { sendAlertToTelegram } = require('./utils/alert');
 require('dotenv').config();
@@ -17,6 +18,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
 
+// ===== تنظیم Pusher =====
+const pusher = new Pusher({
+    appId: process.env.PUSHER_APP_ID,
+    key: process.env.PUSHER_KEY,
+    secret: process.env.PUSHER_SECRET,
+    cluster: process.env.PUSHER_CLUSTER,
+    useTLS: true
+});
+
+// ===== لاگر =====
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -102,8 +113,18 @@ db.serialize(() => {
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     `);
+    db.run(`
+        CREATE TABLE IF NOT EXISTS group_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `);
 });
 
+// ===== توابع کمکی =====
 function sanitizeInput(input) {
     if (typeof input !== 'string') return input;
     return validator.escape(input.trim());
@@ -122,35 +143,17 @@ function validateName(name) {
 }
 
 function getInnovationText(value) {
-    const map = {
-        1: 'خیلی کم',
-        2: 'کم',
-        3: 'متوسط',
-        4: 'زیاد',
-        5: 'خیلی زیاد'
-    };
+    const map = { 1: 'خیلی کم', 2: 'کم', 3: 'متوسط', 4: 'زیاد', 5: 'خیلی زیاد' };
     return map[value] || 'نامشخص';
 }
 
 function getMarketText(value) {
-    const map = {
-        1: 'خیلی کوچک',
-        2: 'کوچک',
-        3: 'متوسط',
-        4: 'بزرگ',
-        5: 'خیلی بزرگ'
-    };
+    const map = { 1: 'خیلی کوچک', 2: 'کوچک', 3: 'متوسط', 4: 'بزرگ', 5: 'خیلی بزرگ' };
     return map[value] || 'نامشخص';
 }
 
 function getStageText(value) {
-    const map = {
-        1: 'فقط یک ایده',
-        2: 'طرح اولیه',
-        3: 'نمونه اولیه',
-        4: 'محصول آماده',
-        5: 'در حال فروش'
-    };
+    const map = { 1: 'فقط یک ایده', 2: 'طرح اولیه', 3: 'نمونه اولیه', 4: 'محصول آماده', 5: 'در حال فروش' };
     return map[value] || 'نامشخص';
 }
 
@@ -167,6 +170,21 @@ function getCategoryText(value) {
     return map[value] || value || 'متفرقه';
 }
 
+// ===== پاک کردن پیام‌های قدیمی (بعد از ۱۴ روز) =====
+function cleanOldMessages() {
+    db.run(
+        `DELETE FROM group_messages 
+         WHERE created_at < datetime('now', '-14 days')`,
+        (err) => {
+            if (err) console.error('خطا در پاک کردن پیام‌های قدیمی:', err);
+            else console.log('✅ پیام‌های قدیمی پاک شدند.');
+        }
+    );
+}
+setInterval(cleanOldMessages, 12 * 60 * 60 * 1000);
+cleanOldMessages();
+
+// ===== تشخیص حملات =====
 function detectAttack(req, res, next) {
     const patterns = [/<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
         /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i, /--/, /;/, /\/\*/, /\*\//];
@@ -206,6 +224,9 @@ function authenticateToken(req, res, next) {
     });
 }
 
+// ============================================================
+// مسیرهای احراز هویت
+// ============================================================
 app.post('/api/register', async (req, res) => {
     const { email, name, password } = req.body;
     if (!email || !name || !password) return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
@@ -272,6 +293,9 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
     });
 });
 
+// ============================================================
+// مسیرهای ایده
+// ============================================================
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { content, category, innovation, market, stage } = req.body;
@@ -300,7 +324,6 @@ app.post('/api/ideas', authenticateToken, (req, res) => {
                     return res.status(500).json({ error: 'خطا در ذخیره ایده' });
                 }
 
-                // ===== ارسال اطلاعات کامل ایده با متن‌های دقیق (فقط یک بار) =====
                 const ideaDetails = `
 🆕 ایده جدید ثبت شد!
 
@@ -319,7 +342,6 @@ ${sanitizedContent}
 📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
                 `;
 
-                // ===== فقط یک بار ارسال به تلگرام =====
                 sendToTelegram(user.name, user.email, ideaDetails);
 
                 res.status(201).json({
@@ -367,6 +389,9 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
     );
 });
 
+// ============================================================
+// مسیرهای مشاوره
+// ============================================================
 app.post('/api/consultation', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { phone, topic, description } = req.body;
@@ -398,6 +423,96 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
     });
 });
 
+// ============================================================
+// مسیرهای گفتگو (چت گروهی)
+// ============================================================
+
+app.get('/api/group-messages', authenticateToken, (req, res) => {
+    db.all(
+        `SELECT gm.id, gm.content, gm.created_at, u.name as user_name 
+         FROM group_messages gm
+         JOIN users u ON gm.user_id = u.id
+         ORDER BY gm.created_at DESC LIMIT 50`,
+        (err, messages) => {
+            if (err) {
+                logger.error('خطا در دریافت پیام‌ها:', err);
+                return res.status(500).json({ error: 'خطا در دریافت پیام‌ها' });
+            }
+            res.json(messages.reverse());
+        }
+    );
+});
+
+app.post('/api/group-messages', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+    const { content } = req.body;
+
+    if (!content || content.trim().length < 1) {
+        return res.status(400).json({ error: 'متن پیام حداقل ۱ کاراکتر باشد.' });
+    }
+
+    const sanitizedContent = sanitizeInput(content);
+
+    db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err || !user) {
+            logger.error('خطا در دریافت اطلاعات کاربر:', err);
+            return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
+        }
+
+        db.run(
+            'INSERT INTO group_messages (user_id, content) VALUES (?, ?)',
+            [userId, sanitizedContent],
+            function(err) {
+                if (err) {
+                    logger.error('خطا در ذخیره پیام:', err);
+                    return res.status(500).json({ error: 'خطا در ذخیره پیام' });
+                }
+
+                const telegramMessage = `
+💬 پیام جدید در گفتگو!
+
+👤 نام: ${user.name}
+📧 ایمیل: ${user.email}
+💬 متن پیام:
+${sanitizedContent}
+
+📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
+                `;
+                sendToTelegram(user.name, user.email, telegramMessage);
+
+                pusher.trigger('chat-channel', 'new-message', {
+                    id: this.lastID,
+                    user_id: userId,
+                    user_name: user.name,
+                    content: sanitizedContent,
+                    created_at: new Date().toISOString()
+                });
+
+                res.status(201).json({
+                    id: this.lastID,
+                    user_id: userId,
+                    content: sanitizedContent,
+                    created_at: new Date().toISOString()
+                });
+            }
+        );
+    });
+});
+
+app.post('/api/pusher-auth', authenticateToken, (req, res) => {
+    const socketId = req.body.socket_id;
+    const channel = req.body.channel_name;
+    const presenceData = {
+        user_id: req.user.id,
+        user_info: { name: req.user.name }
+    };
+    const auth = pusher.authorizeChannel(socketId, channel, presenceData);
+    res.send(auth);
+});
+
+// ============================================================
+// مسیرهای عمومی
+// ============================================================
 app.get('/idea/:id', (req, res) => {
     const ideaId = req.params.id;
     
