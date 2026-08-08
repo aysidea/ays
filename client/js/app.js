@@ -56,6 +56,12 @@ function showLoader(btnId, loaderId, textId, show) {
 }
 
 function showPage(pageId) {
+    // ===== اگر صفحه گفتگو بود، به آدرس جداگانه برو =====
+    if (pageId === 'chatPage') {
+        window.location.href = '/chat.html';
+        return;
+    }
+
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
     if (target) target.classList.add('active');
