@@ -1170,8 +1170,14 @@ body {
 }
 
 @keyframes overlayFadeIn {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .chat-overlay-content {
@@ -1184,9 +1190,18 @@ body {
 }
 
 @keyframes overlayContent {
-    0% { transform: translateY(40px) scale(0.9); opacity: 0; }
-    60% { transform: translateY(-8px) scale(1.02); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+    0% {
+        transform: translateY(40px) scale(0.9);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-8px) scale(1.02);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
 }
 
 .chat-overlay-icon {
@@ -1197,8 +1212,13 @@ body {
 }
 
 @keyframes iconPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
 }
 
 .chat-overlay-content h2 {
@@ -1210,14 +1230,14 @@ body {
 
 .chat-overlay-content p {
     font-size: 1.05rem;
-    color: rgba(255,255,255,0.85);
+    color: rgba(255, 255, 255, 0.85);
     line-height: 1.8;
     margin-bottom: 4px;
 }
 
 .chat-overlay-content .overlay-sub {
     font-size: 0.85rem;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255, 255, 255, 0.6);
     margin-top: 8px;
 }
 
@@ -1236,15 +1256,27 @@ body {
     animation: loaderBounce 1.2s ease infinite;
 }
 
-.overlay-loader span:nth-child(2) { animation-delay: 0.2s; }
-.overlay-loader span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes loaderBounce {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-    40% { transform: scale(1); opacity: 1; }
+.overlay-loader span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.overlay-loader span:nth-child(3) {
+    animation-delay: 0.4s;
 }
 
-/* ===== کانتینر چت ===== */
+@keyframes loaderBounce {
+    0%,
+    80%,
+    100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ===== کانتینر اصلی چت ===== */
 .chat-wrapper {
     display: flex;
     flex-direction: column;
@@ -1272,9 +1304,15 @@ body {
 }
 
 @keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* ===== پیام‌ها ===== */
@@ -1309,7 +1347,7 @@ body {
     flex-direction: column;
     word-wrap: break-word;
     font-size: 0.95rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .chat-message.other {
@@ -1333,7 +1371,7 @@ body {
 }
 
 .chat-message.own .msg-user {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .chat-message.other .msg-user {
@@ -1354,14 +1392,14 @@ body {
 }
 
 .chat-message.own .msg-time {
-    color: rgba(255,255,255,0.7);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .chat-message.other .msg-time {
     color: var(--text-gray);
 }
 
-/* ===== ورودی پیام (چسبیده به کیبورد) ===== */
+/* ===== کادر ورودی (همیشه پایین و چسبیده به منو) ===== */
 .chat-input-fixed {
     flex-shrink: 0;
     padding: 8px 0 10px 0;
@@ -1390,12 +1428,12 @@ body {
     transition: var(--transition);
     outline: none;
     height: 52px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .chat-input-wrapper input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(230,126,34,0.08);
+    box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.08);
 }
 
 .chat-input-wrapper input::placeholder {
@@ -1417,12 +1455,12 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 20px rgba(230,126,34,0.25);
+    box-shadow: 0 4px 20px rgba(230, 126, 34, 0.25);
 }
 
 .chat-input-wrapper button:hover:not(:disabled) {
     transform: scale(1.05);
-    box-shadow: 0 4px 25px rgba(230,126,34,0.35);
+    box-shadow: 0 4px 25px rgba(230, 126, 34, 0.35);
 }
 
 .chat-input-wrapper button:disabled {
