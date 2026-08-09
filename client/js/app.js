@@ -40,14 +40,58 @@ const consultSubmitBtn = document.getElementById('consultSubmitBtn');
 const consultSubmitText = document.getElementById('consultSubmitText');
 const consultSubmitLoader = document.getElementById('consultSubmitLoader');
 
-// ===== متغیرهای چت =====
 let chatInitialized = false;
 let chatChannel = null;
 let pusherInstance = null;
 const PUSHER_KEY = 'c001529546705bdb1a57';
 const PUSHER_CLUSTER = 'eu';
 
-// ===== توابع کمکی =====
+// ============================================================
+// متغیرهای زمان (دریافت از سرور)
+// ============================================================
+let serverTimeOffset = 0;
+let serverTimeInterval = null;
+
+async function fetchServerTime() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/time`);
+        const data = await response.json();
+        const serverDate = new Date(data.time);
+        serverTimeOffset = serverDate.getTime() - Date.now();
+        return serverDate;
+    } catch (error) {
+        console.error('❌ خطا در دریافت زمان سرور:', error);
+        return new Date();
+    }
+}
+
+function getCurrentServerTime() {
+    return new Date(Date.now() + serverTimeOffset);
+}
+
+function updateChatClock() {
+    const clockElement = document.getElementById('chatClock');
+    if (!clockElement) return;
+    const now = getCurrentServerTime();
+    const timeStr = now.toLocaleTimeString('fa-IR', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    const dateStr = now.toLocaleDateString('fa-IR');
+    clockElement.textContent = `${dateStr} - ${timeStr}`;
+}
+
+async function initServerTime() {
+    await fetchServerTime();
+    if (serverTimeInterval) clearInterval(serverTimeInterval);
+    serverTimeInterval = setInterval(updateChatClock, 1000);
+    updateChatClock();
+}
+
+// ============================================================
+// توابع کمکی
+// ============================================================
 function showLoader(btnId, loaderId, textId, show) {
     const btn = document.getElementById(btnId);
     const loader = document.getElementById(loaderId);
@@ -140,7 +184,6 @@ function getAuthHeaders() {
     };
 }
 
-// ===== احراز هویت =====
 async function registerUser(name, email, password) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -198,7 +241,6 @@ async function checkSession() {
     }
 }
 
-// ===== مدیریت ایده‌ها =====
 async function submitIdea(content, category, innovation, market, stage) {
     if (!currentToken) {
         showFeedback('لطفاً ابتدا وارد شوید.', false);
@@ -288,7 +330,7 @@ async function loadAccountInfo() {
 }
 
 // ============================================================
-// بخش چت (گفتگو) - نسخه نهایی
+// بخش چت (گفتگو)
 // ============================================================
 
 function showChatOverlay() {
@@ -318,6 +360,7 @@ function initChat() {
 
     showChatOverlay().then(() => {
         loadChatMessages();
+        initServerTime();
     });
 
     const sendBtn = document.getElementById('sendChatBtn');
@@ -354,7 +397,6 @@ function initChat() {
         setTimeout(() => { chatInitialized = false; initChat(); }, 5000);
     }
 
-    // ===== تنظیم viewport برای کیبورد (چسباندن کادر ورودی) =====
     if ('visualViewport' in window) {
         const viewport = window.visualViewport;
         const inputFixed = document.getElementById('chatInputFixed');
@@ -624,6 +666,7 @@ logoutBtn.addEventListener('click', () => {
     currentUserId = null;
     currentUserData = null;
     chatInitialized = false;
+    if (serverTimeInterval) clearInterval(serverTimeInterval);
     showPage('landingPage');
 });
 
