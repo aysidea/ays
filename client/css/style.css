@@ -1145,16 +1145,16 @@ body {
 }
 
 /* ============================================================
-   صفحه گفتگو (چت) - نسخه نهایی
+   صفحه گفتگو (چت)
    ============================================================ */
 
-/* ===== اورلی (کاور ۴ ثانیه) ===== */
 .chat-overlay {
     position: fixed;
     inset: 0;
     z-index: 2000;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(14px);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: none;
     align-items: center;
     justify-content: center;
@@ -1170,14 +1170,8 @@ body {
 }
 
 @keyframes overlayFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 .chat-overlay-content {
@@ -1187,21 +1181,18 @@ body {
     max-width: 400px;
     width: 90%;
     animation: overlayContent 0.8s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 @keyframes overlayContent {
-    0% {
-        transform: translateY(40px) scale(0.9);
-        opacity: 0;
-    }
-    60% {
-        transform: translateY(-8px) scale(1.02);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
+    0% { transform: translateY(40px) scale(0.9); opacity: 0; }
+    60% { transform: translateY(-8px) scale(1.02); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .chat-overlay-icon {
@@ -1212,13 +1203,8 @@ body {
 }
 
 @keyframes iconPulse {
-    0%,
-    100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.15);
-    }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
 }
 
 .chat-overlay-content h2 {
@@ -1256,27 +1242,14 @@ body {
     animation: loaderBounce 1.2s ease infinite;
 }
 
-.overlay-loader span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-.overlay-loader span:nth-child(3) {
-    animation-delay: 0.4s;
-}
+.overlay-loader span:nth-child(2) { animation-delay: 0.2s; }
+.overlay-loader span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes loaderBounce {
-    0%,
-    80%,
-    100% {
-        transform: scale(0.6);
-        opacity: 0.4;
-    }
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
 }
 
-/* ===== کانتینر اصلی چت ===== */
 .chat-wrapper {
     display: flex;
     flex-direction: column;
@@ -1286,51 +1259,10 @@ body {
     width: 100%;
     padding: 0 15px;
     position: relative;
-    padding-top: 65px;
+    padding-top: 70px;
     padding-bottom: 70px;
 }
 
-/* ===== خط تزیینی ===== */
-.chat-divider-line {
-    padding: 6px 0 4px 0;
-    flex-shrink: 0;
-    margin-top: 8px;
-}
-
-.divider-line {
-    width: 100%;
-    height: 3px;
-    border-radius: 4px;
-    background: linear-gradient(90deg, #00CED1, #FF6B00, #4FC3F7, #00CED1);
-    background-size: 300% 100%;
-    animation: gradientMove 4s ease infinite;
-}
-
-@keyframes gradientMove {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-/* ===== ساعت چت ===== */
-.chat-clock {
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--text-gray);
-    padding: 4px 0 6px 0;
-    font-family: 'AradVF', 'Tahoma', sans-serif;
-    border-bottom: 1px solid var(--border-light);
-    margin-bottom: 6px;
-    direction: ltr;
-}
-
-/* ===== پیام‌ها ===== */
 .chat-messages-scroll {
     flex: 1;
     overflow-y: auto;
@@ -1353,7 +1285,6 @@ body {
     background: transparent;
 }
 
-/* ===== پیام ===== */
 .chat-message {
     max-width: 78%;
     padding: 8px 14px;
@@ -1414,7 +1345,6 @@ body {
     color: var(--text-gray);
 }
 
-/* ===== کادر ورودی (کاملاً ثابت و چسبیده به منو) ===== */
 .chat-input-fixed {
     position: fixed;
     bottom: 70px;
@@ -1488,10 +1418,6 @@ body {
     cursor: not-allowed;
 }
 
-/* ============================================================
-   واکنش‌گرایی
-   ============================================================ */
-
 @media (max-width: 992px) {
     .collage-modern {
         grid-template-columns: 1fr 1fr;
@@ -1558,7 +1484,7 @@ body {
     }
     .chat-wrapper {
         padding: 0 10px;
-        padding-top: 65px;
+        padding-top: 70px;
         padding-bottom: 70px;
     }
     .chat-message {
@@ -1579,12 +1505,6 @@ body {
         height: 46px;
         font-size: 1.1rem;
     }
-    .chat-divider-line {
-        padding: 4px 0;
-    }
-    .divider-line {
-        height: 2px;
-    }
     .chat-overlay-content {
         padding: 24px 28px;
     }
@@ -1600,10 +1520,6 @@ body {
     .chat-input-fixed {
         bottom: 70px;
         padding: 6px 10px 8px 10px;
-    }
-    .chat-clock {
-        font-size: 0.65rem;
-        padding: 3px 0 4px 0;
     }
 }
 
@@ -1643,7 +1559,7 @@ body {
     }
     .chat-wrapper {
         padding: 0 8px;
-        padding-top: 55px;
+        padding-top: 60px;
         padding-bottom: 60px;
     }
     .chat-message {
@@ -1670,12 +1586,6 @@ body {
         width: 40px;
         height: 40px;
         font-size: 0.95rem;
-    }
-    .chat-divider-line {
-        padding: 3px 0;
-    }
-    .divider-line {
-        height: 2px;
     }
     .chat-overlay-content {
         padding: 18px 20px;
@@ -1704,9 +1614,5 @@ body {
     .chat-input-fixed {
         bottom: 60px;
         padding: 6px 8px 8px 8px;
-    }
-    .chat-clock {
-        font-size: 0.6rem;
-        padding: 3px 0 4px 0;
     }
 }
