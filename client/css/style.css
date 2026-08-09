@@ -1145,71 +1145,136 @@ body {
 }
 
 /* ============================================================
-   صفحه گفتگو (چت)
+   صفحه گفتگو (چت) - نسخه نهایی
    ============================================================ */
 
-/* ===== هشدارهای موقت (۵ ثانیه) ===== */
-.chat-alerts-container {
+/* ===== اورلی (کاور ۴ ثانیه) ===== */
+.chat-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(14px);
     display: none;
-    flex-direction: column;
-    gap: 4px;
-    padding: 4px 0;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: overlayFadeIn 0.6s ease forwards;
+    pointer-events: all;
+}
+
+.chat-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
     transition: opacity 0.5s ease;
 }
 
-.chat-alert-item {
-    background: linear-gradient(135deg, #FFF8F0, #FDF6ED);
-    border: 1px solid #F0E0D0;
-    border-radius: 10px;
-    padding: 5px 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.7rem;
-    color: var(--text-gray);
+@keyframes overlayFadeIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-.chat-alert-item i {
-    color: var(--primary);
-    font-size: 0.85rem;
-}
-
-/* ===== خط تزئینی ===== */
-.chat-divider {
-    padding: 4px 0;
+.chat-overlay-content {
     text-align: center;
-    flex-shrink: 0;
+    color: #fff;
+    padding: 30px 40px;
+    max-width: 400px;
+    width: 90%;
+    animation: overlayContent 0.8s ease;
 }
 
-.divider-svg {
-    width: 100%;
-    max-width: 200px;
-    height: 20px;
-    display: block;
-    margin: 0 auto;
+@keyframes overlayContent {
+    0% { transform: translateY(40px) scale(0.9); opacity: 0; }
+    60% { transform: translateY(-8px) scale(1.02); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-.divider-svg path {
-    stroke-dasharray: 300;
-    stroke-dashoffset: 300;
-    animation: drawLine 3s ease forwards infinite;
+.chat-overlay-icon {
+    font-size: 4.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+    animation: iconPulse 1.5s ease infinite;
 }
 
-@keyframes drawLine {
-    0% { stroke-dashoffset: 300; }
-    100% { stroke-dashoffset: 0; }
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.chat-overlay-content h2 {
+    font-family: 'Shoklat', sans-serif;
+    font-size: 2.2rem;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.chat-overlay-content p {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.8;
+    margin-bottom: 4px;
+}
+
+.chat-overlay-content .overlay-sub {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 8px;
+}
+
+.overlay-loader {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.overlay-loader span {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: loaderBounce 1.2s ease infinite;
+}
+
+.overlay-loader span:nth-child(2) { animation-delay: 0.2s; }
+.overlay-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes loaderBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
 }
 
 /* ===== کانتینر چت ===== */
 .chat-wrapper {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 155px);
+    height: calc(100vh - 65px - 70px);
     max-width: 700px;
     margin: 0 auto;
     width: 100%;
     padding: 0 15px;
     position: relative;
+}
+
+/* ===== خط تزیینی ===== */
+.chat-divider-line {
+    padding: 6px 0 4px 0;
+    flex-shrink: 0;
+}
+
+.divider-line {
+    width: 100%;
+    height: 3px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #00CED1, #FF6B00, #4FC3F7, #00CED1);
+    background-size: 300% 100%;
+    animation: gradientMove 4s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* ===== پیام‌ها ===== */
@@ -1237,13 +1302,13 @@ body {
 
 /* ===== پیام ===== */
 .chat-message {
-    max-width: 75%;
-    padding: 6px 12px;
-    border-radius: 14px;
+    max-width: 78%;
+    padding: 8px 14px;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
     word-wrap: break-word;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
@@ -1264,7 +1329,7 @@ body {
 .chat-message .msg-user {
     font-size: 0.6rem;
     font-weight: 600;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
 }
 
 .chat-message.own .msg-user {
@@ -1276,15 +1341,15 @@ body {
 }
 
 .chat-message .msg-content {
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.9rem;
+    line-height: 1.5;
     font-family: 'AradVF', 'Tahoma', sans-serif;
 }
 
 .chat-message .msg-time {
     font-size: 0.5rem;
     opacity: 0.6;
-    margin-top: 2px;
+    margin-top: 3px;
     align-self: flex-end;
 }
 
@@ -1299,7 +1364,7 @@ body {
 /* ===== ورودی پیام (چسبیده به کیبورد) ===== */
 .chat-input-fixed {
     flex-shrink: 0;
-    padding: 6px 0 8px 0;
+    padding: 8px 0 10px 0;
     background: var(--bg-body);
     border-top: 1px solid var(--border-light);
     position: sticky;
@@ -1310,22 +1375,22 @@ body {
 
 .chat-input-wrapper {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
 }
 
 .chat-input-wrapper input {
     flex: 1;
-    padding: 10px 16px;
+    padding: 12px 18px;
     border: 2px solid var(--border-light);
     border-radius: 30px;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-family: 'AradVF', 'Tahoma', sans-serif;
     background: #fff;
     transition: var(--transition);
     outline: none;
-    height: 48px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    height: 52px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
 .chat-input-wrapper input:focus {
@@ -1335,29 +1400,29 @@ body {
 
 .chat-input-wrapper input::placeholder {
     color: #B0A8A0;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
 .chat-input-wrapper button {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     border: none;
     background: var(--primary);
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 15px rgba(230,126,34,0.2);
+    box-shadow: 0 4px 20px rgba(230,126,34,0.25);
 }
 
 .chat-input-wrapper button:hover:not(:disabled) {
     transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(230,126,34,0.3);
+    box-shadow: 0 4px 25px rgba(230,126,34,0.35);
 }
 
 .chat-input-wrapper button:disabled {
@@ -1435,36 +1500,43 @@ body {
     }
     .chat-wrapper {
         padding: 0 10px;
-        height: calc(100vh - 145px);
+        height: calc(100vh - 65px - 70px);
     }
     .chat-message {
         max-width: 85%;
-        padding: 5px 10px;
-        font-size: 0.85rem;
+        padding: 6px 12px;
+        font-size: 0.88rem;
     }
     .chat-message .msg-content {
-        font-size: 0.8rem;
+        font-size: 0.84rem;
     }
     .chat-input-wrapper input {
-        font-size: 0.85rem;
-        padding: 7px 12px;
-        height: 40px;
+        font-size: 0.9rem;
+        padding: 10px 16px;
+        height: 46px;
     }
     .chat-input-wrapper button {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
+        width: 46px;
+        height: 46px;
+        font-size: 1.1rem;
     }
-    .chat-alert-item {
-        font-size: 0.65rem;
-        padding: 4px 10px;
+    .chat-divider-line {
+        padding: 4px 0;
     }
-    .chat-divider {
-        padding: 3px 0;
+    .divider-line {
+        height: 2px;
     }
-    .divider-svg {
-        height: 18px;
-        max-width: 160px;
+    .chat-overlay-content {
+        padding: 24px 28px;
+    }
+    .chat-overlay-content h2 {
+        font-size: 1.8rem;
+    }
+    .chat-overlay-content p {
+        font-size: 0.95rem;
+    }
+    .chat-overlay-icon {
+        font-size: 3.8rem;
     }
 }
 
@@ -1503,16 +1575,16 @@ body {
         padding: 12px 14px;
     }
     .chat-wrapper {
-        height: calc(100vh - 125px);
+        height: calc(100vh - 55px - 70px);
         padding: 0 8px;
     }
     .chat-message {
         max-width: 90%;
-        padding: 4px 10px;
-        font-size: 0.8rem;
+        padding: 5px 10px;
+        font-size: 0.82rem;
     }
     .chat-message .msg-content {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
     }
     .chat-message .msg-user {
         font-size: 0.55rem;
@@ -1521,33 +1593,44 @@ body {
         font-size: 0.45rem;
     }
     .chat-input-wrapper input {
-        font-size: 0.8rem;
-        padding: 6px 12px;
-        height: 36px;
+        font-size: 0.85rem;
+        padding: 8px 14px;
+        height: 40px;
         border-radius: 25px;
     }
     .chat-input-wrapper button {
-        width: 36px;
-        height: 36px;
-        font-size: 0.9rem;
+        width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
     }
-    .chat-alerts-container {
-        gap: 3px;
+    .chat-divider-line {
         padding: 3px 0;
     }
-    .chat-alert-item {
-        font-size: 0.6rem;
-        padding: 3px 8px;
-        gap: 4px;
+    .divider-line {
+        height: 2px;
     }
-    .chat-alert-item i {
-        font-size: 0.7rem;
+    .chat-overlay-content {
+        padding: 18px 20px;
     }
-    .chat-divider {
-        padding: 2px 0;
+    .chat-overlay-content h2 {
+        font-size: 1.5rem;
     }
-    .divider-svg {
-        height: 14px;
-        max-width: 120px;
+    .chat-overlay-content p {
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+    .chat-overlay-content .overlay-sub {
+        font-size: 0.75rem;
+    }
+    .chat-overlay-icon {
+        font-size: 3rem;
+    }
+    .overlay-loader span {
+        width: 10px;
+        height: 10px;
+    }
+    .overlay-loader {
+        gap: 8px;
+        margin-top: 16px;
     }
 }
