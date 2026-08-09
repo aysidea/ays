@@ -230,34 +230,21 @@
 
         <!-- گفتگو (چت) -->
         <section id="chatPage" class="page">
-            <!-- اورلی (کادر هدف از گفتگو - ۴ ثانیه) -->
+            <!-- اورلی (۴ ثانیه) -->
             <div id="chatOverlay" class="chat-overlay">
                 <div class="chat-overlay-content">
-                    <div class="chat-overlay-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
+                    <div class="chat-overlay-icon"><i class="fas fa-comments"></i></div>
                     <h2>💬 گفتگو</h2>
                     <p>اینجا فضایی برای همفکری و تبادل نظر است.</p>
                     <p class="overlay-sub">پیام‌ها پس از ۱۴ روز حذف می‌شوند</p>
-                    <div class="overlay-loader">
-                        <span></span><span></span><span></span>
-                    </div>
+                    <div class="overlay-loader"><span></span><span></span><span></span></div>
                 </div>
             </div>
 
             <div class="chat-wrapper">
-                <!-- خط تزیینی (بالای صفحه) -->
-                <div class="chat-divider-line">
-                    <div class="divider-line"></div>
-                </div>
-
-                <!-- پیام‌ها -->
-                <div id="chatMessages" class="chat-messages-scroll">
-                    <!-- پیام‌ها اینجا قرار می‌گیرند -->
-                </div>
-
-                <!-- ورودی پیام -->
-                <div class="chat-input-fixed" id="chatInputFixed">
+                <div class="chat-divider-line"><div class="divider-line"></div></div>
+                <div id="chatMessages" class="chat-messages-scroll"></div>
+                <div id="chatInputFixed" class="chat-input-fixed">
                     <div class="chat-input-wrapper">
                         <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." />
                         <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
