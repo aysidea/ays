@@ -8,6 +8,7 @@ const pages = {
     register: document.getElementById('registerPage'),
     dashboard: document.getElementById('dashboardPage'),
     myIdeas: document.getElementById('myIdeasPage'),
+    chat: document.getElementById('chatPage'),
     account: document.getElementById('accountPage'),
     about: document.getElementById('aboutPage'),
 };
@@ -39,6 +40,14 @@ const consultSubmitBtn = document.getElementById('consultSubmitBtn');
 const consultSubmitText = document.getElementById('consultSubmitText');
 const consultSubmitLoader = document.getElementById('consultSubmitLoader');
 
+// ===== متغیرهای چت =====
+let chatInitialized = false;
+let chatChannel = null;
+let pusherInstance = null;
+const PUSHER_KEY = 'c001529546705bdb1a57';
+const PUSHER_CLUSTER = 'eu';
+
+// ===== توابع کمکی =====
 function showLoader(btnId, loaderId, textId, show) {
     const btn = document.getElementById(btnId);
     const loader = document.getElementById(loaderId);
@@ -56,9 +65,29 @@ function showLoader(btnId, loaderId, textId, show) {
 }
 
 function showPage(pageId) {
-    // ===== اگر صفحه گفتگو بود، به آدرس جداگانه برو =====
+    // ===== اگر صفحه چت بود، مقداردهی اولیه کن =====
     if (pageId === 'chatPage') {
-        window.location.href = '/chat.html';
+        Object.values(pages).forEach(p => p.classList.remove('active'));
+        const target = document.getElementById(pageId);
+        if (target) target.classList.add('active');
+
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.page === pageId) {
+                item.classList.add('active');
+            }
+        });
+
+        header.classList.remove('hidden-header');
+        bottomNav.classList.remove('hidden-nav');
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.inset = '';
+
+        if (currentToken) {
+            consultBtn.style.display = 'none';
+            setTimeout(() => initChat(), 200);
+        }
         return;
     }
 
@@ -113,6 +142,7 @@ function getAuthHeaders() {
     };
 }
 
+// ===== احراز هویت =====
 async function registerUser(name, email, password) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -166,6 +196,7 @@ async function checkSession() {
     }
 }
 
+// ===== مدیریت ایده‌ها =====
 async function submitIdea(content, category, innovation, market, stage) {
     if (!currentToken) {
         showFeedback('لطفاً ابتدا وارد شوید.', false);
@@ -262,6 +293,168 @@ async function loadAccountInfo() {
         accountInfo.innerHTML = `<p style="color:#C0392B;">${error.message || 'خطا در دریافت اطلاعات.'}</p>`;
     }
 }
+
+// ============================================================
+// بخش چت (گفتگو)
+// ============================================================
+
+function initChat() {
+    if (chatInitialized) return;
+    chatInitialized = true;
+
+    const token = localStorage.getItem('ays_token');
+    if (!token) return;
+
+    // ===== نمایش هشدارها به مدت ۵ ثانیه =====
+    const alerts = document.getElementById('chatAlerts');
+    if (alerts) {
+        alerts.style.display = 'flex';
+        alerts.style.opacity = '1';
+        setTimeout(() => {
+            alerts.style.opacity = '0';
+            alerts.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                alerts.style.display = 'none';
+            }, 500);
+        }, 5000);
+    }
+
+    // ===== بارگذاری پیام‌ها =====
+    loadChatMessages();
+
+    // ===== رویدادهای ارسال پیام =====
+    const sendBtn = document.getElementById('sendChatBtn');
+    const input = document.getElementById('chatInput');
+
+    sendBtn?.addEventListener('click', sendChatMessage);
+    input?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+    });
+
+    // ===== تنظیم Pusher =====
+    pusherInstance = new Pusher(PUSHER_KEY, {
+        cluster: PUSHER_CLUSTER,
+        authEndpoint: `${API_BASE_URL}/pusher-auth`,
+        auth: { headers: { Authorization: `Bearer ${token}` } }
+    });
+
+    chatChannel = pusherInstance.subscribe('presence-chat-channel');
+
+    chatChannel.bind('new-message', function(data) {
+        console.log('📩 پیام جدید:', data);
+        const container = document.getElementById('chatMessages');
+        const isOwn = data.user_id == currentUserId;
+        const msgElement = createChatMessageElement(data, isOwn);
+        container.appendChild(msgElement);
+        scrollChatToBottom();
+    });
+
+    pusherInstance.connection.bind('error', function(err) {
+        console.error('❌ خطای Pusher:', err);
+    });
+
+    // ===== تنظیم viewport برای کیبورد =====
+    if ('visualViewport' in window) {
+        const viewport = window.visualViewport;
+        const inputFixed = document.getElementById('chatInputFixed');
+
+        viewport.addEventListener('resize', function() {
+            if (inputFixed) {
+                const heightDiff = window.innerHeight - viewport.height;
+                if (heightDiff > 100) {
+                    inputFixed.style.bottom = heightDiff + 'px';
+                } else {
+                    inputFixed.style.bottom = '0';
+                }
+            }
+        });
+    }
+}
+
+async function loadChatMessages() {
+    const token = localStorage.getItem('ays_token');
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/group-messages`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('خطا در دریافت پیام‌ها');
+        const messages = await response.json();
+        container.innerHTML = '';
+        messages.forEach(msg => {
+            const isOwn = msg.user_id == currentUserId;
+            container.appendChild(createChatMessageElement(msg, isOwn));
+        });
+        scrollChatToBottom();
+    } catch (error) {
+        console.error('❌ خطا در دریافت پیام‌ها:', error);
+    }
+}
+
+function createChatMessageElement(msg, isOwn) {
+    const div = document.createElement('div');
+    div.className = `chat-message ${isOwn ? 'own' : 'other'}`;
+
+    const date = new Date(msg.created_at);
+    const timeStr = date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = date.toLocaleDateString('fa-IR');
+
+    div.innerHTML = `
+        <span class="msg-user">${isOwn ? 'شما' : msg.user_name}</span>
+        <span class="msg-content">${msg.content}</span>
+        <span class="msg-time">${dateStr} - ${timeStr}</span>
+    `;
+    return div;
+}
+
+function scrollChatToBottom() {
+    const container = document.getElementById('chatMessages');
+    if (container) {
+        setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+        }, 50);
+    }
+}
+
+async function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const content = input.value.trim();
+    if (!content) return;
+
+    const token = localStorage.getItem('ays_token');
+    const sendBtn = document.getElementById('sendChatBtn');
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.6';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/group-messages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ content })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            alert('خطا: ' + (data.error || 'مشکل در ارسال'));
+            return;
+        }
+        input.value = '';
+    } catch (error) {
+        console.error('❌ خطا در ارسال:', error);
+        alert('خطا در ارتباط با سرور');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+    }
+}
+
+// ============================================================
+// رویدادها
+// ============================================================
 
 startBtn.addEventListener('click', function() {
     showLoader('startBtn', 'startBtnLoader', 'startBtnText', true);
@@ -388,7 +581,6 @@ document.querySelectorAll('.btn-prev-step').forEach(btn => {
 });
 
 submitIdeaBtn.addEventListener('click', async () => {
-    // ===== غیرفعال کردن دکمه برای جلوگیری از ارسال دوباره =====
     submitIdeaBtn.disabled = true;
     submitIdeaBtn.style.opacity = '0.7';
 
@@ -426,8 +618,6 @@ submitIdeaBtn.addEventListener('click', async () => {
     }
 
     showLoader('submitIdeaBtn', 'submitIdeaLoader', 'submitIdeaText', false);
-    
-    // ===== فعال کردن مجدد دکمه =====
     submitIdeaBtn.disabled = false;
     submitIdeaBtn.style.opacity = '1';
 });
@@ -449,6 +639,7 @@ logoutBtn.addEventListener('click', () => {
     currentToken = null;
     currentUserId = null;
     currentUserData = null;
+    chatInitialized = false;
     showPage('landingPage');
 });
 
