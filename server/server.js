@@ -18,7 +18,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
 
-// ===== تنظیم Pusher =====
 const pusher = new Pusher({
     appId: process.env.PUSHER_APP_ID,
     key: process.env.PUSHER_KEY,
@@ -27,7 +26,6 @@ const pusher = new Pusher({
     useTLS: true
 });
 
-// ===== لاگر =====
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -124,7 +122,6 @@ db.serialize(() => {
     `);
 });
 
-// ===== توابع کمکی =====
 function sanitizeInput(input) {
     if (typeof input !== 'string') return input;
     return validator.escape(input.trim());
@@ -170,21 +167,19 @@ function getCategoryText(value) {
     return map[value] || value || 'متفرقه';
 }
 
-// ===== پاک کردن پیام‌های قدیمی (بعد از ۱۴ روز) =====
 function cleanOldMessages() {
     db.run(
         `DELETE FROM group_messages 
          WHERE created_at < datetime('now', '-14 days')`,
         (err) => {
             if (err) console.error('خطا در پاک کردن پیام‌های قدیمی:', err);
-            else console.log('✅ پیام‌های قدیمی پاک شدند.');
+            else console.log('پیام‌های قدیمی پاک شدند.');
         }
     );
 }
 setInterval(cleanOldMessages, 12 * 60 * 60 * 1000);
 cleanOldMessages();
 
-// ===== تشخیص حملات =====
 function detectAttack(req, res, next) {
     const patterns = [/<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
         /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i, /--/, /;/, /\/\*/, /\*\//];
@@ -200,10 +195,10 @@ function detectAttack(req, res, next) {
         }
     }
     if (found) {
-        sendAlertToTelegram('SECURITY', `🚨 تلاش برای نفوذ: ${detected.substring(0, 100)}`, {
+        sendAlertToTelegram('SECURITY', `تلاش برای نفوذ: ${detected.substring(0, 100)}`, {
             ip: req.ip, path: req.path, user: req.user?.email || 'مهمان'
         });
-        logger.warn(`🚨 حمله: ${req.path} از ${req.ip}`);
+        logger.warn(`حمله: ${req.path} از ${req.ip}`);
         return res.status(403).json({ error: 'درخواست غیرمجاز' });
     }
     next();
@@ -216,7 +211,7 @@ function authenticateToken(req, res, next) {
     if (!token) return res.status(401).json({ error: 'دسترسی غیرمجاز' });
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
-            sendAlertToTelegram('WARNING', `⚠️ توکن نامعتبر: ${err.message}`, { ip: req.ip, path: req.path });
+            sendAlertToTelegram('WARNING', `توکن نامعتبر: ${err.message}`, { ip: req.ip, path: req.path });
             return res.status(403).json({ error: 'توکن نامعتبر' });
         }
         req.user = user;
@@ -224,9 +219,6 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// ============================================================
-// مسیرهای احراز هویت
-// ============================================================
 app.post('/api/register', async (req, res) => {
     const { email, name, password } = req.body;
     if (!email || !name || !password) return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
@@ -293,9 +285,6 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
     });
 });
 
-// ============================================================
-// مسیرهای ایده
-// ============================================================
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { content, category, innovation, market, stage } = req.body;
@@ -389,9 +378,6 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
     );
 });
 
-// ============================================================
-// مسیرهای مشاوره
-// ============================================================
 app.post('/api/consultation', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { phone, topic, description } = req.body;
@@ -422,10 +408,6 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
         );
     });
 });
-
-// ============================================================
-// مسیرهای گفتگو (چت گروهی)
-// ============================================================
 
 app.get('/api/group-messages', authenticateToken, (req, res) => {
     db.all(
@@ -511,8 +493,16 @@ app.post('/api/pusher-auth', authenticateToken, (req, res) => {
 });
 
 // ============================================================
-// مسیرهای عمومی
+// ===== دریافت زمان سرور (برای نمایش ساعت دقیق) =====
 // ============================================================
+app.get('/api/time', (req, res) => {
+    const now = new Date();
+    res.json({
+        time: now.toISOString(),
+        timestamp: now.getTime()
+    });
+});
+
 app.get('/idea/:id', (req, res) => {
     const ideaId = req.params.id;
     
