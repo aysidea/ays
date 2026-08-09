@@ -133,24 +133,6 @@ body {
     letter-spacing: 3px;
 }
 
-.back-btn {
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0 10px;
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-}
-
-.back-btn:hover {
-    color: var(--primary-dark);
-}
-
 #bottomNav {
     position: fixed;
     bottom: 0;
@@ -1162,20 +1144,67 @@ body {
     }
 }
 
-/* ===== صفحه گفتگو ===== */
-#chatMain {
-    padding-top: 65px;
-    padding-bottom: 0;
-    min-height: 100vh;
-    display: flex;
+/* ============================================================
+   صفحه گفتگو (چت)
+   ============================================================ */
+
+/* ===== هشدارهای موقت (۵ ثانیه) ===== */
+.chat-alerts-container {
+    display: none;
     flex-direction: column;
-    background: var(--bg-body);
+    gap: 4px;
+    padding: 4px 0;
+    transition: opacity 0.5s ease;
 }
 
+.chat-alert-item {
+    background: linear-gradient(135deg, #FFF8F0, #FDF6ED);
+    border: 1px solid #F0E0D0;
+    border-radius: 10px;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: var(--text-gray);
+}
+
+.chat-alert-item i {
+    color: var(--primary);
+    font-size: 0.85rem;
+}
+
+/* ===== خط تزئینی ===== */
+.chat-divider {
+    padding: 4px 0;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.divider-svg {
+    width: 100%;
+    max-width: 200px;
+    height: 20px;
+    display: block;
+    margin: 0 auto;
+}
+
+.divider-svg path {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: drawLine 3s ease forwards infinite;
+}
+
+@keyframes drawLine {
+    0% { stroke-dashoffset: 300; }
+    100% { stroke-dashoffset: 0; }
+}
+
+/* ===== کانتینر چت ===== */
 .chat-wrapper {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 65px);
+    height: calc(100vh - 155px);
     max-width: 700px;
     margin: 0 auto;
     width: 100%;
@@ -1183,79 +1212,7 @@ body {
     position: relative;
 }
 
-.chat-header-fixed {
-    flex-shrink: 0;
-    padding: 8px 0 4px 0;
-    background: var(--bg-body);
-    z-index: 5;
-}
-
-.chat-header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-    border-bottom: 1px solid var(--border-light);
-    margin-bottom: 6px;
-}
-
-.chat-header-content h2 {
-    font-family: 'Shoklat', sans-serif;
-    font-size: 1.2rem;
-    color: var(--text-dark);
-}
-
-.online-count {
-    font-size: 0.7rem;
-    color: var(--text-gray);
-}
-
-.chat-info-box {
-    background: linear-gradient(135deg, #FFF8F0, #FDF6ED);
-    border: 1px solid #F0E0D0;
-    border-radius: 12px;
-    padding: 8px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 6px;
-}
-
-.chat-info-box i {
-    color: var(--primary);
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-
-.chat-info-text {
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: var(--text-dark);
-    font-family: 'AradVF', 'Tahoma', sans-serif;
-}
-
-.chat-info-text strong {
-    color: var(--primary);
-}
-
-.chat-rules {
-    background: #FFF8F0;
-    border: 1px solid var(--border-light);
-    border-radius: 10px;
-    padding: 6px 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.7rem;
-    color: var(--text-gray);
-    margin-bottom: 6px;
-}
-
-.chat-rules i {
-    color: var(--primary);
-    font-size: 0.9rem;
-}
-
+/* ===== پیام‌ها ===== */
 .chat-messages-scroll {
     flex: 1;
     overflow-y: auto;
@@ -1278,6 +1235,7 @@ body {
     background: transparent;
 }
 
+/* ===== پیام ===== */
 .chat-message {
     max-width: 75%;
     padding: 6px 12px;
@@ -1286,6 +1244,7 @@ body {
     flex-direction: column;
     word-wrap: break-word;
     font-size: 0.9rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .chat-message.other {
@@ -1337,14 +1296,16 @@ body {
     color: var(--text-gray);
 }
 
+/* ===== ورودی پیام (چسبیده به کیبورد) ===== */
 .chat-input-fixed {
     flex-shrink: 0;
-    padding: 6px 0 12px 0;
+    padding: 6px 0 8px 0;
     background: var(--bg-body);
     border-top: 1px solid var(--border-light);
     position: sticky;
     bottom: 0;
     z-index: 10;
+    transition: bottom 0.2s ease;
 }
 
 .chat-input-wrapper {
@@ -1355,52 +1316,58 @@ body {
 
 .chat-input-wrapper input {
     flex: 1;
-    padding: 8px 14px;
-    border: 1px solid var(--border-light);
+    padding: 10px 16px;
+    border: 2px solid var(--border-light);
     border-radius: 30px;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-family: 'AradVF', 'Tahoma', sans-serif;
     background: #fff;
     transition: var(--transition);
     outline: none;
-    height: 42px;
+    height: 48px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
 .chat-input-wrapper input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(230,126,34,0.08);
+    box-shadow: 0 0 0 4px rgba(230,126,34,0.08);
 }
 
 .chat-input-wrapper input::placeholder {
     color: #B0A8A0;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 }
 
 .chat-input-wrapper button {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: none;
     background: var(--primary);
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(230,126,34,0.2);
 }
 
 .chat-input-wrapper button:hover:not(:disabled) {
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(230,126,34,0.25);
+    box-shadow: 0 4px 20px rgba(230,126,34,0.3);
 }
 
 .chat-input-wrapper button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* ============================================================
+   واکنش‌گرایی
+   ============================================================ */
 
 @media (max-width: 992px) {
     .collage-modern {
@@ -1468,6 +1435,7 @@ body {
     }
     .chat-wrapper {
         padding: 0 10px;
+        height: calc(100vh - 145px);
     }
     .chat-message {
         max-width: 85%;
@@ -1487,15 +1455,16 @@ body {
         height: 40px;
         font-size: 1rem;
     }
-    .chat-info-text {
-        font-size: 0.78rem;
+    .chat-alert-item {
+        font-size: 0.65rem;
+        padding: 4px 10px;
     }
-    .chat-header-content h2 {
-        font-size: 1.1rem;
+    .chat-divider {
+        padding: 3px 0;
     }
-    .back-btn {
-        font-size: 1.2rem;
-        right: 10px;
+    .divider-svg {
+        height: 18px;
+        max-width: 160px;
     }
 }
 
@@ -1534,7 +1503,7 @@ body {
         padding: 12px 14px;
     }
     .chat-wrapper {
-        height: calc(100vh - 65px);
+        height: calc(100vh - 125px);
         padding: 0 8px;
     }
     .chat-message {
@@ -1562,41 +1531,23 @@ body {
         height: 36px;
         font-size: 0.9rem;
     }
-    .chat-info-text {
+    .chat-alerts-container {
+        gap: 3px;
+        padding: 3px 0;
+    }
+    .chat-alert-item {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+        gap: 4px;
+    }
+    .chat-alert-item i {
         font-size: 0.7rem;
     }
-    .chat-info-box {
-        padding: 6px 10px;
-        gap: 6px;
+    .chat-divider {
+        padding: 2px 0;
     }
-    .chat-info-box i {
-        font-size: 0.9rem;
-    }
-    .chat-header-content h2 {
-        font-size: 0.95rem;
-    }
-    .online-count {
-        font-size: 0.55rem;
-    }
-    .chat-rules {
-        font-size: 0.55rem;
-        padding: 4px 8px;
-    }
-    .chat-rules i {
-        font-size: 0.7rem;
-    }
-    .back-btn {
-        font-size: 1rem;
-        right: 8px;
-        padding: 0 6px;
-    }
-    #mainHeader {
-        height: 55px;
-    }
-    #chatMain {
-        padding-top: 55px;
-    }
-    .chat-wrapper {
-        height: calc(100vh - 55px);
+    .divider-svg {
+        height: 14px;
+        max-width: 120px;
     }
 }
