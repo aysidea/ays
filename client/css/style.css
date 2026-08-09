@@ -1318,6 +1318,18 @@ body {
     }
 }
 
+/* ===== ساعت چت ===== */
+.chat-clock {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-gray);
+    padding: 4px 0 6px 0;
+    font-family: 'AradVF', 'Tahoma', sans-serif;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 6px;
+    direction: ltr;
+}
+
 /* ===== پیام‌ها ===== */
 .chat-messages-scroll {
     flex: 1;
@@ -1589,6 +1601,10 @@ body {
         bottom: 70px;
         padding: 6px 10px 8px 10px;
     }
+    .chat-clock {
+        font-size: 0.65rem;
+        padding: 3px 0 4px 0;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1688,5 +1704,9 @@ body {
     .chat-input-fixed {
         bottom: 60px;
         padding: 6px 8px 8px 8px;
+    }
+    .chat-clock {
+        font-size: 0.6rem;
+        padding: 3px 0 4px 0;
     }
 }
