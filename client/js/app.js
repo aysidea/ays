@@ -354,19 +354,24 @@ function initChat() {
         setTimeout(() => { chatInitialized = false; initChat(); }, 5000);
     }
 
+    // ===== تنظیم viewport برای کیبورد (چسباندن کادر ورودی) =====
     if ('visualViewport' in window) {
         const viewport = window.visualViewport;
         const inputFixed = document.getElementById('chatInputFixed');
-        if (viewport && inputFixed) {
-            viewport.addEventListener('resize', function() {
-                const heightDiff = window.innerHeight - viewport.height;
-                if (heightDiff > 100) {
-                    inputFixed.style.bottom = heightDiff + 'px';
-                } else {
-                    inputFixed.style.bottom = '0';
-                }
-            });
+
+        function adjustChatInput() {
+            if (!inputFixed) return;
+            const navHeight = bottomNav ? bottomNav.offsetHeight : 70;
+            const heightDiff = window.innerHeight - viewport.height;
+            if (heightDiff > 100) {
+                inputFixed.style.bottom = (heightDiff + 8) + 'px';
+            } else {
+                inputFixed.style.bottom = navHeight + 'px';
+            }
         }
+
+        viewport.addEventListener('resize', adjustChatInput);
+        setTimeout(adjustChatInput, 300);
     }
 }
 
