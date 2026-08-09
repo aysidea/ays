@@ -65,8 +65,10 @@ function showLoader(btnId, loaderId, textId, show) {
 }
 
 function showPage(pageId) {
-    // ===== اگر صفحه چت بود، مقداردهی اولیه کن =====
+    // ===== اگر صفحه چت بود =====
     if (pageId === 'chatPage') {
+        localStorage.setItem('lastPage', 'chatPage');
+        
         Object.values(pages).forEach(p => p.classList.remove('active'));
         const target = document.getElementById(pageId);
         if (target) target.classList.add('active');
@@ -86,10 +88,12 @@ function showPage(pageId) {
 
         if (currentToken) {
             consultBtn.style.display = 'none';
-            setTimeout(() => initChat(), 200);
+            setTimeout(() => initChat(), 300);
         }
         return;
     }
+
+    localStorage.setItem('lastPage', pageId);
 
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -181,6 +185,8 @@ async function getUserData() {
 }
 
 async function checkSession() {
+    const lastPage = localStorage.getItem('lastPage');
+    
     if (!currentToken || !currentUserId) {
         showPage('landingPage');
         return;
@@ -189,7 +195,12 @@ async function checkSession() {
     try {
         const user = await getUserData();
         currentUserData = user;
-        showPage('dashboardPage');
+        
+        if (lastPage === 'chatPage') {
+            showPage('chatPage');
+        } else {
+            showPage('dashboardPage');
+        }
     } catch (error) {
         console.warn('خطا در دریافت اطلاعات کاربر:', error.message);
         showPage('dashboardPage');
@@ -298,6 +309,27 @@ async function loadAccountInfo() {
 // بخش چت (گفتگو)
 // ============================================================
 
+function showChatOverlay() {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('chatOverlay');
+        if (!overlay) { resolve(); return; }
+        
+        overlay.classList.remove('hidden');
+        overlay.style.display = 'flex';
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'all';
+        
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            overlay.style.pointerEvents = 'none';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                resolve();
+            }, 500);
+        }, 4000);
+    });
+}
+
 function initChat() {
     if (chatInitialized) return;
     chatInitialized = true;
@@ -305,22 +337,10 @@ function initChat() {
     const token = localStorage.getItem('ays_token');
     if (!token) return;
 
-    // ===== نمایش هشدارها به مدت ۵ ثانیه =====
-    const alerts = document.getElementById('chatAlerts');
-    if (alerts) {
-        alerts.style.display = 'flex';
-        alerts.style.opacity = '1';
-        setTimeout(() => {
-            alerts.style.opacity = '0';
-            alerts.style.transition = 'opacity 0.5s ease';
-            setTimeout(() => {
-                alerts.style.display = 'none';
-            }, 500);
-        }, 5000);
-    }
-
-    // ===== بارگذاری پیام‌ها =====
-    loadChatMessages();
+    // ===== نمایش اورلی =====
+    showChatOverlay().then(() => {
+        loadChatMessages();
+    });
 
     // ===== رویدادهای ارسال پیام =====
     const sendBtn = document.getElementById('sendChatBtn');
@@ -414,7 +434,7 @@ function scrollChatToBottom() {
     if (container) {
         setTimeout(() => {
             container.scrollTop = container.scrollHeight;
-        }, 50);
+        }, 100);
     }
 }
 
@@ -636,6 +656,7 @@ navItems.forEach(item => {
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('ays_token');
     localStorage.removeItem('ays_user_id');
+    localStorage.removeItem('lastPage');
     currentToken = null;
     currentUserId = null;
     currentUserData = null;
@@ -709,8 +730,14 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    const lastPage = localStorage.getItem('lastPage');
+    
     if (currentToken && currentUserId) {
-        showPage('dashboardPage');
+        if (lastPage === 'chatPage') {
+            showPage('chatPage');
+        } else {
+            showPage('dashboardPage');
+        }
         getUserData().then(user => {
             if (user && !user.error) {
                 currentUserData = user;
@@ -721,6 +748,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('خطا در دریافت اطلاعات کاربر:', err.message);
         });
     } else {
+        localStorage.removeItem('lastPage');
         showPage('landingPage');
     }
 
