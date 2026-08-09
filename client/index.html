@@ -3,35 +3,33 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>AYS | پلتفرمی که ایده‌های شما را می‌خرد.</title>
-    <meta name="description" content="ایده‌های خود را ثبت کنید تا به شرکت‌های بزرگ معرفی شوند. پلتفرمی برای تبدیل ایده به کسب‌وکار و فروش ایده‌های خلاقانه. با ما، ایده‌های شما به واقعیت تبدیل می‌شوند." />
-    <meta name="keywords" content="ثبت ایده, فروش ایده, تبدیل ایده به کسب و کار, معرفی ایده به شرکت, پلتفرم ایده, نوآوری, سرمایه‌گذاری روی ایده" />
-    <meta property="og:title" content="پلتفرم تبدیل ایده به فرصت | ثبت و فروش ایده" />
-    <meta property="og:description" content="ایده‌های خود را ثبت کنید تا به شرکت‌های بزرگ معرفی شوند. پلتفرمی برای تبدیل ایده به کسب‌وکار و فروش ایده‌های خلاقانه." />
+    <title>پلتفرم تبدیل ایده به فرصت | ثبت و فروش ایده</title>
+    <meta name="description" content="ایده‌های خود را ثبت کنید تا به شرکت‌های بزرگ معرفی شوند." />
+    <meta name="keywords" content="ثبت ایده, فروش ایده, تبدیل ایده به کسب و کار" />
+    <meta property="og:title" content="پلتفرم تبدیل ایده به فرصت" />
+    <meta property="og:description" content="ایده‌های خود را ثبت کنید تا به شرکت‌های بزرگ معرفی شوند." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://ays365.onrender.com" />
     <meta property="og:image" content="https://ays365.onrender.com/assets/images/ays-icon1.png" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://ays365.onrender.com" />
-
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#E67E22" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="AYS" />
     <link rel="apple-touch-icon" href="assets/images/ays-icon1.png" />
-
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "پلتفرم تبدیل ایده به فرصت",
         "url": "https://ays365.onrender.com",
-        "description": "ایده‌های خود را ثبت کنید تا به شرکت‌های بزرگ معرفی شوند. پلتفرمی برای تبدیل ایده به کسب‌وکار."
+        "description": "ایده‌های خود را ثبت کنید تا به شرکت‌های بزرگ معرفی شوند."
     }
     </script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://js.pusher.com/8.0/pusher.min.js"></script>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -43,7 +41,7 @@
     </header>
 
     <main id="mainContent">
-
+        <!-- لندینگ -->
         <section id="landingPage" class="page active no-scroll">
             <div class="landing-wrapper">
                 <div class="landing-card">
@@ -51,7 +49,7 @@
                     <h1 class="landing-title">به پلتفرم ما خوش آمدید</h1>
                     <div class="landing-text">
                         <p>اینجا جایی است که ایده‌های ناب شما، به چشم‌اندازهای بزرگ تبدیل می‌شوند.</p>
-                        <p>ما پل ارتباطی میان خلاقیت شما و پیشروترین شرکت‌ها هستیم.</p>
+                        <p>ما پل ارتباطی میان خلاقیت شما و پیشروترین شرکت‌های کشور هستیم.</p>
                         <p>کافی است ایده خود را با ما در میان بگذارید؛ اگر ارزش سرمایه‌گذاری داشته باشد،</p>
                         <p>از طریق ایمیل با شما ارتباط خواهیم گرفت و آن را به بهترین شکل معرفی می‌کنیم.</p>
                         <p class="highlight-text">همین حالا شروع کنید و آینده‌ساز باشید.</p>
@@ -66,6 +64,7 @@
             </div>
         </section>
 
+        <!-- ثبت‌نام -->
         <section id="registerPage" class="page no-scroll">
             <div class="register-wrapper">
                 <div class="register-card">
@@ -119,24 +118,21 @@
             </div>
         </section>
 
+        <!-- داشبورد -->
         <section id="dashboardPage" class="page">
             <div class="dashboard-wrapper">
-
                 <div class="idea-submit-modern">
                     <h2>ایده خود را ثبت کنید</h2>
                     <p class="sub-text">هر ایده‌ای، حتی کوچک، می‌تواند جرقه‌ای برای تحول باشد.</p>
-
                     <div class="steps-indicator">
                         <span class="step active" data-step="1">۱</span>
                         <span class="step" data-step="2">۲</span>
                         <span class="step" data-step="3">۳</span>
                     </div>
-
                     <div class="step-content active" data-step="1">
                         <textarea id="ideaInput" placeholder="ایده خود را به طور کامل و شفاف توضیح دهید..."></textarea>
                         <button type="button" class="btn-next-step" id="stepNext1">بعدی</button>
                     </div>
-
                     <div class="step-content" data-step="2">
                         <div class="criteria-group">
                             <p><strong>نوآوری:</strong> این ایده چقدر با ایده‌های موجود تفاوت دارد؟</p>
@@ -171,7 +167,6 @@
                         <button type="button" class="btn-prev-step" id="stepPrev2">قبلی</button>
                         <button type="button" class="btn-next-step" id="stepNext2">بعدی</button>
                     </div>
-
                     <div class="step-content" data-step="3">
                         <div class="form-group">
                             <label>حوزه ایده</label>
@@ -194,44 +189,34 @@
                             </span>
                         </button>
                     </div>
-
                     <div id="ideaFeedback" class="feedback-message"></div>
                 </div>
-
                 <div class="collage-modern">
                     <div class="collage-item-large">
                         <div class="collage-image" style="background-image: url('assets/images/collage-1.jpg');">
-                            <div class="collage-overlay">
-                                <span>ایده‌های شما</span>
-                                <span>آینده را می‌سازند</span>
-                            </div>
+                            <div class="collage-overlay"><span>ایده‌های شما</span><span>آینده را می‌سازند</span></div>
                         </div>
                     </div>
                     <div class="collage-item-small">
                         <div class="collage-image" style="background-image: url('assets/images/collage-2.jpg');">
-                            <div class="collage-overlay">
-                                <span>ارتباط با صنعت</span>
-                            </div>
+                            <div class="collage-overlay"><span>ارتباط با صنعت</span></div>
                         </div>
                     </div>
                     <div class="collage-item-small">
                         <div class="collage-image" style="background-image: url('assets/images/collage-3.jpg');">
-                            <div class="collage-overlay">
-                                <span>تحقق ایده‌ها</span>
-                            </div>
+                            <div class="collage-overlay"><span>تحقق ایده‌ها</span></div>
                         </div>
                     </div>
                     <div class="collage-item-medium">
                         <div class="collage-image" style="background-image: url('assets/images/collage-4.jpg');">
-                            <div class="collage-overlay">
-                                <span>همکاری با شرکت‌های بزرگ</span>
-                            </div>
+                            <div class="collage-overlay"><span>همکاری با شرکت‌های بزرگ</span></div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ایده‌های من -->
         <section id="myIdeasPage" class="page">
             <div class="my-ideas-wrapper">
                 <div class="info-banner-modern">
@@ -242,6 +227,61 @@
             </div>
         </section>
 
+        <!-- گفتگو (چت) -->
+        <section id="chatPage" class="page">
+            <div class="chat-wrapper">
+                <!-- هشدارهای موقت (۵ ثانیه) -->
+                <div id="chatAlerts" class="chat-alerts-container">
+                    <div class="chat-alert-item" id="alertInfo">
+                        <i class="fas fa-users"></i>
+                        <span>این جا فضایی برای همفکری و تبادل نظر است.</span>
+                    </div>
+                    <div class="chat-alert-item" id="alertRule">
+                        <i class="fas fa-info-circle"></i>
+                        <span>پیام‌ها پس از ۱۴ روز حذف می‌شوند.</span>
+                    </div>
+                </div>
+
+                <!-- خط تزئینی با انیمیشن -->
+                <div class="chat-divider">
+                    <svg class="divider-svg" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10,10 Q50,0 90,10 T170,10" stroke="url(#grad1)" stroke-width="3" fill="none" />
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#00CED1" />
+                                <stop offset="33%" stop-color="#FF6B00" />
+                                <stop offset="66%" stop-color="#4FC3F7" />
+                                <stop offset="100%" stop-color="#00CED1" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="10" cy="10" r="4" fill="#00CED1">
+                            <animate attributeName="cx" from="10" to="190" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="10" cy="10" r="4" fill="#FF6B00">
+                            <animate attributeName="cx" from="10" to="190" dur="4s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="10" cy="10" r="4" fill="#4FC3F7">
+                            <animate attributeName="cx" from="10" to="190" dur="5s" repeatCount="indefinite" />
+                        </circle>
+                    </svg>
+                </div>
+
+                <!-- پیام‌ها -->
+                <div id="chatMessages" class="chat-messages-scroll">
+                    <!-- پیام‌ها اینجا قرار می‌گیرند -->
+                </div>
+
+                <!-- ورودی پیام (چسبیده به کیبورد) -->
+                <div class="chat-input-fixed" id="chatInputFixed">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." />
+                        <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- اکانت -->
         <section id="accountPage" class="page">
             <div class="account-wrapper">
                 <h2 class="account-title">حساب کاربری من</h2>
@@ -252,99 +292,45 @@
             </div>
         </section>
 
+        <!-- درباره ما -->
         <section id="aboutPage" class="page">
             <div class="about-wrapper">
                 <div class="about-card">
                     <h2 class="about-title">درباره پلتفرم</h2>
-                    <p class="about-text">
-                        این پلتفرم با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ تأسیس شده است.
-                        ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد.
-                    </p>
-                    <p class="about-text">
-                        همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی،
-                        این امکان را فراهم می‌کند که ایده‌های ارزشمند به سرعت به مرحله اجرا برسند.
-                    </p>
-                    <p class="about-text highlight-about">
-                        ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن،
-                        به اشتراک گذاشته نمی‌شود.
-                    </p>
+                    <p class="about-text">این پلتفرم با هدف ایجاد پلی میان خلاقیت فردی و صنایع بزرگ کشور تأسیس شده است. ما معتقدیم هر ایده نابی می‌تواند جرقه‌ای برای تحول باشد.</p>
+                    <p class="about-text">همکاری ما با شرکت‌های پیشرو در حوزه‌های فناوری، صنعت، خدمات و کشاورزی، این امکان را فراهم می‌کند که ایده‌های ارزشمند به سرعت به مرحله اجرا برسند.</p>
+                    <p class="about-text highlight-about">ما به حریم خصوصی کاربران احترام می‌گذاریم و هیچ ایده‌ای بدون اجازه صاحب آن، به اشتراک گذاشته نمی‌شود.</p>
                     <div class="about-stats">
-                        <div class="stat-item">
-                            <span class="stat-number">۵۰۰+</span>
-                            <span class="stat-label">ایده دریافت شده</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">۵۰+</span>
-                            <span class="stat-label">شرکت همکار</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">۲۰+</span>
-                            <span class="stat-label">ایده خریداری شده</span>
-                        </div>
+                        <div class="stat-item"><span class="stat-number">۵۰۰+</span><span class="stat-label">ایده دریافت شده</span></div>
+                        <div class="stat-item"><span class="stat-number">۵۰+</span><span class="stat-label">شرکت همکار</span></div>
+                        <div class="stat-item"><span class="stat-number">۲۰+</span><span class="stat-label">ایده خریداری شده</span></div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- ناوبری پایین -->
     <nav id="bottomNav" class="hidden-nav">
-        <div class="nav-item active" data-page="dashboardPage">
-            <i class="fas fa-home"></i>
-            <span>خانه</span>
-        </div>
-        <div class="nav-item" data-page="myIdeasPage">
-            <i class="fas fa-lightbulb"></i>
-            <span>ایده‌های من</span>
-        </div>
-        <div class="nav-item" data-page="chatPage">
-            <i class="fas fa-comments"></i>
-            <span>گفتگو</span>
-        </div>
-        <div class="nav-item" data-page="accountPage">
-            <i class="fas fa-user"></i>
-            <span>اکانت</span>
-        </div>
-        <div class="nav-item" data-page="aboutPage">
-            <i class="fas fa-info-circle"></i>
-            <span>درباره ما</span>
-        </div>
+        <div class="nav-item active" data-page="dashboardPage"><i class="fas fa-home"></i><span>خانه</span></div>
+        <div class="nav-item" data-page="myIdeasPage"><i class="fas fa-lightbulb"></i><span>ایده‌های من</span></div>
+        <div class="nav-item" data-page="chatPage"><i class="fas fa-comments"></i><span>گفتگو</span></div>
+        <div class="nav-item" data-page="accountPage"><i class="fas fa-user"></i><span>اکانت</span></div>
+        <div class="nav-item" data-page="aboutPage"><i class="fas fa-info-circle"></i><span>درباره ما</span></div>
     </nav>
 
-    <button id="consultBtn" class="consult-fab" style="display:none;">
-        <i class="fas fa-headset"></i>
-    </button>
-
+    <!-- مشاوره -->
+    <button id="consultBtn" class="consult-fab" style="display:none;"><i class="fas fa-headset"></i></button>
     <div id="consultModal" class="consult-modal" style="display:none;">
         <div class="consult-content">
             <span class="consult-close">&times;</span>
             <h2>مشاوره و پشتیبانی</h2>
             <p>برای دریافت مشاوره رایگان، فرم زیر را پر کنید.</p>
             <form id="consultForm">
-                <div class="form-group">
-                    <label>شماره موبایل</label>
-                    <input type="tel" id="consultPhone" placeholder="۰۹۱۲۳۴۵۶۷۸۹" required />
-                </div>
-                <div class="form-group">
-                    <label>موضوع مشاوره</label>
-                    <select id="consultTopic" required>
-                        <option value="">انتخاب کنید...</option>
-                        <option value="business-plan">تبدیل ایده به بیزینس پلن</option>
-                        <option value="mvp">ساخت نمونه اولیه (MVP)</option>
-                        <option value="funding">جذب سرمایه</option>
-                        <option value="market">تحلیل بازار</option>
-                        <option value="other">سایر</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>توضیحات (اجباری)</label>
-                    <textarea id="consultDesc" rows="4" placeholder="لطفاً توضیح دهید چه کمکی نیاز دارید..." required></textarea>
-                </div>
-                <button type="submit" class="btn-primary" id="consultSubmitBtn">
-                    <span id="consultSubmitText">ارسال درخواست</span>
-                    <span id="consultSubmitLoader" class="loader-dots" style="display:none;">
-                        <span></span><span></span><span></span>
-                    </span>
-                </button>
+                <div class="form-group"><label>شماره موبایل</label><input type="tel" id="consultPhone" placeholder="۰۹۱۲۳۴۵۶۷۸۹" required /></div>
+                <div class="form-group"><label>موضوع مشاوره</label><select id="consultTopic" required><option value="">انتخاب کنید...</option><option value="business-plan">تبدیل ایده به بیزینس پلن</option><option value="mvp">ساخت نمونه اولیه (MVP)</option><option value="funding">جذب سرمایه</option><option value="market">تحلیل بازار</option><option value="other">سایر</option></select></div>
+                <div class="form-group"><label>توضیحات (اجباری)</label><textarea id="consultDesc" rows="4" placeholder="لطفاً توضیح دهید چه کمکی نیاز دارید..." required></textarea></div>
+                <button type="submit" class="btn-primary" id="consultSubmitBtn"><span id="consultSubmitText">ارسال درخواست</span><span id="consultSubmitLoader" class="loader-dots" style="display:none;"><span></span><span></span><span></span></span></button>
                 <div id="consultFeedback" class="feedback-message"></div>
             </form>
         </div>
@@ -352,4 +338,4 @@
 
     <script src="js/app.js"></script>
 </body>
-                                           </html>
+    </html>
