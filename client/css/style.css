@@ -1280,18 +1280,21 @@ body {
 .chat-wrapper {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 65px - 70px);
+    height: 100vh;
     max-width: 700px;
     margin: 0 auto;
     width: 100%;
     padding: 0 15px;
     position: relative;
+    padding-top: 65px;
+    padding-bottom: 70px;
 }
 
 /* ===== خط تزیینی ===== */
 .chat-divider-line {
     padding: 6px 0 4px 0;
     flex-shrink: 0;
+    margin-top: 8px;
 }
 
 .divider-line {
@@ -1399,22 +1402,27 @@ body {
     color: var(--text-gray);
 }
 
-/* ===== کادر ورودی (همیشه پایین و چسبیده به منو) ===== */
+/* ===== کادر ورودی (کاملاً ثابت و چسبیده به منو) ===== */
 .chat-input-fixed {
-    flex-shrink: 0;
-    padding: 8px 0 10px 0;
+    position: fixed;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    padding: 8px 15px 10px 15px;
     background: var(--bg-body);
     border-top: 1px solid var(--border-light);
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
+    z-index: 100;
     transition: bottom 0.2s ease;
+    max-width: 700px;
+    margin: 0 auto;
 }
 
 .chat-input-wrapper {
     display: flex;
     gap: 10px;
     align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
 }
 
 .chat-input-wrapper input {
@@ -1538,7 +1546,8 @@ body {
     }
     .chat-wrapper {
         padding: 0 10px;
-        height: calc(100vh - 65px - 70px);
+        padding-top: 65px;
+        padding-bottom: 70px;
     }
     .chat-message {
         max-width: 85%;
@@ -1575,6 +1584,10 @@ body {
     }
     .chat-overlay-icon {
         font-size: 3.8rem;
+    }
+    .chat-input-fixed {
+        bottom: 70px;
+        padding: 6px 10px 8px 10px;
     }
 }
 
@@ -1613,8 +1626,9 @@ body {
         padding: 12px 14px;
     }
     .chat-wrapper {
-        height: calc(100vh - 55px - 70px);
         padding: 0 8px;
+        padding-top: 55px;
+        padding-bottom: 60px;
     }
     .chat-message {
         max-width: 90%;
@@ -1670,5 +1684,9 @@ body {
     .overlay-loader {
         gap: 8px;
         margin-top: 16px;
+    }
+    .chat-input-fixed {
+        bottom: 60px;
+        padding: 6px 8px 8px 8px;
     }
 }
