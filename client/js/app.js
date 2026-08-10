@@ -283,10 +283,6 @@ async function loadAccountInfo() {
     }
 }
 
-// ============================================================
-// بخش چت (گفتگو)
-// ============================================================
-
 function showChatOverlay() {
     return new Promise((resolve) => {
         const overlay = document.getElementById('chatOverlay');
@@ -444,10 +440,6 @@ async function sendChatMessage() {
         if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = '1'; }
     }
 }
-
-// ============================================================
-// رویدادها
-// ============================================================
 
 startBtn.addEventListener('click', function() {
     showLoader('startBtn', 'startBtnLoader', 'startBtnText', true);
