@@ -136,7 +136,7 @@
                     <div class="step-content" data-step="2">
                         <div class="criteria-group">
                             <p><strong>نوآوری:</strong> این ایده چقدر با ایده‌های موجود تفاوت دارد؟</p>
-                            <div class="criteria-options">
+                            <div class="criteria-options vertical">
                                 <label><input type="radio" name="innovation" value="1"> خیلی کم</label>
                                 <label><input type="radio" name="innovation" value="2"> کم</label>
                                 <label><input type="radio" name="innovation" value="3" checked> متوسط</label>
@@ -146,7 +146,7 @@
                         </div>
                         <div class="criteria-group">
                             <p><strong>بازار:</strong> این ایده چقدر بازار هدف دارد؟</p>
-                            <div class="criteria-options">
+                            <div class="criteria-options vertical">
                                 <label><input type="radio" name="market" value="1"> خیلی کوچک</label>
                                 <label><input type="radio" name="market" value="2"> کوچک</label>
                                 <label><input type="radio" name="market" value="3" checked> متوسط</label>
@@ -156,7 +156,7 @@
                         </div>
                         <div class="criteria-group">
                             <p><strong>مرحله فعلی:</strong> ایده در چه مرحله‌ای است؟</p>
-                            <div class="criteria-options">
+                            <div class="criteria-options vertical">
                                 <label><input type="radio" name="stage" value="1"> فقط یک ایده</label>
                                 <label><input type="radio" name="stage" value="2"> طرح اولیه</label>
                                 <label><input type="radio" name="stage" value="3" checked> نمونه اولیه</label>
@@ -191,25 +191,129 @@
                     </div>
                     <div id="ideaFeedback" class="feedback-message"></div>
                 </div>
-                <div class="collage-modern">
-                    <div class="collage-item-large">
+
+                <!-- کلاژ‌ها (۱۲ عددی با متن زیر هر کدام) -->
+                <div class="collage-section">
+                    <div class="collage-item">
                         <div class="collage-image" style="background-image: url('assets/images/collage-1.jpg');">
-                            <div class="collage-overlay"><span>ایده‌های شما</span><span>آینده را می‌سازند</span></div>
+                            <div class="collage-overlay">
+                                <span>ایده‌های شما</span>
+                                <span>آینده را می‌سازند</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>اینجا ایده‌های ناب به فرصت‌های بزرگ تبدیل می‌شوند.</p>
                         </div>
                     </div>
-                    <div class="collage-item-small">
+                    <div class="collage-item">
                         <div class="collage-image" style="background-image: url('assets/images/collage-2.jpg');">
-                            <div class="collage-overlay"><span>ارتباط با صنعت</span></div>
+                            <div class="collage-overlay">
+                                <span>ارتباط با صنعت</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>خلاقیت شما، سرمایه فردای شماست.</p>
                         </div>
                     </div>
-                    <div class="collage-item-small">
+                    <div class="collage-item">
                         <div class="collage-image" style="background-image: url('assets/images/collage-3.jpg');">
-                            <div class="collage-overlay"><span>تحقق ایده‌ها</span></div>
+                            <div class="collage-overlay">
+                                <span>تحقق ایده‌ها</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>پلی مطمئن میان ایده و صنعت.</p>
                         </div>
                     </div>
-                    <div class="collage-item-medium">
+                    <div class="collage-item">
                         <div class="collage-image" style="background-image: url('assets/images/collage-4.jpg');">
-                            <div class="collage-overlay"><span>همکاری با شرکت‌های بزرگ</span></div>
+                            <div class="collage-overlay">
+                                <span>همکاری با شرکت‌های بزرگ</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>با AYS، هر ایده‌ای دیده می‌شود.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-1.jpg');">
+                            <div class="collage-overlay">
+                                <span>ایده‌های نوآورانه</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>از یک فکر تا یک کسب‌وکار موفق.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-2.jpg');">
+                            <div class="collage-overlay">
+                                <span>ارتباط با صنعت</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>ما به ایده‌های شما جان می‌بخشیم.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-3.jpg');">
+                            <div class="collage-overlay">
+                                <span>تحقق ایده‌ها</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>ایده‌های خود را به پرواز درآورید.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-4.jpg');">
+                            <div class="collage-overlay">
+                                <span>همکاری با شرکت‌های بزرگ</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>مسیر تحقق ایده‌ها با AYS هموار است.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-1.jpg');">
+                            <div class="collage-overlay">
+                                <span>ایده‌های شما</span>
+                                <span>آینده را می‌سازند</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>اینجا، ایده‌ها به سرنوشت می‌رسند.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-2.jpg');">
+                            <div class="collage-overlay">
+                                <span>ارتباط با صنعت</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>پلتفرمی برای رشد و نوآوری.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-3.jpg');">
+                            <div class="collage-overlay">
+                                <span>تحقق ایده‌ها</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>هر ایده‌ای ارزش شنیده شدن دارد.</p>
+                        </div>
+                    </div>
+                    <div class="collage-item">
+                        <div class="collage-image" style="background-image: url('assets/images/collage-4.jpg');">
+                            <div class="collage-overlay">
+                                <span>همکاری با شرکت‌های بزرگ</span>
+                            </div>
+                        </div>
+                        <div class="collage-text-below">
+                            <p>با AYS، آینده را بسازید.</p>
                         </div>
                     </div>
                 </div>
