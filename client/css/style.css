@@ -1145,7 +1145,7 @@ body {
 }
 
 /* ============================================================
-   صفحه گفتگو (چت)
+   صفحه گفتگو (چت) - نسخه نهایی
    ============================================================ */
 
 .chat-overlay {
@@ -1170,8 +1170,14 @@ body {
 }
 
 @keyframes overlayFadeIn {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .chat-overlay-content {
@@ -1190,9 +1196,18 @@ body {
 }
 
 @keyframes overlayContent {
-    0% { transform: translateY(40px) scale(0.9); opacity: 0; }
-    60% { transform: translateY(-8px) scale(1.02); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+    0% {
+        transform: translateY(40px) scale(0.9);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-8px) scale(1.02);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
 }
 
 .chat-overlay-icon {
@@ -1203,8 +1218,13 @@ body {
 }
 
 @keyframes iconPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
 }
 
 .chat-overlay-content h2 {
@@ -1242,12 +1262,24 @@ body {
     animation: loaderBounce 1.2s ease infinite;
 }
 
-.overlay-loader span:nth-child(2) { animation-delay: 0.2s; }
-.overlay-loader span:nth-child(3) { animation-delay: 0.4s; }
+.overlay-loader span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.overlay-loader span:nth-child(3) {
+    animation-delay: 0.4s;
+}
 
 @keyframes loaderBounce {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-    40% { transform: scale(1); opacity: 1; }
+    0%,
+    80%,
+    100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .chat-wrapper {
@@ -1260,7 +1292,34 @@ body {
     padding: 0 15px;
     position: relative;
     padding-top: 70px;
-    padding-bottom: 70px;
+    /* padding-bottom توسط جاوااسکریپت تنظیم می‌شود */
+}
+
+.chat-divider-line {
+    padding: 6px 0 4px 0;
+    flex-shrink: 0;
+    margin-top: 8px;
+}
+
+.divider-line {
+    width: 100%;
+    height: 3px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #00CED1, #FF6B00, #4FC3F7, #00CED1);
+    background-size: 300% 100%;
+    animation: gradientMove 4s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .chat-messages-scroll {
@@ -1345,16 +1404,17 @@ body {
     color: var(--text-gray);
 }
 
+/* ===== کادر ورودی (چسبیده به کیبورد) ===== */
 .chat-input-fixed {
     position: fixed;
-    bottom: 70px;
+    bottom: 0;
     left: 0;
     right: 0;
     padding: 8px 15px 10px 15px;
     background: var(--bg-body);
     border-top: 1px solid var(--border-light);
     z-index: 100;
-    transition: bottom 0.2s ease;
+    transition: bottom 0.1s ease;
     max-width: 700px;
     margin: 0 auto;
 }
@@ -1417,6 +1477,10 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* ============================================================
+   واکنش‌گرایی
+   ============================================================ */
 
 @media (max-width: 992px) {
     .collage-modern {
@@ -1485,7 +1549,6 @@ body {
     .chat-wrapper {
         padding: 0 10px;
         padding-top: 70px;
-        padding-bottom: 70px;
     }
     .chat-message {
         max-width: 85%;
@@ -1518,7 +1581,6 @@ body {
         font-size: 3.8rem;
     }
     .chat-input-fixed {
-        bottom: 70px;
         padding: 6px 10px 8px 10px;
     }
 }
@@ -1560,7 +1622,6 @@ body {
     .chat-wrapper {
         padding: 0 8px;
         padding-top: 60px;
-        padding-bottom: 60px;
     }
     .chat-message {
         max-width: 90%;
@@ -1612,7 +1673,6 @@ body {
         margin-top: 16px;
     }
     .chat-input-fixed {
-        bottom: 60px;
         padding: 6px 8px 8px 8px;
     }
 }
