@@ -11,12 +11,14 @@ const morgan = require('morgan');
 const winston = require('winston');
 const { sendToTelegram, sendConsultationToTelegram } = require('./utils/telegram');
 const { sendAlertToTelegram } = require('./utils/alert');
+const { sendWelcomeEmail } = require('./utils/email');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
 
+// ===== لاگر =====
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -31,6 +33,7 @@ if (process.env.NODE_ENV !== 'production') {
     }));
 }
 
+// ===== Middlewareها =====
 app.use(helmet());
 app.use(morgan('combined'));
 
@@ -61,6 +64,7 @@ const authLimiter = rateLimit({
 app.use('/api/register', authLimiter);
 app.use('/api/login', authLimiter);
 
+// ===== دیتابیس =====
 const dbPath = path.join(__dirname, 'database', 'ays.db');
 const db = new sqlite3.Database(dbPath);
 
@@ -102,9 +106,9 @@ db.serialize(() => {
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     `);
-    // ===== جدول group_messages حذف شد =====
 });
 
+// ===== توابع کمکی =====
 function sanitizeInput(input) {
     if (typeof input !== 'string') return input;
     return validator.escape(input.trim());
@@ -150,6 +154,7 @@ function getCategoryText(value) {
     return map[value] || value || 'متفرقه';
 }
 
+// ===== تشخیص حملات =====
 function detectAttack(req, res, next) {
     const patterns = [/<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
         /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i, /--/, /;/, /\/\*/, /\*\//];
@@ -165,24 +170,25 @@ function detectAttack(req, res, next) {
         }
     }
     if (found) {
-        sendAlertToTelegram('SECURITY', `تلاش برای نفوذ: ${detected.substring(0, 100)}`, {
+        sendAlertToTelegram('SECURITY', `🚨 تلاش برای نفوذ: ${detected.substring(0, 100)}`, {
             ip: req.ip, path: req.path, user: req.user?.email || 'مهمان'
         });
-        logger.warn(`حمله: ${req.path} از ${req.ip}`);
+        logger.warn(`🚨 حمله: ${req.path} از ${req.ip}`);
         return res.status(403).json({ error: 'درخواست غیرمجاز' });
     }
     next();
 }
 app.use(detectAttack);
 
+// ===== احراز هویت JWT =====
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'دسترسی غیرمجاز' });
+    if (!token) return res.status(401).json({ error: 'دسترسی غیرمجاز. لطفاً وارد شوید.' });
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
-            sendAlertToTelegram('WARNING', `توکن نامعتبر: ${err.message}`, { ip: req.ip, path: req.path });
-            return res.status(403).json({ error: 'توکن نامعتبر' });
+            sendAlertToTelegram('WARNING', `⚠️ توکن نامعتبر: ${err.message}`, { ip: req.ip, path: req.path });
+            return res.status(403).json({ error: 'توکن نامعتبر. دوباره وارد شوید.' });
         }
         req.user = user;
         next();
@@ -190,77 +196,167 @@ function authenticateToken(req, res, next) {
 }
 
 // ============================================================
-// مسیرهای احراز هویت (بدون تغییر)
+// مسیرهای احراز هویت
 // ============================================================
+
 app.post('/api/register', async (req, res) => {
     const { email, name, password } = req.body;
-    if (!email || !name || !password) return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
-    if (!validateEmail(email)) return res.status(400).json({ error: 'ایمیل معتبر وارد کنید.' });
-    if (!validatePassword(password)) return res.status(400).json({ error: 'رمز عبور حداقل ۶ کاراکتر باشد.' });
-    if (!validateName(name)) return res.status(400).json({ error: 'نام معتبر وارد کنید.' });
+
+    if (!email || !name || !password) {
+        return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
+    }
+    if (!validateEmail(email)) {
+        return res.status(400).json({ error: 'ایمیل معتبر وارد کنید.' });
+    }
+    if (!validatePassword(password)) {
+        return res.status(400).json({ error: 'رمز عبور حداقل ۶ کاراکتر باشد.' });
+    }
+    if (!validateName(name)) {
+        return res.status(400).json({ error: 'نام باید حداقل ۲ کاراکتر و فقط شامل حروف باشد.' });
+    }
+
     const sanitizedEmail = validator.normalizeEmail(email);
     const sanitizedName = sanitizeInput(name);
+
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+
         db.get('SELECT id FROM users WHERE email = ?', [sanitizedEmail], (err, existing) => {
-            if (err) return res.status(500).json({ error: 'خطای داخلی' });
-            if (existing) return res.status(400).json({ error: 'این ایمیل قبلاً ثبت شده است.' });
-            db.run('INSERT INTO users (email, name, password) VALUES (?, ?, ?)',
+            if (err) {
+                logger.error('خطای دیتابیس:', err);
+                return res.status(500).json({ error: 'خطای داخلی سرور' });
+            }
+            if (existing) {
+                return res.status(400).json({ error: 'این ایمیل قبلاً ثبت شده است.' });
+            }
+
+            db.run(
+                'INSERT INTO users (email, name, password) VALUES (?, ?, ?)',
                 [sanitizedEmail, sanitizedName, hashedPassword],
                 function(err) {
-                    if (err) return res.status(500).json({ error: 'خطا در ثبت‌نام' });
-                    const token = jwt.sign({ id: this.lastID, email: sanitizedEmail }, JWT_SECRET, { expiresIn: '7d' });
-                    res.status(201).json({ id: this.lastID, email: sanitizedEmail, name: sanitizedName, token, created_at: new Date().toISOString() });
+                    if (err) {
+                        logger.error('خطا در ثبت‌نام:', err);
+                        return res.status(500).json({ error: 'خطا در ثبت‌نام' });
+                    }
+
+                    const token = jwt.sign(
+                        { id: this.lastID, email: sanitizedEmail },
+                        JWT_SECRET,
+                        { expiresIn: '7d' }
+                    );
+
+                    // ===== ارسال ایمیل خوش‌آمدگویی (غیرهمگام) =====
+                    sendWelcomeEmail(sanitizedEmail, sanitizedName);
+
+                    res.status(201).json({
+                        id: this.lastID,
+                        email: sanitizedEmail,
+                        name: sanitizedName,
+                        token,
+                        created_at: new Date().toISOString()
+                    });
                 }
             );
         });
     } catch (error) {
-        logger.error('خطا در ثبت‌نام:', error);
+        logger.error('خطا در هش کردن رمز:', error);
         res.status(500).json({ error: 'خطای داخلی سرور' });
     }
 });
 
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'ایمیل و رمز عبور الزامی هستند.' });
-    if (!validateEmail(email)) return res.status(400).json({ error: 'ایمیل معتبر وارد کنید.' });
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'ایمیل و رمز عبور الزامی هستند.' });
+    }
+    if (!validateEmail(email)) {
+        return res.status(400).json({ error: 'ایمیل معتبر وارد کنید.' });
+    }
+
     const sanitizedEmail = validator.normalizeEmail(email);
-    db.get('SELECT id, email, name, password FROM users WHERE email = ?', [sanitizedEmail], async (err, user) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی' });
-        if (!user) return res.status(401).json({ error: 'ایمیل یا رمز عبور اشتباه است.' });
-        try {
-            const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid) return res.status(401).json({ error: 'ایمیل یا رمز عبور اشتباه است.' });
-            const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-            res.json({ id: user.id, email: user.email, name: user.name, token });
-        } catch (error) {
-            logger.error('خطا در مقایسه رمز:', error);
-            res.status(500).json({ error: 'خطای داخلی سرور' });
+
+    db.get(
+        'SELECT id, email, name, password FROM users WHERE email = ?',
+        [sanitizedEmail],
+        async (err, user) => {
+            if (err) {
+                logger.error('خطای دیتابیس:', err);
+                return res.status(500).json({ error: 'خطای داخلی سرور' });
+            }
+            if (!user) {
+                return res.status(401).json({ error: 'ایمیل یا رمز عبور اشتباه است.' });
+            }
+
+            try {
+                const isValid = await bcrypt.compare(password, user.password);
+                if (!isValid) {
+                    return res.status(401).json({ error: 'ایمیل یا رمز عبور اشتباه است.' });
+                }
+
+                const token = jwt.sign(
+                    { id: user.id, email: user.email },
+                    JWT_SECRET,
+                    { expiresIn: '7d' }
+                );
+
+                res.json({
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    token
+                });
+            } catch (error) {
+                logger.error('خطا در مقایسه رمز:', error);
+                res.status(500).json({ error: 'خطای داخلی سرور' });
+            }
         }
-    });
+    );
 });
 
 app.get('/api/user', authenticateToken, (req, res) => {
-    db.get('SELECT id, email, name, created_at FROM users WHERE id = ?', [req.user.id], (err, user) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی' });
-        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
-        res.json(user);
-    });
+    db.get(
+        'SELECT id, email, name, created_at FROM users WHERE id = ?',
+        [req.user.id],
+        (err, user) => {
+            if (err) {
+                logger.error('خطای دیتابیس:', err);
+                return res.status(500).json({ error: 'خطای داخلی سرور' });
+            }
+            if (!user) {
+                return res.status(404).json({ error: 'کاربر یافت نشد' });
+            }
+            res.json(user);
+        }
+    );
 });
 
 app.get('/api/user/:id', authenticateToken, (req, res) => {
     const userId = parseInt(req.params.id);
-    if (userId !== req.user.id) return res.status(403).json({ error: 'دسترسی غیرمجاز' });
-    db.get('SELECT id, email, name, created_at FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err) return res.status(500).json({ error: 'خطای داخلی' });
-        if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
-        res.json(user);
-    });
+    if (userId !== req.user.id) {
+        return res.status(403).json({ error: 'دسترسی غیرمجاز به اطلاعات کاربر دیگر' });
+    }
+
+    db.get(
+        'SELECT id, email, name, created_at FROM users WHERE id = ?',
+        [userId],
+        (err, user) => {
+            if (err) {
+                logger.error('خطای دیتابیس:', err);
+                return res.status(500).json({ error: 'خطای داخلی سرور' });
+            }
+            if (!user) {
+                return res.status(404).json({ error: 'کاربر یافت نشد' });
+            }
+            res.json(user);
+        }
+    );
 });
 
 // ============================================================
-// مسیرهای ایده (بدون تغییر)
+// مسیرهای ایده
 // ============================================================
+
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { content, category, innovation, market, stage } = req.body;
@@ -355,8 +451,9 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
 });
 
 // ============================================================
-// مسیرهای مشاوره (بدون تغییر)
+// مسیرهای مشاوره
 // ============================================================
+
 app.post('/api/consultation', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { phone, topic, description } = req.body;
@@ -382,15 +479,16 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
 
                 sendConsultationToTelegram(user.name, user.email, phone, topic, description);
 
-                res.status(201).json({ message: 'درخواست مشاوره با موفقیت ثبت شد.' });
+                res.status(201).json({ message: '✅ درخواست مشاوره با موفقیت ثبت شد.' });
             }
         );
     });
 });
 
 // ============================================================
-// مسیرهای عمومی (بدون تغییر)
+// مسیرهای عمومی
 // ============================================================
+
 app.get('/idea/:id', (req, res) => {
     const ideaId = req.params.id;
     
@@ -577,6 +675,10 @@ app.get('/api/time', (req, res) => {
     });
 });
 
+// ============================================================
+// مدیریت خطاها
+// ============================================================
+
 app.use((err, req, res, next) => {
     const statusCode = err.status || 500;
     const message = err.message || 'خطای داخلی سرور';
@@ -592,6 +694,11 @@ app.use((err, req, res, next) => {
     res.status(statusCode).json({ error: message });
 });
 
+// ============================================================
+// راه‌اندازی سرور
+// ============================================================
+
 app.listen(PORT, () => {
     console.log(`🚀 سرور روی پورت ${PORT} در حال اجرا است.`);
+    console.log(`🔒 حالت امنیت: فعال (JWT, bcrypt, Helmet, Rate Limit, XSS Prevention)`);
 });
