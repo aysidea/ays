@@ -29,7 +29,6 @@
     }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://js.pusher.com/8.0/pusher.min.js"></script>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -228,36 +227,6 @@
             </div>
         </section>
 
-        <!-- گفتگو (چت) -->
-        <section id="chatPage" class="page">
-            <!-- اورلی (۴ ثانیه) -->
-            <div id="chatOverlay" class="chat-overlay">
-                <div class="chat-overlay-content">
-                    <div class="chat-overlay-icon"><i class="fas fa-comments"></i></div>
-                    <h2>💬 گفتگو</h2>
-                    <p>اینجا فضایی برای همفکری، شکوفایی ایده‌ها و کار تیمی است.</p>
-                    <p class="overlay-sub">با هم بیندیشیم، با هم بسازیم</p>
-                    <div class="overlay-loader"><span></span><span></span><span></span></div>
-                </div>
-            </div>
-
-            <div class="chat-wrapper">
-                <!-- خط تزیینی آبی -->
-                <div class="chat-divider-line"><div class="divider-line"></div></div>
-
-                <!-- پیام‌ها -->
-                <div id="chatMessages" class="chat-messages-scroll"></div>
-
-                <!-- کادر ورودی -->
-                <div id="chatInputFixed" class="chat-input-fixed">
-                    <div class="chat-input-wrapper">
-                        <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." />
-                        <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- اکانت -->
         <section id="accountPage" class="page">
             <div class="account-wrapper">
@@ -291,7 +260,6 @@
     <nav id="bottomNav" class="hidden-nav">
         <div class="nav-item active" data-page="dashboardPage"><i class="fas fa-home"></i><span>خانه</span></div>
         <div class="nav-item" data-page="myIdeasPage"><i class="fas fa-lightbulb"></i><span>ایده‌های من</span></div>
-        <div class="nav-item" data-page="chatPage"><i class="fas fa-comments"></i><span>گفتگو</span></div>
         <div class="nav-item" data-page="accountPage"><i class="fas fa-user"></i><span>اکانت</span></div>
         <div class="nav-item" data-page="aboutPage"><i class="fas fa-info-circle"></i><span>درباره ما</span></div>
     </nav>
