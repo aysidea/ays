@@ -346,23 +346,39 @@ function initChat() {
         setTimeout(() => { chatInitialized = false; initChat(); }, 5000);
     }
 
+    // ============================================================
+    // تنظیم viewport برای کیبورد (چسباندن کادر ورودی)
+    // ============================================================
     if ('visualViewport' in window) {
         const viewport = window.visualViewport;
         const inputFixed = document.getElementById('chatInputFixed');
+        const chatWrapper = document.querySelector('.chat-wrapper');
 
         function adjustChatInput() {
             if (!inputFixed) return;
-            const navHeight = bottomNav ? bottomNav.offsetHeight : 70;
+            if (!chatWrapper) return;
+
             const heightDiff = window.innerHeight - viewport.height;
-            if (heightDiff > 100) {
-                inputFixed.style.bottom = (heightDiff + 8) + 'px';
+            const navHeight = bottomNav ? bottomNav.offsetHeight : 70;
+            const inputHeight = inputFixed.offsetHeight || 70;
+
+            if (heightDiff > 50) {
+                // کیبورد باز است - کادر ورودی را بالای کیبورد قرار بده
+                inputFixed.style.bottom = heightDiff + 'px';
+                // padding-bottom به chat-wrapper اضافه کن تا پیام‌ها زیر input نروند
+                chatWrapper.style.paddingBottom = (heightDiff + inputHeight + 10) + 'px';
             } else {
+                // کیبورد بسته است - کادر ورودی را بالای منو قرار بده
                 inputFixed.style.bottom = navHeight + 'px';
+                chatWrapper.style.paddingBottom = (navHeight + inputHeight + 10) + 'px';
             }
         }
 
         viewport.addEventListener('resize', adjustChatInput);
-        setTimeout(adjustChatInput, 300);
+        // اجرای اولیه بعد از لود کامل
+        setTimeout(adjustChatInput, 500);
+        // همچنین بعد از هر تغییر احتمالی
+        window.addEventListener('load', adjustChatInput);
     }
 }
 
