@@ -1145,7 +1145,7 @@ body {
 }
 
 /* ============================================================
-   صفحه گفتگو (چت) - نسخه نهایی با چسبیدن به کیبورد
+   صفحه گفتگو (چت)
    ============================================================ */
 
 .chat-overlay {
@@ -1292,7 +1292,7 @@ body {
     padding: 0 15px;
     position: relative;
     padding-top: 70px;
-    padding-bottom: 90px;
+    padding-bottom: 0;
 }
 
 .chat-divider-line {
@@ -1404,9 +1404,8 @@ body {
     color: var(--text-gray);
 }
 
-/* ===== کادر ورودی (چسبیده به کیبورد) ===== */
 .chat-input-fixed {
-    position: fixed;
+    position: sticky;
     bottom: 0;
     left: 0;
     right: 0;
@@ -1548,7 +1547,7 @@ body {
     .chat-wrapper {
         padding: 0 10px;
         padding-top: 70px;
-        padding-bottom: 80px;
+        padding-bottom: 0;
     }
     .chat-message {
         max-width: 85%;
@@ -1622,7 +1621,7 @@ body {
     .chat-wrapper {
         padding: 0 8px;
         padding-top: 60px;
-        padding-bottom: 70px;
+        padding-bottom: 0;
         height: 100dvh;
     }
     .chat-message {
