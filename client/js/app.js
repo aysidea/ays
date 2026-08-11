@@ -8,7 +8,6 @@ const pages = {
     register: document.getElementById('registerPage'),
     dashboard: document.getElementById('dashboardPage'),
     myIdeas: document.getElementById('myIdeasPage'),
-    chat: document.getElementById('chatPage'),
     account: document.getElementById('accountPage'),
     about: document.getElementById('aboutPage'),
 };
@@ -40,12 +39,6 @@ const consultSubmitBtn = document.getElementById('consultSubmitBtn');
 const consultSubmitText = document.getElementById('consultSubmitText');
 const consultSubmitLoader = document.getElementById('consultSubmitLoader');
 
-let chatInitialized = false;
-let chatChannel = null;
-let pusherInstance = null;
-const PUSHER_KEY = 'c001529546705bdb1a57';
-const PUSHER_CLUSTER = 'eu';
-
 function showLoader(btnId, loaderId, textId, show) {
     const btn = document.getElementById(btnId);
     const loader = document.getElementById(loaderId);
@@ -63,29 +56,6 @@ function showLoader(btnId, loaderId, textId, show) {
 }
 
 function showPage(pageId) {
-    if (pageId === 'chatPage') {
-        localStorage.setItem('lastPage', 'chatPage');
-        Object.values(pages).forEach(p => p.classList.remove('active'));
-        const target = document.getElementById(pageId);
-        if (target) target.classList.add('active');
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.dataset.page === pageId) {
-                item.classList.add('active');
-            }
-        });
-        header.classList.remove('hidden-header');
-        bottomNav.classList.remove('hidden-nav');
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.inset = '';
-        if (currentToken) {
-            consultBtn.style.display = 'none';
-            setTimeout(() => initChat(), 200);
-        }
-        return;
-    }
-
     localStorage.setItem('lastPage', pageId);
     Object.values(pages).forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -184,8 +154,8 @@ async function checkSession() {
     try {
         const user = await getUserData();
         currentUserData = user;
-        if (lastPage === 'chatPage') {
-            showPage('chatPage');
+        if (lastPage && ['myIdeasPage', 'accountPage', 'aboutPage'].includes(lastPage)) {
+            showPage(lastPage);
         } else {
             showPage('dashboardPage');
         }
@@ -280,145 +250,6 @@ async function loadAccountInfo() {
         `;
     } catch (error) {
         accountInfo.innerHTML = `<p style="color:#C0392B;">${error.message || 'خطا در دریافت اطلاعات.'}</p>`;
-    }
-}
-
-function showChatOverlay() {
-    return new Promise((resolve) => {
-        const overlay = document.getElementById('chatOverlay');
-        if (!overlay) { resolve(); return; }
-        overlay.classList.remove('hidden');
-        overlay.style.display = 'flex';
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'all';
-        setTimeout(() => {
-            overlay.classList.add('hidden');
-            overlay.style.pointerEvents = 'none';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                resolve();
-            }, 500);
-        }, 4000);
-    });
-}
-
-function initChat() {
-    if (chatInitialized) return;
-    chatInitialized = true;
-    const token = localStorage.getItem('ays_token');
-    if (!token) return;
-
-    showChatOverlay().then(() => {
-        loadChatMessages();
-    });
-
-    const sendBtn = document.getElementById('sendChatBtn');
-    const input = document.getElementById('chatInput');
-    if (sendBtn) sendBtn.addEventListener('click', sendChatMessage);
-    if (input) input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendChatMessage();
-    });
-
-    try {
-        pusherInstance = new Pusher(PUSHER_KEY, {
-            cluster: PUSHER_CLUSTER,
-            authEndpoint: `${API_BASE_URL}/pusher-auth`,
-            auth: { headers: { Authorization: `Bearer ${token}` } }
-        });
-        chatChannel = pusherInstance.subscribe('presence-chat-channel');
-        chatChannel.bind('pusher:subscription_succeeded', function() {
-            console.log('✅ اتصال به Pusher موفق');
-        });
-        chatChannel.bind('new-message', function(data) {
-            console.log('📩 پیام جدید از Pusher:', data);
-            const container = document.getElementById('chatMessages');
-            if (!container) return;
-            const isOwn = data.user_id == currentUserId;
-            const msgElement = createChatMessageElement(data, isOwn);
-            container.appendChild(msgElement);
-            scrollChatToBottom();
-        });
-        pusherInstance.connection.bind('error', function(err) {
-            console.error('❌ خطای Pusher:', err);
-        });
-    } catch (error) {
-        console.error('❌ خطا در تنظیم Pusher:', error);
-        setTimeout(() => { chatInitialized = false; initChat(); }, 5000);
-    }
-}
-
-async function loadChatMessages() {
-    const token = localStorage.getItem('ays_token');
-    const container = document.getElementById('chatMessages');
-    if (!container || !token) return;
-    try {
-        const response = await fetch(`${API_BASE_URL}/group-messages`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) throw new Error('خطا در دریافت پیام‌ها');
-        const messages = await response.json();
-        container.innerHTML = '';
-        messages.forEach(msg => {
-            const isOwn = msg.user_id == currentUserId;
-            container.appendChild(createChatMessageElement(msg, isOwn));
-        });
-        scrollChatToBottom();
-    } catch (error) {
-        console.error('❌ خطا در دریافت پیام‌ها:', error);
-        container.innerHTML = '<p style="text-align:center;color:#C0392B;padding:20px;">خطا در دریافت پیام‌ها</p>';
-    }
-}
-
-function createChatMessageElement(msg, isOwn) {
-    const div = document.createElement('div');
-    div.className = `chat-message ${isOwn ? 'own' : 'other'}`;
-    const date = new Date(msg.created_at);
-    const timeStr = date.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-    const dateStr = date.toLocaleDateString('fa-IR');
-    div.innerHTML = `
-        <span class="msg-user">${isOwn ? 'شما' : msg.user_name}</span>
-        <span class="msg-content">${msg.content}</span>
-        <span class="msg-time">${dateStr} - ${timeStr}</span>
-    `;
-    return div;
-}
-
-function scrollChatToBottom() {
-    const container = document.getElementById('chatMessages');
-    if (container) {
-        setTimeout(() => {
-            container.scrollTop = container.scrollHeight;
-        }, 100);
-    }
-}
-
-async function sendChatMessage() {
-    const input = document.getElementById('chatInput');
-    const content = input.value.trim();
-    if (!content) return;
-    const token = localStorage.getItem('ays_token');
-    const sendBtn = document.getElementById('sendChatBtn');
-    if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.6'; }
-    try {
-        const response = await fetch(`${API_BASE_URL}/group-messages`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ content })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            alert('خطا: ' + (data.error || 'مشکل در ارسال'));
-            return;
-        }
-        input.value = '';
-    } catch (error) {
-        console.error('❌ خطا در ارسال:', error);
-        alert('خطا در ارتباط با سرور');
-    } finally {
-        if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = '1'; }
     }
 }
 
@@ -591,7 +422,6 @@ logoutBtn.addEventListener('click', () => {
     currentToken = null;
     currentUserId = null;
     currentUserData = null;
-    chatInitialized = false;
     showPage('landingPage');
 });
 
@@ -656,8 +486,8 @@ document.getElementById('consultForm')?.addEventListener('submit', async (e) => 
 document.addEventListener('DOMContentLoaded', function() {
     const lastPage = localStorage.getItem('lastPage');
     if (currentToken && currentUserId) {
-        if (lastPage === 'chatPage') {
-            showPage('chatPage');
+        if (lastPage && ['myIdeasPage', 'accountPage', 'aboutPage'].includes(lastPage)) {
+            showPage(lastPage);
         } else {
             showPage('dashboardPage');
         }
