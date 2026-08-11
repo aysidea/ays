@@ -1145,7 +1145,7 @@ body {
 }
 
 /* ============================================================
-   صفحه گفتگو (چت) - نسخه نهایی
+   صفحه گفتگو (چت) - نسخه نهایی با چسبیدن به کیبورد
    ============================================================ */
 
 .chat-overlay {
@@ -1285,14 +1285,14 @@ body {
 .chat-wrapper {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100dvh;
     max-width: 700px;
     margin: 0 auto;
     width: 100%;
     padding: 0 15px;
     position: relative;
     padding-top: 70px;
-    /* padding-bottom توسط جاوااسکریپت تنظیم می‌شود */
+    padding-bottom: 90px;
 }
 
 .chat-divider-line {
@@ -1414,7 +1414,6 @@ body {
     background: var(--bg-body);
     border-top: 1px solid var(--border-light);
     z-index: 100;
-    transition: bottom 0.1s ease;
     max-width: 700px;
     margin: 0 auto;
 }
@@ -1549,6 +1548,7 @@ body {
     .chat-wrapper {
         padding: 0 10px;
         padding-top: 70px;
+        padding-bottom: 80px;
     }
     .chat-message {
         max-width: 85%;
@@ -1622,6 +1622,8 @@ body {
     .chat-wrapper {
         padding: 0 8px;
         padding-top: 60px;
+        padding-bottom: 70px;
+        height: 100dvh;
     }
     .chat-message {
         max-width: 90%;
