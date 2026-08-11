@@ -9,7 +9,6 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const morgan = require('morgan');
 const winston = require('winston');
-const Pusher = require('pusher');
 const { sendToTelegram, sendConsultationToTelegram } = require('./utils/telegram');
 const { sendAlertToTelegram } = require('./utils/alert');
 require('dotenv').config();
@@ -17,14 +16,6 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
-
-const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID,
-    key: process.env.PUSHER_KEY,
-    secret: process.env.PUSHER_SECRET,
-    cluster: process.env.PUSHER_CLUSTER,
-    useTLS: true
-});
 
 const logger = winston.createLogger({
     level: 'info',
@@ -111,15 +102,7 @@ db.serialize(() => {
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     `);
-    db.run(`
-        CREATE TABLE IF NOT EXISTS group_messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            content TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    `);
+    // ===== جدول group_messages حذف شد =====
 });
 
 function sanitizeInput(input) {
@@ -167,19 +150,6 @@ function getCategoryText(value) {
     return map[value] || value || 'متفرقه';
 }
 
-function cleanOldMessages() {
-    db.run(
-        `DELETE FROM group_messages 
-         WHERE created_at < datetime('now', '-14 days')`,
-        (err) => {
-            if (err) console.error('خطا در پاک کردن پیام‌های قدیمی:', err);
-            else console.log('پیام‌های قدیمی پاک شدند.');
-        }
-    );
-}
-setInterval(cleanOldMessages, 12 * 60 * 60 * 1000);
-cleanOldMessages();
-
 function detectAttack(req, res, next) {
     const patterns = [/<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
         /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i, /--/, /;/, /\/\*/, /\*\//];
@@ -219,6 +189,9 @@ function authenticateToken(req, res, next) {
     });
 }
 
+// ============================================================
+// مسیرهای احراز هویت (بدون تغییر)
+// ============================================================
 app.post('/api/register', async (req, res) => {
     const { email, name, password } = req.body;
     if (!email || !name || !password) return res.status(400).json({ error: 'همه فیلدها الزامی هستند.' });
@@ -285,6 +258,9 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
     });
 });
 
+// ============================================================
+// مسیرهای ایده (بدون تغییر)
+// ============================================================
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { content, category, innovation, market, stage } = req.body;
@@ -378,6 +354,9 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
     );
 });
 
+// ============================================================
+// مسیرهای مشاوره (بدون تغییر)
+// ============================================================
 app.post('/api/consultation', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { phone, topic, description } = req.body;
@@ -409,100 +388,9 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
     });
 });
 
-app.get('/api/group-messages', authenticateToken, (req, res) => {
-    db.all(
-        `SELECT gm.id, gm.content, gm.created_at, u.name as user_name 
-         FROM group_messages gm
-         JOIN users u ON gm.user_id = u.id
-         ORDER BY gm.created_at DESC LIMIT 50`,
-        (err, messages) => {
-            if (err) {
-                logger.error('خطا در دریافت پیام‌ها:', err);
-                return res.status(500).json({ error: 'خطا در دریافت پیام‌ها' });
-            }
-            res.json(messages.reverse());
-        }
-    );
-});
-
-app.post('/api/group-messages', authenticateToken, (req, res) => {
-    const userId = req.user.id;
-    const { content } = req.body;
-
-    if (!content || content.trim().length < 1) {
-        return res.status(400).json({ error: 'متن پیام حداقل ۱ کاراکتر باشد.' });
-    }
-
-    const sanitizedContent = sanitizeInput(content);
-
-    db.get('SELECT name, email FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err || !user) {
-            logger.error('خطا در دریافت اطلاعات کاربر:', err);
-            return res.status(500).json({ error: 'خطا در دریافت اطلاعات کاربر' });
-        }
-
-        db.run(
-            'INSERT INTO group_messages (user_id, content) VALUES (?, ?)',
-            [userId, sanitizedContent],
-            function(err) {
-                if (err) {
-                    logger.error('خطا در ذخیره پیام:', err);
-                    return res.status(500).json({ error: 'خطا در ذخیره پیام' });
-                }
-
-                const telegramMessage = `
-💬 پیام جدید در گفتگو!
-
-👤 نام: ${user.name}
-📧 ایمیل: ${user.email}
-💬 متن پیام:
-${sanitizedContent}
-
-📅 تاریخ: ${new Date().toLocaleString('fa-IR')}
-                `;
-                sendToTelegram(user.name, user.email, telegramMessage);
-
-                pusher.trigger('chat-channel', 'new-message', {
-                    id: this.lastID,
-                    user_id: userId,
-                    user_name: user.name,
-                    content: sanitizedContent,
-                    created_at: new Date().toISOString()
-                });
-
-                res.status(201).json({
-                    id: this.lastID,
-                    user_id: userId,
-                    content: sanitizedContent,
-                    created_at: new Date().toISOString()
-                });
-            }
-        );
-    });
-});
-
-app.post('/api/pusher-auth', authenticateToken, (req, res) => {
-    const socketId = req.body.socket_id;
-    const channel = req.body.channel_name;
-    const presenceData = {
-        user_id: req.user.id,
-        user_info: { name: req.user.name }
-    };
-    const auth = pusher.authorizeChannel(socketId, channel, presenceData);
-    res.send(auth);
-});
-
 // ============================================================
-// ===== دریافت زمان سرور (برای نمایش ساعت دقیق) =====
+// مسیرهای عمومی (بدون تغییر)
 // ============================================================
-app.get('/api/time', (req, res) => {
-    const now = new Date();
-    res.json({
-        time: now.toISOString(),
-        timestamp: now.getTime()
-    });
-});
-
 app.get('/idea/:id', (req, res) => {
     const ideaId = req.params.id;
     
@@ -679,6 +567,14 @@ app.get('/idea/:id', (req, res) => {
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/time', (req, res) => {
+    const now = new Date();
+    res.json({
+        time: now.toISOString(),
+        timestamp: now.getTime()
+    });
 });
 
 app.use((err, req, res, next) => {
