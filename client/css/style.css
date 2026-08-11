@@ -663,69 +663,69 @@ body {
     }
 }
 
-/* ===== کلاژ‌ها (۱۲ عددی با متن زیر هر کدام) ===== */
-.collage-section {
+/* ===== کلاژ (نسخه قبلی - ۴ عددی) ===== */
+.collage-modern {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-auto-rows: 180px;
+    gap: 14px;
     margin-top: 30px;
 }
 
-.collage-item {
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-card);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
+.collage-item-large {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
 }
 
-.collage-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+.collage-item-medium {
+    grid-column: 2 / 4;
+    grid-row: 2 / 3;
+}
+
+.collage-item-small {
+    grid-column: span 1;
+    grid-row: span 1;
 }
 
 .collage-image {
     width: 100%;
-    height: 180px;
+    height: 100%;
     background-size: cover;
     background-position: center;
+    border-radius: 16px;
     position: relative;
-    flex-shrink: 0;
+    overflow: hidden;
+    transition: var(--transition);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+.collage-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
 }
 
 .collage-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(230,126,34,0.2));
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.45), rgba(230, 126, 34, 0.15));
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     color: #fff;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
     font-weight: 700;
-    font-size: 1.1rem;
-    padding: 10px;
+    font-size: 1.15rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    padding: 12px;
     text-align: center;
+    font-family: 'AradVF', sans-serif;
 }
 
 .collage-overlay span:last-child {
     font-size: 0.8rem;
     font-weight: 400;
     opacity: 0.9;
-}
-
-.collage-text-below {
-    padding: 12px 16px;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: var(--text-dark);
-    text-align: center;
-    font-family: 'AradVF', 'Tahoma', sans-serif;
-    border-top: 1px solid var(--border-light);
-    background: var(--bg-card);
 }
 
 .my-ideas-wrapper {
@@ -1148,9 +1148,21 @@ body {
 }
 
 @media (max-width: 992px) {
-    .collage-section {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
+    .collage-modern {
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: 160px;
+    }
+    .collage-item-large {
+        grid-column: 1 / 3;
+        grid-row: 1 / 2;
+    }
+    .collage-item-medium {
+        grid-column: 1 / 3;
+        grid-row: 3 / 4;
+    }
+    .collage-item-small {
+        grid-column: span 1;
+        grid-row: span 1;
     }
 }
 
@@ -1173,12 +1185,15 @@ body {
     .register-logo {
         font-size: 36px;
     }
-    .collage-section {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+    .collage-modern {
+        grid-template-columns: 1fr;
+        grid-auto-rows: 180px;
     }
-    .collage-image {
-        height: 160px;
+    .collage-item-large,
+    .collage-item-medium,
+    .collage-item-small {
+        grid-column: 1 / 2;
+        grid-row: auto;
     }
     .about-stats {
         flex-direction: column;
@@ -1231,16 +1246,9 @@ body {
     .idea-card-modern {
         padding: 12px 14px;
     }
-    .collage-section {
+    .collage-modern {
         grid-template-columns: 1fr;
-        gap: 12px;
-    }
-    .collage-image {
-        height: 150px;
-    }
-    .collage-text-below {
-        font-size: 0.85rem;
-        padding: 10px 14px;
+        grid-auto-rows: 160px;
     }
     .criteria-options.vertical label {
         font-size: 0.85rem;
