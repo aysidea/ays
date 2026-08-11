@@ -345,41 +345,6 @@ function initChat() {
         console.error('❌ خطا در تنظیم Pusher:', error);
         setTimeout(() => { chatInitialized = false; initChat(); }, 5000);
     }
-
-    // ============================================================
-    // تنظیم viewport برای کیبورد (چسباندن کادر ورودی)
-    // ============================================================
-    if ('visualViewport' in window) {
-        const viewport = window.visualViewport;
-        const inputFixed = document.getElementById('chatInputFixed');
-        const chatWrapper = document.querySelector('.chat-wrapper');
-
-        function adjustChatInput() {
-            if (!inputFixed) return;
-            if (!chatWrapper) return;
-
-            const heightDiff = window.innerHeight - viewport.height;
-            const navHeight = bottomNav ? bottomNav.offsetHeight : 70;
-            const inputHeight = inputFixed.offsetHeight || 70;
-
-            if (heightDiff > 50) {
-                // کیبورد باز است - کادر ورودی را بالای کیبورد قرار بده
-                inputFixed.style.bottom = heightDiff + 'px';
-                // padding-bottom به chat-wrapper اضافه کن تا پیام‌ها زیر input نروند
-                chatWrapper.style.paddingBottom = (heightDiff + inputHeight + 10) + 'px';
-            } else {
-                // کیبورد بسته است - کادر ورودی را بالای منو قرار بده
-                inputFixed.style.bottom = navHeight + 'px';
-                chatWrapper.style.paddingBottom = (navHeight + inputHeight + 10) + 'px';
-            }
-        }
-
-        viewport.addEventListener('resize', adjustChatInput);
-        // اجرای اولیه بعد از لود کامل
-        setTimeout(adjustChatInput, 500);
-        // همچنین بعد از هر تغییر احتمالی
-        window.addEventListener('load', adjustChatInput);
-    }
 }
 
 async function loadChatMessages() {
