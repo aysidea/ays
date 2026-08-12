@@ -11,14 +11,12 @@ const morgan = require('morgan');
 const winston = require('winston');
 const { sendToTelegram, sendConsultationToTelegram } = require('./utils/telegram');
 const { sendAlertToTelegram } = require('./utils/alert');
-const { sendWelcomeEmail } = require('./utils/email');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ays-super-secret-key-change-in-production';
 
-// ===== لاگر =====
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -33,7 +31,6 @@ if (process.env.NODE_ENV !== 'production') {
     }));
 }
 
-// ===== Middlewareها =====
 app.use(helmet());
 app.use(morgan('combined'));
 
@@ -64,7 +61,6 @@ const authLimiter = rateLimit({
 app.use('/api/register', authLimiter);
 app.use('/api/login', authLimiter);
 
-// ===== دیتابیس =====
 const dbPath = path.join(__dirname, 'database', 'ays.db');
 const db = new sqlite3.Database(dbPath);
 
@@ -108,7 +104,6 @@ db.serialize(() => {
     `);
 });
 
-// ===== توابع کمکی =====
 function sanitizeInput(input) {
     if (typeof input !== 'string') return input;
     return validator.escape(input.trim());
@@ -154,7 +149,6 @@ function getCategoryText(value) {
     return map[value] || value || 'متفرقه';
 }
 
-// ===== تشخیص حملات =====
 function detectAttack(req, res, next) {
     const patterns = [/<script/i, /javascript:/i, /alert\(/i, /onerror=/i, /onclick=/i,
         /SELECT.*FROM/i, /DROP.*TABLE/i, /INSERT.*INTO/i, /UNION.*SELECT/i, /--/, /;/, /\/\*/, /\*\//];
@@ -180,7 +174,6 @@ function detectAttack(req, res, next) {
 }
 app.use(detectAttack);
 
-// ===== احراز هویت JWT =====
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -194,10 +187,6 @@ function authenticateToken(req, res, next) {
         next();
     });
 }
-
-// ============================================================
-// مسیرهای احراز هویت
-// ============================================================
 
 app.post('/api/register', async (req, res) => {
     const { email, name, password } = req.body;
@@ -244,9 +233,6 @@ app.post('/api/register', async (req, res) => {
                         JWT_SECRET,
                         { expiresIn: '7d' }
                     );
-
-                    // ===== ارسال ایمیل خوش‌آمدگویی (غیرهمگام) =====
-                    sendWelcomeEmail(sanitizedEmail, sanitizedName);
 
                     res.status(201).json({
                         id: this.lastID,
@@ -353,10 +339,6 @@ app.get('/api/user/:id', authenticateToken, (req, res) => {
     );
 });
 
-// ============================================================
-// مسیرهای ایده
-// ============================================================
-
 app.post('/api/ideas', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { content, category, innovation, market, stage } = req.body;
@@ -450,10 +432,6 @@ app.get('/api/ideas', authenticateToken, (req, res) => {
     );
 });
 
-// ============================================================
-// مسیرهای مشاوره
-// ============================================================
-
 app.post('/api/consultation', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { phone, topic, description } = req.body;
@@ -484,10 +462,6 @@ app.post('/api/consultation', authenticateToken, (req, res) => {
         );
     });
 });
-
-// ============================================================
-// مسیرهای عمومی
-// ============================================================
 
 app.get('/idea/:id', (req, res) => {
     const ideaId = req.params.id;
@@ -675,10 +649,6 @@ app.get('/api/time', (req, res) => {
     });
 });
 
-// ============================================================
-// مدیریت خطاها
-// ============================================================
-
 app.use((err, req, res, next) => {
     const statusCode = err.status || 500;
     const message = err.message || 'خطای داخلی سرور';
@@ -693,10 +663,6 @@ app.use((err, req, res, next) => {
     }
     res.status(statusCode).json({ error: message });
 });
-
-// ============================================================
-// راه‌اندازی سرور
-// ============================================================
 
 app.listen(PORT, () => {
     console.log(`🚀 سرور روی پورت ${PORT} در حال اجرا است.`);
